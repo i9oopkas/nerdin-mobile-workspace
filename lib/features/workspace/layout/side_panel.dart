@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nerdin_mobile_workspace/features/workspace/layout/file_explorer.dart';
 import 'package:nerdin_mobile_workspace/features/workspace/layout/workspace_providers.dart';
+import 'package:nerdin_mobile_workspace/features/workspace/layout/file_search.dart';
 
 /// The collapsible side panel that shows context-appropriate content
 /// based on the selected [SidePanelTab].
@@ -78,11 +79,7 @@ class SidePanel extends ConsumerWidget {
       case SidePanelTab.explorer:
         return FileExplorer(onFileTap: onFileTap);
       case SidePanelTab.search:
-        return _PlaceholderPanel(
-          icon: Icons.search,
-          message: 'Search\n(coming in Phase 3)',
-          colorScheme: colorScheme,
-        );
+        return FileSearch(onFileTap: onFileTap);
       case SidePanelTab.git:
         return _PlaceholderPanel(
           icon: Icons.code_branch,
