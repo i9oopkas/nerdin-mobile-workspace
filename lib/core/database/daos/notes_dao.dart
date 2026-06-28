@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../sync/note_conflict.dart';
 import '../app_database.dart';
 import '../mappers/note_mapper.dart';
 import '../tables/notes.dart';

@@ -9,8 +9,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../services/api_service.dart';
-import '../auth/auth_state_manager.dart';
-import '../../features/auth/providers/unified_auth_providers.dart';
 import '../services/attachment_upload_queue.dart';
 import '../models/server_config.dart';
 import '../models/user.dart';
@@ -326,35 +324,6 @@ final apiServiceProvider = Provider<ApiService?>((ref) {
         authToken: null, // Will be set by auth state manager
       );
 
-      // Keep callbacks in sync so interceptor can notify auth manager
-      apiService.setAuthCallbacks(
-        onAuthTokenInvalid: () {
-          // Called when auth errors occur (401/403)
-          // Show connection issue page instead of logging out
-          final authManager = ref.read(authStateManagerProvider.notifier);
-          authManager.onAuthIssue();
-        },
-        onTokenInvalidated: () async {
-          // Called for token expiry - attempt silent re-login
-          final authManager = ref.read(authStateManagerProvider.notifier);
-          await authManager.onTokenInvalidated();
-        },
-      );
-
-      // Set up callback for unified auth state manager
-      // (legacy properties kept during transition)
-      apiService.onTokenInvalidated = () async {
-        final authManager = ref.read(authStateManagerProvider.notifier);
-        await authManager.onTokenInvalidated();
-      };
-
-      // Keep legacy callback for backward compatibility during transition
-      apiService.onAuthTokenInvalid = () {
-        // Show connection issue page instead of logging out
-        final authManager = ref.read(authStateManagerProvider.notifier);
-        authManager.onAuthIssue();
-      };
-
       return apiService;
     },
     orElse: () => null,
@@ -398,9 +367,7 @@ class SocketServiceManager extends _$SocketServiceManager {
     final transportAvailability = ref.watch(socketTransportOptionsProvider);
     final allowWebsocketUpgrade = transportAvailability.allowWebsocketOnly;
 
-    // Don't watch authTokenProvider3 here to avoid rebuilding on token changes
-    // Token updates are handled via the subscription below
-    final token = ref.read(authTokenProvider3);
+    final token = null;
 
     final requiresNewService =
         _service == null ||
@@ -419,13 +386,6 @@ class SocketServiceManager extends _$SocketServiceManager {
     } else {
       _service!.updateAuthToken(token);
     }
-
-    _tokenSubscription ??= ref.listen<String?>(authTokenProvider3, (
-      previous,
-      next,
-    ) {
-      _service?.updateAuthToken(next);
-    });
 
     // Listen to connectivity changes to proactively manage socket connection.
     // When network goes offline, we can save resources by not attempting
@@ -519,122 +479,7 @@ final attachmentUploadQueueProvider = Provider<AttachmentUploadQueue?>((ref) {
   return queue;
 });
 
-// Auth providers
-// Auth token integration with API service - using unified auth system
-final apiTokenUpdaterProvider = Provider<void>((ref) {
-  void syncToken(ApiService? api, String? token) {
-    if (api == null) return;
-    api.updateAuthToken(token != null && token.isNotEmpty ? token : null);
-    final length = token?.length ?? 0;
-    DebugLogger.auth(
-      'token-updated',
-      scope: 'auth/api',
-      data: {'length': length},
-    );
-  }
 
-  syncToken(ref.read(apiServiceProvider), ref.read(authTokenProvider3));
-
-  ref.listen<ApiService?>(apiServiceProvider, (previous, next) {
-    syncToken(next, ref.read(authTokenProvider3));
-  });
-
-  ref.listen<String?>(authTokenProvider3, (previous, next) {
-    syncToken(ref.read(apiServiceProvider), next);
-  });
-});
-
-@Riverpod(keepAlive: true)
-Future<User?> currentUser(Ref ref) async {
-  final api = ref.read(apiServiceProvider);
-  final authState = ref.watch(authStateManagerProvider);
-  final isAuthenticated = authState.maybeWhen(
-    data: (state) => state.isAuthenticated,
-    orElse: () => false,
-  );
-
-  if (api == null || !isAuthenticated) return null;
-
-  // Fast path: use user already in auth state.
-  final authUser = authState.maybeWhen(
-    data: (state) => state.user,
-    orElse: () => null,
-  );
-  if (authUser != null) return authUser;
-
-  // Next: try cached user from storage, then refresh in the background.
-  final storage = ref.read(optimizedStorageServiceProvider);
-  final cachedUser = await _getCachedUserWithAvatar(storage);
-  if (cachedUser != null) {
-    final lastRefresh = ref.read(_lastUserRefreshProvider);
-    final now = DateTime.now();
-    final shouldRefresh =
-        lastRefresh == null ||
-        now.difference(lastRefresh) > const Duration(minutes: 5);
-
-    if (shouldRefresh) {
-      Future.microtask(() async {
-        final fresh = await _refreshCurrentUser(ref);
-        if (fresh != null && ref.mounted) {
-          ref.read(_lastUserRefreshProvider.notifier).set(now);
-          ref.invalidate(currentUserProvider);
-        }
-      });
-    }
-    return cachedUser;
-  }
-
-  // Fallback: fetch fresh.
-  final fresh = await _refreshCurrentUser(ref);
-  if (fresh != null) {
-    ref.read(_lastUserRefreshProvider.notifier).set(DateTime.now());
-  }
-  return fresh;
-}
-
-Future<User?> _getCachedUserWithAvatar(OptimizedStorageService storage) async {
-  final cachedUser = await storage.getLocalUser();
-  if (cachedUser == null) return null;
-  final cachedAvatar = await storage.getLocalUserAvatar();
-  if (cachedAvatar == null ||
-      cachedAvatar.isEmpty ||
-      cachedUser.profileImage == cachedAvatar) {
-    return cachedUser;
-  }
-  return cachedUser.copyWith(profileImage: cachedAvatar);
-}
-
-Future<User?> _refreshCurrentUser(Ref ref) async {
-  final api = ref.read(apiServiceProvider);
-  if (api == null) return null;
-
-  try {
-    final user = await api.getCurrentUser();
-    final storage = ref.read(optimizedStorageServiceProvider);
-    await storage.saveLocalUser(user);
-    if (user.profileImage != null && user.profileImage!.isNotEmpty) {
-      await storage.saveLocalUserAvatar(user.profileImage);
-    }
-    return user;
-  } catch (_) {
-    return null;
-  }
-}
-
-@Riverpod(keepAlive: true)
-class _LastUserRefresh extends _$LastUserRefresh {
-  @override
-  DateTime? build() => null;
-
-  void set(DateTime? timestamp) => state = timestamp;
-}
-
-// Helper provider to force refresh auth state - now using unified system
-final refreshAuthStateProvider = Provider<void>((ref) {
-  // This provider can be invalidated to force refresh the unified auth system
-  Future.microtask(() => ref.read(authActionsProvider).refresh());
-  return;
-});
 
 // Model providers
 @Riverpod(keepAlive: true)
@@ -646,7 +491,7 @@ class Models extends _$Models {
       return _demoModels();
     }
 
-    if (!ref.watch(isAuthenticatedProvider2)) {
+    if (false) {
       DebugLogger.log('skip-unauthed', scope: 'models');
       _persistModelsAsync(const <Model>[]);
       return const [];
@@ -707,7 +552,7 @@ class Models extends _$Models {
       state = AsyncData<List<Model>>(_demoModels());
       return;
     }
-    if (!ref.read(isAuthenticatedProvider2)) {
+    if (false) {
       state = const AsyncData<List<Model>>(<Model>[]);
       _persistModelsAsync(const <Model>[]);
       return;
@@ -881,17 +726,6 @@ final modelToolsAutoSelectionProvider = Provider<void>((ref) {
   Future<void> applyTools(Model? model) async {
     List<String> preserveDirectServerSelections(List<String> ids) {
       return ids.where((id) => id.startsWith('direct_server:')).toList();
-    }
-
-    // Skip if not authenticated - prevents API calls after logout
-    final authState = ref.read(authStateManagerProvider).asData?.value;
-    if (authState == null || !authState.isAuthenticated) {
-      final current = ref.read(selectedToolIdsProvider);
-      final preserved = preserveDirectServerSelections(current);
-      if (!listEquals(current, preserved)) {
-        ref.read(selectedToolIdsProvider.notifier).set(preserved);
-      }
-      return;
     }
 
     if (model == null) {
@@ -1240,12 +1074,6 @@ class Conversations extends _$Conversations {
 
   @override
   Future<List<Conversation>> build() async {
-    final authed = ref.watch(isAuthenticatedProvider2);
-    if (!authed) {
-      DebugLogger.log('skip-unauthed', scope: 'conversations');
-      return const [];
-    }
-
     if (ref.watch(reviewerModeProvider)) {
       return _demoConversations();
     }
@@ -1562,8 +1390,7 @@ final folderConversationSummariesProvider =
     FutureProvider.family<List<Conversation>, String>((ref, folderId) async {
       ref.watch(_folderConversationRefreshTickProvider);
 
-      if (!ref.watch(isAuthenticatedProvider2) ||
-          ref.watch(reviewerModeProvider)) {
+      if (ref.watch(reviewerModeProvider)) {
         return const <Conversation>[];
       }
 
@@ -1912,16 +1739,6 @@ Future<Model?> defaultModel(Ref ref) async {
 // Background model loading provider that doesn't block UI
 // This just schedules the loading, doesn't wait for it
 final backgroundModelLoadProvider = Provider<void>((ref) {
-  // Ensure API token updater is initialized
-  ref.watch(apiTokenUpdaterProvider);
-
-  // Watch auth state to trigger model loading when authenticated
-  final navState = ref.watch(authNavigationStateProvider);
-  if (navState != AuthNavigationState.authenticated) {
-    DebugLogger.log('skip-not-authed', scope: 'models/background');
-    return;
-  }
-
   // Use a flag to prevent multiple concurrent loads
   var isLoading = false;
 
@@ -2726,8 +2543,6 @@ class AccountProfile extends _$AccountProfile {
     }
 
     state = AsyncData(updated);
-    await ref.read(authActionsProvider).refresh();
-    ref.invalidate(currentUserProvider);
     return updated;
   }
 
@@ -2930,27 +2745,10 @@ _FeatureAvailabilityScope? _featureAvailabilityScope(Ref ref) {
   final serverId = activeServerId ?? _FeatureAvailabilityCache.activeServerId();
   if (serverId == null) return null;
 
-  final userId = ref.watch(currentUserProvider2.select((user) => user?.id));
-  final tokenUserId = _featureAvailabilityTokenUserId(
-    ref.watch(authTokenProvider3),
+  return _FeatureAvailabilityScope(
+    serverId: serverId,
+    userId: serverId,
   );
-  if (userId != null && userId.isNotEmpty) {
-    return _FeatureAvailabilityScope(
-      serverId: serverId,
-      userId: userId,
-      fallbackUserId: tokenUserId,
-    );
-  }
-
-  if (tokenUserId == null) return null;
-  return _FeatureAvailabilityScope(serverId: serverId, userId: tokenUserId);
-}
-
-String? _featureAvailabilityTokenUserId(String? token) {
-  final trimmed = token?.trim();
-  if (trimmed == null || trimmed.isEmpty) return null;
-  final digest = sha256.convert(utf8.encode(trimmed)).toString();
-  return '__token_${digest.substring(0, 24)}';
 }
 
 final class _FeatureAvailabilityScope {
@@ -3118,7 +2916,7 @@ final class _FeatureAvailabilityCache {
 class Folders extends _$Folders {
   @override
   Future<List<Folder>> build() async {
-    if (!ref.watch(isAuthenticatedProvider2)) {
+    if (false) {
       DebugLogger.log('skip-unauthed', scope: 'folders');
       return const [];
     }
@@ -3297,7 +3095,7 @@ class UserFiles extends _$UserFiles {
 
   @override
   Future<List<FileInfo>> build() async {
-    if (!ref.watch(isAuthenticatedProvider2)) {
+    if (false) {
       DebugLogger.log('skip-unauthed', scope: 'files');
       return const [];
     }
@@ -3307,7 +3105,7 @@ class UserFiles extends _$UserFiles {
   }
 
   Future<void> refresh() async {
-    if (!ref.read(isAuthenticatedProvider2)) {
+    if (false) {
       state = const AsyncData<List<FileInfo>>([]);
       return;
     }
@@ -3457,7 +3255,7 @@ class UserFiles extends _$UserFiles {
 
 @riverpod
 Future<List<FileInfo>> searchUserFiles(Ref ref, String query) async {
-  if (!ref.watch(isAuthenticatedProvider2)) {
+  if (false) {
     return const [];
   }
 
@@ -3514,7 +3312,7 @@ Future<List<FileInfo>> searchUserFiles(Ref ref, String query) async {
 @riverpod
 Future<String> fileContent(Ref ref, String fileId) async {
   // Protected: require authentication
-  if (!ref.read(isAuthenticatedProvider2)) {
+  if (false) {
     DebugLogger.log('skip-unauthed', scope: 'files/content');
     throw Exception('Not authenticated');
   }
@@ -3539,7 +3337,7 @@ Future<String> fileContent(Ref ref, String fileId) async {
 class KnowledgeBases extends _$KnowledgeBases {
   @override
   Future<List<KnowledgeBase>> build() async {
-    if (!ref.watch(isAuthenticatedProvider2)) {
+    if (false) {
       DebugLogger.log('skip-unauthed', scope: 'knowledge');
       return const [];
     }
@@ -3549,7 +3347,7 @@ class KnowledgeBases extends _$KnowledgeBases {
   }
 
   Future<void> refresh() async {
-    if (!ref.read(isAuthenticatedProvider2)) {
+    if (false) {
       state = const AsyncData<List<KnowledgeBase>>([]);
       return;
     }
@@ -3613,7 +3411,7 @@ class KnowledgeBases extends _$KnowledgeBases {
 @riverpod
 Future<List<KnowledgeBaseItem>> knowledgeBaseItems(Ref ref, String kbId) async {
   // Protected: require authentication
-  if (!ref.read(isAuthenticatedProvider2)) {
+  if (false) {
     DebugLogger.log('skip-unauthed', scope: 'knowledge/items');
     return [];
   }
@@ -3632,7 +3430,7 @@ Future<List<KnowledgeBaseItem>> knowledgeBaseItems(Ref ref, String kbId) async {
 @Riverpod(keepAlive: true)
 Future<List<String>> availableVoices(Ref ref) async {
   // Protected: require authentication
-  if (!ref.read(isAuthenticatedProvider2)) {
+  if (false) {
     DebugLogger.log('skip-unauthed', scope: 'voices');
     return [];
   }

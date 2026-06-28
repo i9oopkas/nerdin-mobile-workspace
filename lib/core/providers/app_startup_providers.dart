@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../providers/app_providers.dart';
-import '../../features/auth/providers/unified_auth_providers.dart';
 import '../services/navigation_service.dart';
 import '../services/app_intents_service.dart';
 import '../services/carplay_service.dart';
@@ -1085,7 +1084,7 @@ final silentLoginCoordinatorProvider = Provider<void>((ref) {
         final hasCreds = await ref.read(hasSavedCredentialsProvider2.future);
         if (hasCreds) {
           ref.read(_silentLoginAttemptedProvider.notifier).markAttempted();
-          await ref.read(authActionsProvider).silentLogin();
+          // await ref.read(authActionsProvider).silentLogin();
         }
       } catch (_) {
         // Ignore silent login errors; app will proceed to manual login

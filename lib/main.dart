@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
-import 'package:flutter_driver/driver_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:pdfrx/pdfrx.dart';
@@ -23,9 +22,6 @@ import 'core/services/carplay_service.dart';
 import 'core/services/settings_service.dart';
 import 'core/utils/tts_voice_utils.dart';
 import 'core/utils/current_localizations.dart';
-import 'features/auth/providers/unified_auth_providers.dart';
-import 'features/chat/providers/text_to_speech_provider.dart';
-import 'features/chat/providers/chat_providers.dart' show restoreDefaultModel;
 import 'core/utils/debug_logger.dart';
 import 'core/utils/system_ui_style.dart';
 
@@ -33,11 +29,6 @@ import 'core/services/quick_actions_service.dart';
 import 'core/providers/app_startup_providers.dart';
 import 'package:nerdin_mobile_workspace/features/agent/permissions/permission_providers.dart';
 import 'package:nerdin_mobile_workspace/features/agent/permissions/permission_dialog_handler.dart';
-
-const bool _enableFlutterDriverExtension = bool.fromEnvironment(
-  'ENABLE_FLUTTER_DRIVER_EXTENSION',
-  defaultValue: false,
-);
 
 Locale? _localeFromNativeTag(String code) {
   final normalized = code.replaceAll('_', '-');
@@ -67,10 +58,6 @@ Locale? _localeFromNativeTag(String code) {
 developer.TimelineTask? _startupTimeline;
 
 void main() {
-  if (_enableFlutterDriverExtension) {
-    enableFlutterDriverExtension();
-  }
-
   runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
@@ -243,7 +230,7 @@ class _NerdinAppState extends ConsumerState<NerdinApp> {
   void _handleNativeSheetEvent(NativeSheetEvent event) {
     switch (event) {
       case NativeSheetLogoutRequested():
-        unawaited(ref.read(authActionsProvider).logout());
+        // auth removed
       case NativeSheetDismissed():
         _nativeSheetDraftValues.clear();
         break;

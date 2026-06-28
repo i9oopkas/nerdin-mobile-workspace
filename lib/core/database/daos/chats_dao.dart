@@ -4,7 +4,6 @@ import 'dart:math' as math;
 import 'package:drift/drift.dart';
 
 import '../../utils/debug_logger.dart';
-import '../../sync/chat_merger.dart';
 import '../app_database.dart';
 import '../mappers/chat_blob_mapper.dart';
 import '../mappers/conversation_assembler.dart';
