@@ -55,7 +55,7 @@ class CitationBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final badgeTextStyle = _badgeLabelTextStyle(context, theme.textSecondary);
 
     // Check if index is valid
@@ -140,7 +140,7 @@ class CitationBadgeGroup extends StatelessWidget {
       );
     }
 
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final badgeTextStyle = _badgeLabelTextStyle(context, theme.textSecondary);
     final countTextStyle = _badgeCountTextStyle(context, theme.textPrimary);
 

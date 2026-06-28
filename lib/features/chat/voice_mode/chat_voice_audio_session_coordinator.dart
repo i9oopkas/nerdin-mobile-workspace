@@ -12,7 +12,7 @@ class ChatVoiceAudioSessionCoordinator {
     milliseconds: 160,
   );
   static const MethodChannel _iosVoiceAudioRouteChannel = MethodChannel(
-    'app.cogwheel.conduit/voice_audio_route',
+    'com.nerdin.mobile/voice_audio_route',
   );
 
   AudioSession? _session;

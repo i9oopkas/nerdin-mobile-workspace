@@ -16,8 +16,8 @@ import '../../../core/utils/debug_logger.dart';
 import '../../../core/widgets/error_boundary.dart';
 import '../../../shared/theme/theme_extensions.dart';
 import '../../../shared/widgets/adaptive_route_shell.dart';
-import '../../../shared/widgets/conduit_components.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import '../../../shared/widgets/nerdin_components.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 
 /// Result of proxy authentication.
 class ProxyAuthResult {
@@ -869,7 +869,7 @@ class _ProxyAuthPageState extends ConsumerState<ProxyAuthPage> {
 
     return ErrorBoundary(
       child: AdaptiveRouteShell(
-        backgroundColor: context.conduitTheme.surfaceBackground,
+        backgroundColor: context.nerdinTheme.surfaceBackground,
         extendBodyBehindAppBar: true,
         appBar: AdaptiveAppBar(
           title: l10n?.proxyAuthentication ?? 'Proxy Authentication',
@@ -942,10 +942,10 @@ class _ProxyAuthPageState extends ConsumerState<ProxyAuthPage> {
     return Container(
       padding: const EdgeInsets.all(Spacing.md),
       decoration: BoxDecoration(
-        color: context.conduitTheme.surfaceContainer.withValues(alpha: 0.95),
+        color: context.nerdinTheme.surfaceContainer.withValues(alpha: 0.95),
         border: Border(
           top: BorderSide(
-            color: context.conduitTheme.dividerColor,
+            color: context.nerdinTheme.dividerColor,
             width: BorderWidth.standard,
           ),
         ),
@@ -958,7 +958,7 @@ class _ProxyAuthPageState extends ConsumerState<ProxyAuthPage> {
               Icon(
                 Platform.isIOS ? CupertinoIcons.info : Icons.info_outline,
                 size: IconSize.small,
-                color: context.conduitTheme.iconSecondary,
+                color: context.nerdinTheme.iconSecondary,
               ),
               const SizedBox(width: Spacing.sm),
               Expanded(
@@ -966,8 +966,8 @@ class _ProxyAuthPageState extends ConsumerState<ProxyAuthPage> {
                   l10n?.proxyAuthHelpTextSimple ??
                       'Sign in through your proxy. Once authenticated, '
                           'tap Continue to proceed to sign in.',
-                  style: context.conduitTheme.bodySmall?.copyWith(
-                    color: context.conduitTheme.textSecondary,
+                  style: context.nerdinTheme.bodySmall?.copyWith(
+                    color: context.nerdinTheme.textSecondary,
                   ),
                 ),
               ),
@@ -976,7 +976,7 @@ class _ProxyAuthPageState extends ConsumerState<ProxyAuthPage> {
           const SizedBox(height: Spacing.sm),
           SizedBox(
             width: double.infinity,
-            child: ConduitButton(
+            child: NerdinButton(
               text: l10n?.continueButton ?? 'Continue',
               icon: Platform.isIOS
                   ? CupertinoIcons.arrow_right
@@ -998,8 +998,8 @@ class _ProxyAuthPageState extends ConsumerState<ProxyAuthPage> {
           const SizedBox(height: Spacing.lg),
           Text(
             l10n?.proxyAuthLoading ?? 'Loading authentication page...',
-            style: context.conduitTheme.bodyMedium?.copyWith(
-              color: context.conduitTheme.textSecondary,
+            style: context.nerdinTheme.bodyMedium?.copyWith(
+              color: context.nerdinTheme.textSecondary,
             ),
           ),
         ],
@@ -1010,7 +1010,7 @@ class _ProxyAuthPageState extends ConsumerState<ProxyAuthPage> {
   Widget _buildLoadingOverlay(AppLocalizations? l10n) {
     return Positioned.fill(
       child: Container(
-        color: context.conduitTheme.surfaceBackground.withValues(alpha: 0.8),
+        color: context.nerdinTheme.surfaceBackground.withValues(alpha: 0.8),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -1019,8 +1019,8 @@ class _ProxyAuthPageState extends ConsumerState<ProxyAuthPage> {
               const SizedBox(height: Spacing.lg),
               Text(
                 l10n?.proxyAuthLoading ?? 'Loading...',
-                style: context.conduitTheme.bodyMedium?.copyWith(
-                  color: context.conduitTheme.textSecondary,
+                style: context.nerdinTheme.bodyMedium?.copyWith(
+                  color: context.nerdinTheme.textSecondary,
                 ),
               ),
             ],
@@ -1042,30 +1042,30 @@ class _ProxyAuthPageState extends ConsumerState<ProxyAuthPage> {
                   ? CupertinoIcons.exclamationmark_circle
                   : Icons.error_outline,
               size: IconSize.xxl,
-              color: context.conduitTheme.error,
+              color: context.nerdinTheme.error,
             ),
             const SizedBox(height: Spacing.lg),
             Text(
               l10n?.proxyAuthFailed ?? 'Authentication failed',
-              style: context.conduitTheme.headingMedium,
+              style: context.nerdinTheme.headingMedium,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: Spacing.sm),
             Text(
               _error ?? '',
-              style: context.conduitTheme.bodyMedium?.copyWith(
-                color: context.conduitTheme.textSecondary,
+              style: context.nerdinTheme.bodyMedium?.copyWith(
+                color: context.nerdinTheme.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: Spacing.xl),
-            ConduitButton(
+            NerdinButton(
               text: l10n?.retry ?? 'Retry',
               icon: Platform.isIOS ? CupertinoIcons.refresh : Icons.refresh,
               onPressed: _refresh,
             ),
             const SizedBox(height: Spacing.md),
-            ConduitButton(
+            NerdinButton(
               text: l10n?.back ?? 'Back',
               icon: Platform.isIOS ? CupertinoIcons.back : Icons.arrow_back,
               onPressed: () => context.pop(const ProxyAuthResult.failed()),

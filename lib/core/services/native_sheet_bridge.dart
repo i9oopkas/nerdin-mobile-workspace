@@ -1,26 +1,4 @@
 import 'dart:async';
-import 'dart:io' show Platform;
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
-
-import '../platform/conduit_platform_apis.g.dart';
-import '../utils/debug_logger.dart';
-
-void _logNativeSheetBridgeError(
-  String method,
-  Object error,
-  StackTrace stackTrace, {
-  Map<String, Object?> data = const {},
-}) {
-  DebugLogger.error(
-    'native-sheet-bridge-call-failed',
-    scope: 'native-sheet',
-    error: error,
-    stackTrace: stackTrace,
-    data: {'method': method, ...data},
-  );
-}
 
 class NativeSheetRoutes {
   const NativeSheetRoutes._();
@@ -41,50 +19,23 @@ class NativeSheetRoutes {
   static const notificationSettings = 'notification-settings';
 }
 
-class NativeSheetBridge implements NativeSheetFlutterApi {
-  NativeSheetBridge._() {
-    NativeSheetFlutterApi.setUp(this);
-  }
+// TODO: iOS platform APIs deleted; native sheet bridge stubbed until iOS dir is re-added.
+class NativeSheetBridge {
+  NativeSheetBridge._();
 
   static final NativeSheetBridge instance = NativeSheetBridge._();
 
-  final NativeSheetHostApi _api = NativeSheetHostApi();
   final StreamController<NativeSheetEvent> _events =
       StreamController<NativeSheetEvent>.broadcast();
-  Future<void> Function(String modelId)? _modelPinToggleHandler;
-  Object? _modelPinToggleHandlerOwner;
-
-  @visibleForTesting
-  bool? debugIsIOSOverride;
 
   Stream<NativeSheetEvent> get events => _events.stream;
 
-  bool get _isIOS => debugIsIOSOverride ?? Platform.isIOS;
-
   Future<bool> presentProfileMenu(NativeProfileSheetConfig config) async {
-    if (!_isIOS) return false;
-    try {
-      return await _api.presentProfileMenu(config.toPlatform());
-    } on PlatformException catch (error, stackTrace) {
-      _logNativeSheetBridgeError('presentProfileMenu', error, stackTrace);
-      return false;
-    } catch (error, stackTrace) {
-      _logNativeSheetBridgeError('presentProfileMenu', error, stackTrace);
-      return false;
-    }
+    return false;
   }
 
   Future<bool> dismiss() async {
-    if (!_isIOS) return false;
-    try {
-      return await _api.dismiss();
-    } on PlatformException catch (error, stackTrace) {
-      _logNativeSheetBridgeError('dismiss', error, stackTrace);
-      return false;
-    } catch (error, stackTrace) {
-      _logNativeSheetBridgeError('dismiss', error, stackTrace);
-      return false;
-    }
+    return false;
   }
 
   Future<String?> presentModelSelector({
@@ -97,81 +48,7 @@ class NativeSheetBridge implements NativeSheetFlutterApi {
     Future<void> Function(String modelId)? onTogglePinned,
     bool rethrowErrors = false,
   }) async {
-    if (!_isIOS || models.isEmpty) return null;
-    final previousPinToggleHandler = _modelPinToggleHandler;
-    final previousPinToggleHandlerOwner = _modelPinToggleHandlerOwner;
-    final pinToggleHandlerOwner = Object();
-    var shouldClearPinToggleHandler = false;
-    _modelPinToggleHandler = onTogglePinned;
-    _modelPinToggleHandlerOwner = pinToggleHandlerOwner;
-    try {
-      final result = await _api.presentModelSelector(
-        PlatformNativeSheetModelSelectorRequest(
-          title: title,
-          selectedModelId: selectedModelId,
-          models: models.map((model) => model.toPlatform()).toList(),
-          pinnedModelIds: pinnedModelIds,
-          allowsPinning: onTogglePinned != null,
-          pinTitle: pinTitle,
-          unpinTitle: unpinTitle,
-        ),
-      );
-      shouldClearPinToggleHandler = true;
-      if (result != null) {
-        return result;
-      }
-      return null;
-    } on PlatformException catch (error, stackTrace) {
-      if (!shouldClearPinToggleHandler) {
-        _restorePreviousModelPinToggleHandler(
-          owner: pinToggleHandlerOwner,
-          previousHandler: previousPinToggleHandler,
-          previousOwner: previousPinToggleHandlerOwner,
-        );
-      }
-      _logNativeSheetBridgeError(
-        'presentModelSelector',
-        error,
-        stackTrace,
-        data: {'modelCount': models.length},
-      );
-      if (rethrowErrors) rethrow;
-      return null;
-    } catch (error, stackTrace) {
-      if (!shouldClearPinToggleHandler) {
-        _restorePreviousModelPinToggleHandler(
-          owner: pinToggleHandlerOwner,
-          previousHandler: previousPinToggleHandler,
-          previousOwner: previousPinToggleHandlerOwner,
-        );
-      }
-      _logNativeSheetBridgeError(
-        'presentModelSelector',
-        error,
-        stackTrace,
-        data: {'modelCount': models.length},
-      );
-      if (rethrowErrors) rethrow;
-      return null;
-    } finally {
-      if (shouldClearPinToggleHandler &&
-          identical(_modelPinToggleHandlerOwner, pinToggleHandlerOwner)) {
-        _modelPinToggleHandler = null;
-        _modelPinToggleHandlerOwner = null;
-      }
-    }
-  }
-
-  void _restorePreviousModelPinToggleHandler({
-    required Object owner,
-    required Future<void> Function(String modelId)? previousHandler,
-    required Object? previousOwner,
-  }) {
-    if (!identical(_modelPinToggleHandlerOwner, owner)) {
-      return;
-    }
-    _modelPinToggleHandler = previousHandler;
-    _modelPinToggleHandlerOwner = previousOwner;
+    return null;
   }
 
   Future<String?> presentOptionsSelector({
@@ -182,36 +59,7 @@ class NativeSheetBridge implements NativeSheetFlutterApi {
     bool searchable = true,
     bool rethrowErrors = false,
   }) async {
-    if (!_isIOS || options.isEmpty) return null;
-    try {
-      return await _api.presentOptionsSelector(
-        PlatformNativeSheetOptionsSelectorRequest(
-          title: title,
-          subtitle: subtitle,
-          selectedOptionId: selectedOptionId,
-          searchable: searchable,
-          options: options.map((option) => option.toPlatform()).toList(),
-        ),
-      );
-    } on PlatformException catch (error, stackTrace) {
-      _logNativeSheetBridgeError(
-        'presentOptionsSelector',
-        error,
-        stackTrace,
-        data: {'optionCount': options.length},
-      );
-      if (rethrowErrors) rethrow;
-      return null;
-    } catch (error, stackTrace) {
-      _logNativeSheetBridgeError(
-        'presentOptionsSelector',
-        error,
-        stackTrace,
-        data: {'optionCount': options.length},
-      );
-      if (rethrowErrors) rethrow;
-      return null;
-    }
+    return null;
   }
 
   Future<DateTime?> presentDatePicker({
@@ -223,29 +71,7 @@ class NativeSheetBridge implements NativeSheetFlutterApi {
     String? cancelLabel,
     bool rethrowErrors = false,
   }) async {
-    if (!_isIOS) return null;
-    try {
-      final raw = await _api.presentDatePicker(
-        PlatformNativeSheetDatePickerRequest(
-          title: title,
-          initialDateIso8601: initialDate.toIso8601String(),
-          firstDateIso8601: firstDate.toIso8601String(),
-          lastDateIso8601: lastDate.toIso8601String(),
-          doneLabel: doneLabel,
-          cancelLabel: cancelLabel,
-        ),
-      );
-      if (raw == null || raw.isEmpty) return null;
-      return DateTime.tryParse(raw);
-    } on PlatformException catch (error, stackTrace) {
-      _logNativeSheetBridgeError('presentDatePicker', error, stackTrace);
-      if (rethrowErrors) rethrow;
-      return null;
-    } catch (error, stackTrace) {
-      _logNativeSheetBridgeError('presentDatePicker', error, stackTrace);
-      if (rethrowErrors) rethrow;
-      return null;
-    }
+    return null;
   }
 
   Future<NativeSheetActionResult?> presentTextEditor({
@@ -258,29 +84,7 @@ class NativeSheetBridge implements NativeSheetFlutterApi {
     String closeActionId = 'close',
     bool rethrowErrors = false,
   }) async {
-    if (!_isIOS) return null;
-    try {
-      final raw = await _api.presentTextEditor(
-        PlatformNativeSheetTextEditorRequest(
-          title: title,
-          value: value,
-          placeholder: placeholder,
-          sendLabel: sendLabel,
-          valueId: valueId,
-          sendActionId: sendActionId,
-          closeActionId: closeActionId,
-        ),
-      );
-      return raw == null ? null : NativeSheetActionResult.fromPlatform(raw);
-    } on PlatformException catch (error, stackTrace) {
-      _logNativeSheetBridgeError('presentTextEditor', error, stackTrace);
-      if (rethrowErrors) rethrow;
-      return null;
-    } catch (error, stackTrace) {
-      _logNativeSheetBridgeError('presentTextEditor', error, stackTrace);
-      if (rethrowErrors) rethrow;
-      return null;
-    }
+    return null;
   }
 
   Future<NativeSheetActionResult?> presentSheet({
@@ -288,39 +92,9 @@ class NativeSheetBridge implements NativeSheetFlutterApi {
     List<NativeSheetDetailConfig> detailSheets = const [],
     bool rethrowErrors = false,
   }) async {
-    if (!_isIOS) return null;
-    try {
-      final raw = await _api.presentResultSheet(
-        PlatformNativeSheetResultRequest(
-          root: root.toPlatform(),
-          detailSheets: detailSheets
-              .map((detail) => detail.toPlatform())
-              .toList(),
-        ),
-      );
-      return raw == null ? null : NativeSheetActionResult.fromPlatform(raw);
-    } on PlatformException catch (error, stackTrace) {
-      _logNativeSheetBridgeError(
-        'presentResultSheet',
-        error,
-        stackTrace,
-        data: {'rootId': root.id},
-      );
-      if (rethrowErrors) rethrow;
-      return null;
-    } catch (error, stackTrace) {
-      _logNativeSheetBridgeError(
-        'presentResultSheet',
-        error,
-        stackTrace,
-        data: {'rootId': root.id},
-      );
-      if (rethrowErrors) rethrow;
-      return null;
-    }
+    return null;
   }
 
-  /// Replace items for an already-presented detail screen (lazy hydration).
   Future<bool> applyDetailPatch({
     required String detailId,
     required List<NativeSheetItemConfig> items,
@@ -328,90 +102,7 @@ class NativeSheetBridge implements NativeSheetFlutterApi {
     String? subtitle,
     List<NativeSheetDetailConfig> detailSheets = const [],
   }) async {
-    if (!_isIOS) return false;
-    try {
-      return await _api.applyDetailPatch(
-        PlatformNativeSheetApplyDetailPatchRequest(
-          detailId: detailId,
-          items: items.map((item) => item.toPlatform()).toList(),
-          title: title,
-          subtitle: subtitle,
-          detailSheets: detailSheets.isEmpty
-              ? null
-              : detailSheets.map((detail) => detail.toPlatform()).toList(),
-        ),
-      );
-    } on PlatformException catch (error, stackTrace) {
-      _logNativeSheetBridgeError(
-        'applyDetailPatch',
-        error,
-        stackTrace,
-        data: {'detailId': detailId},
-      );
-      return false;
-    } catch (error, stackTrace) {
-      _logNativeSheetBridgeError(
-        'applyDetailPatch',
-        error,
-        stackTrace,
-        data: {'detailId': detailId},
-      );
-      return false;
-    }
-  }
-
-  @override
-  void onDismissed() {
-    _events.add(const NativeSheetDismissed());
-  }
-
-  @override
-  void onLogoutRequested() {
-    _events.add(const NativeSheetLogoutRequested());
-  }
-
-  @override
-  void onControlChanged(PlatformNativeSheetControlChangedEvent event) {
-    if (event.id.isEmpty) return;
-    _events.add(NativeSheetControlChanged(id: event.id, value: event.value));
-  }
-
-  @override
-  void onDetailAppeared(PlatformNativeSheetDetailAppearedEvent event) {
-    if (event.detailId.isEmpty) return;
-    _events.add(NativeSheetDetailAppeared(detailId: event.detailId));
-  }
-
-  @override
-  void onModelPinToggled(PlatformNativeSheetModelPinToggledEvent event) {
-    if (event.modelId.isEmpty) return;
-    unawaited(_handleModelPinToggled(event.modelId));
-  }
-
-  Future<void> _handleModelPinToggled(String modelId) async {
-    try {
-      await _modelPinToggleHandler?.call(modelId);
-    } catch (error, stackTrace) {
-      _logNativeSheetBridgeError(
-        'onModelPinToggled',
-        error,
-        stackTrace,
-        data: {'modelId': modelId},
-      );
-    }
-  }
-
-  @override
-  void commitEditProfile(PlatformNativeEditProfileCommittedEvent event) {
-    _events.add(
-      NativeEditProfileCommitted(
-        name: event.name,
-        profileImageUrl: event.profileImageUrl,
-        bio: event.bio,
-        gender: event.gender,
-        dateOfBirth: event.dateOfBirth,
-      ),
-    );
+    return false;
   }
 }
 
@@ -915,193 +606,4 @@ final class NativeSheetActionResult {
     return NativeSheetActionResult(actionId: actionId, values: parsedValues);
   }
 
-  static NativeSheetActionResult fromPlatform(
-    PlatformNativeSheetActionResult raw,
-  ) {
-    return NativeSheetActionResult(actionId: raw.actionId, values: raw.values);
-  }
-}
-
-extension on NativeProfileSheetConfig {
-  PlatformNativeProfileSheetConfig toPlatform() {
-    return PlatformNativeProfileSheetConfig(
-      profile: profile.toPlatform(),
-      profileMenuTitle: profileMenuTitle,
-      editProfileLabel: editProfileLabel,
-      editProfileSheet: editProfileSheet?.toPlatform(),
-      supportTitle: supportTitle,
-      supportSubtitle: supportSubtitle,
-      menuItems: menuItems.map((item) => item.toPlatform()).toList(),
-      supportItems: supportItems.map((item) => item.toPlatform()).toList(),
-      sections: sections.map((section) => section.toPlatform()).toList(),
-      detailSheets: detailSheets.map((sheet) => sheet.toPlatform()).toList(),
-    );
-  }
-}
-
-extension on NativeSheetSectionConfig {
-  PlatformNativeSheetSection toPlatform() {
-    return PlatformNativeSheetSection(
-      title: title,
-      footer: footer,
-      items: items.map((item) => item.toPlatform()).toList(),
-    );
-  }
-}
-
-extension on NativeEditProfileSheetConfig {
-  PlatformNativeEditProfileSheetConfig toPlatform() {
-    return PlatformNativeEditProfileSheetConfig(
-      title: title,
-      saveLabel: saveLabel,
-      cancelLabel: cancelLabel,
-      okLabel: okLabel,
-      footerText: footerText,
-      nameLabel: nameLabel,
-      nameRequiredMessage: nameRequiredMessage,
-      customGenderRequiredMessage: customGenderRequiredMessage,
-      bioLabel: bioLabel,
-      bioHint: bioHint,
-      genderLabel: genderLabel,
-      genderPreferNotToSay: genderPreferNotToSay,
-      genderMale: genderMale,
-      genderFemale: genderFemale,
-      genderCustom: genderCustom,
-      customGenderLabel: customGenderLabel,
-      customGenderHint: customGenderHint,
-      birthDateLabel: birthDateLabel,
-      selectBirthDateLabel: selectBirthDateLabel,
-      clearLabel: clearLabel,
-      uploadFromDeviceLabel: uploadFromDeviceLabel,
-      useInitialsLabel: useInitialsLabel,
-      removeAvatarLabel: removeAvatarLabel,
-      currentAvatarLabel: currentAvatarLabel,
-    );
-  }
-}
-
-extension on NativeProfileSheetUser {
-  PlatformNativeProfileSheetUser toPlatform() {
-    return PlatformNativeProfileSheetUser(
-      displayName: displayName,
-      email: email,
-      initials: initials,
-      avatarUrl: avatarUrl,
-      avatarBytes: avatarBytes,
-      avatarHeaders: avatarHeaders,
-      bio: bio,
-      gender: gender,
-      dateOfBirth: dateOfBirth,
-      profileImageUrl: profileImageUrl,
-    );
-  }
-}
-
-extension on NativeSheetDetailConfig {
-  PlatformNativeSheetDetail toPlatform() {
-    return PlatformNativeSheetDetail(
-      id: id,
-      title: title,
-      subtitle: subtitle,
-      items: items.map((item) => item.toPlatform()).toList(),
-      sections: sections.map((section) => section.toPlatform()).toList(),
-      confirmActionId: confirmActionId,
-      confirmActionLabel: confirmActionLabel,
-      maxHeightFraction: maxHeightFraction,
-    );
-  }
-}
-
-extension on NativeSheetLinkConfig {
-  PlatformNativeSheetLink toPlatform() {
-    return PlatformNativeSheetLink(
-      url: url,
-      title: title,
-      faviconUrl: faviconUrl,
-    );
-  }
-}
-
-extension on NativeSheetItemConfig {
-  PlatformNativeSheetItem toPlatform() {
-    return PlatformNativeSheetItem(
-      id: id,
-      title: title,
-      subtitle: subtitle,
-      sfSymbol: sfSymbol,
-      destructive: destructive,
-      url: url,
-      kind: kind.toPlatform(),
-      value: value,
-      placeholder: placeholder,
-      options: options.map((option) => option.toPlatform()).toList(),
-      sourceIndex: sourceIndex,
-      sourceUrl: sourceUrl,
-      sourceType: sourceType,
-      snippet: snippet,
-      faviconUrl: faviconUrl,
-      queries: queries,
-      links: links.map((link) => link.toPlatform()).toList(),
-      pending: pending ?? false,
-      min: min,
-      max: max,
-      divisions: divisions,
-    );
-  }
-}
-
-extension on NativeSheetItemKind {
-  PlatformNativeSheetItemKind toPlatform() {
-    return switch (this) {
-      NativeSheetItemKind.navigation => PlatformNativeSheetItemKind.navigation,
-      NativeSheetItemKind.textField => PlatformNativeSheetItemKind.textField,
-      NativeSheetItemKind.multilineTextField =>
-        PlatformNativeSheetItemKind.multilineTextField,
-      NativeSheetItemKind.secureTextField =>
-        PlatformNativeSheetItemKind.secureTextField,
-      NativeSheetItemKind.dropdown => PlatformNativeSheetItemKind.dropdown,
-      NativeSheetItemKind.searchablePicker =>
-        PlatformNativeSheetItemKind.searchablePicker,
-      NativeSheetItemKind.toggle => PlatformNativeSheetItemKind.toggle,
-      NativeSheetItemKind.segment => PlatformNativeSheetItemKind.segment,
-      NativeSheetItemKind.slider => PlatformNativeSheetItemKind.slider,
-      NativeSheetItemKind.info => PlatformNativeSheetItemKind.info,
-      NativeSheetItemKind.readOnlyText =>
-        PlatformNativeSheetItemKind.readOnlyText,
-      NativeSheetItemKind.source => PlatformNativeSheetItemKind.source,
-      NativeSheetItemKind.statusUpdate =>
-        PlatformNativeSheetItemKind.statusUpdate,
-    };
-  }
-}
-
-extension on NativeSheetOptionConfig {
-  PlatformNativeSheetOption toPlatform() {
-    return PlatformNativeSheetOption(
-      id: id,
-      label: label,
-      subtitle: subtitle,
-      sfSymbol: sfSymbol,
-      enabled: enabled,
-      destructive: destructive,
-      ancestorHasMoreSiblings: ancestorHasMoreSiblings,
-      showBranch: showBranch,
-      hasMoreSiblings: hasMoreSiblings,
-    );
-  }
-}
-
-extension on NativeSheetModelOption {
-  PlatformNativeSheetModelOption toPlatform() {
-    return PlatformNativeSheetModelOption(
-      id: id,
-      name: name,
-      subtitle: subtitle,
-      sfSymbol: sfSymbol,
-      avatarUrl: avatarUrl,
-      avatarBytes: avatarBytes,
-      avatarHeaders: avatarHeaders,
-      tags: tags,
-    );
-  }
 }

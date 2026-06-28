@@ -7,7 +7,7 @@ import 'api_error_handler.dart';
 import 'api_error_interceptor.dart';
 import '../../shared/theme/theme_extensions.dart';
 import '../../shared/widgets/themed_dialogs.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import '../utils/debug_logger.dart';
 
 /// Enhanced error service with comprehensive error handling capabilities
@@ -137,7 +137,7 @@ class EnhancedErrorService {
       context: context,
       barrierDismissible: true,
       builder: (BuildContext context) {
-        final theme = context.conduitTheme;
+        final theme = context.nerdinTheme;
         return AlertDialog(
           title: Row(
             children: [
@@ -218,7 +218,7 @@ class EnhancedErrorService {
     final message = getUserMessage(error);
     final technicalDetails = getTechnicalDetails(error);
     final isRetryableError = isRetryable(error);
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     return Container(
       padding: padding ?? const EdgeInsets.all(Spacing.md),

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -136,13 +136,13 @@ class _SidebarMaterialBottomNavigationBar extends StatelessWidget {
     required this.navigationItems,
     required this.selectedIndex,
     required this.onTap,
-    required this.conduitTheme,
+    required this.nerdinTheme,
   });
 
   final List<_SidebarNavigationItem> navigationItems;
   final int selectedIndex;
   final ValueChanged<int> onTap;
-  final ConduitThemeExtension conduitTheme;
+  final NerdinThemeExtension nerdinTheme;
 
   @override
   Widget build(BuildContext context) {
@@ -151,9 +151,9 @@ class _SidebarMaterialBottomNavigationBar extends StatelessWidget {
       child: NavigationBarTheme(
         data: NavigationBarTheme.of(context).copyWith(
           height: _kSidebarNavigationBarHeight,
-          backgroundColor: conduitTheme.surfaceBackground,
+          backgroundColor: nerdinTheme.surfaceBackground,
           elevation: 0,
-          indicatorColor: conduitTheme.buttonPrimary.withValues(alpha: 0.12),
+          indicatorColor: nerdinTheme.buttonPrimary.withValues(alpha: 0.12),
           indicatorShape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppBorderRadius.pill),
           ),
@@ -161,8 +161,8 @@ class _SidebarMaterialBottomNavigationBar extends StatelessWidget {
             final selected = states.contains(WidgetState.selected);
             return IconThemeData(
               color: selected
-                  ? conduitTheme.buttonPrimary
-                  : conduitTheme.textSecondary,
+                  ? nerdinTheme.buttonPrimary
+                  : nerdinTheme.textSecondary,
               size: _kSidebarNavigationBarIconSize,
             );
           }),
@@ -170,8 +170,8 @@ class _SidebarMaterialBottomNavigationBar extends StatelessWidget {
             final selected = states.contains(WidgetState.selected);
             return AppTypography.labelSmallStyle.copyWith(
               color: selected
-                  ? conduitTheme.buttonPrimary
-                  : conduitTheme.textSecondary,
+                  ? nerdinTheme.buttonPrimary
+                  : nerdinTheme.textSecondary,
               fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
             );
           }),
@@ -180,9 +180,9 @@ class _SidebarMaterialBottomNavigationBar extends StatelessWidget {
           selectedIndex: selectedIndex,
           onDestinationSelected: onTap,
           height: _kSidebarNavigationBarHeight,
-          backgroundColor: conduitTheme.surfaceBackground,
+          backgroundColor: nerdinTheme.surfaceBackground,
           elevation: 0,
-          indicatorColor: conduitTheme.buttonPrimary.withValues(alpha: 0.12),
+          indicatorColor: nerdinTheme.buttonPrimary.withValues(alpha: 0.12),
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           destinations: [
             for (final item in navigationItems)
@@ -233,7 +233,7 @@ class _SidebarPageState extends ConsumerState<SidebarPage> {
 
   AdaptiveBottomNavigationBar _sidebarBottomNavigationBar(
     List<_SidebarNavigationItem> navigationItems,
-    ConduitThemeExtension conduitTheme,
+    NerdinThemeExtension nerdinTheme,
     int selectedIndex,
     ValueChanged<int> onTap,
   ) {
@@ -242,13 +242,13 @@ class _SidebarPageState extends ConsumerState<SidebarPage> {
       selectedIndex: selectedIndex,
       onTap: onTap,
       useNativeBottomBar: true,
-      selectedItemColor: conduitTheme.buttonPrimary,
-      unselectedItemColor: conduitTheme.textSecondary,
+      selectedItemColor: nerdinTheme.buttonPrimary,
+      unselectedItemColor: nerdinTheme.textSecondary,
       bottomNavigationBar: _SidebarMaterialBottomNavigationBar(
         navigationItems: navigationItems,
         selectedIndex: selectedIndex.clamp(0, navigationItems.length - 1),
         onTap: onTap,
-        conduitTheme: conduitTheme,
+        nerdinTheme: nerdinTheme,
       ),
     );
   }
@@ -320,7 +320,7 @@ class _SidebarPageState extends ConsumerState<SidebarPage> {
     required bool isSearchExpanded,
     required bool showTerminalPanelPicker,
   }) {
-    final defaultTint = context.conduitTheme.textPrimary;
+    final defaultTint = context.nerdinTheme.textPrimary;
     if (isSearchExpanded) {
       return [
         AdaptiveAppBarAction(
@@ -371,7 +371,7 @@ class _SidebarPageState extends ConsumerState<SidebarPage> {
     required bool isSearchExpanded,
     required double toolbarWidth,
   }) {
-    final backgroundColor = context.conduitTheme.surfaceBackground;
+    final backgroundColor = context.nerdinTheme.surfaceBackground;
     return AppBar(
       backgroundColor: backgroundColor,
       elevation: Elevation.none,
@@ -396,10 +396,10 @@ class _SidebarPageState extends ConsumerState<SidebarPage> {
                   : Spacing.sm,
             ),
             child: Center(
-              child: ConduitAdaptiveAppBarIconButton(
+              child: NerdinAdaptiveAppBarIconButton(
                 icon: actions[index].icon ?? Icons.circle,
                 onPressed: actions[index].onPressed,
-                iconColor: context.conduitTheme.textPrimary,
+                iconColor: context.nerdinTheme.textPrimary,
               ),
             ),
           ),
@@ -419,7 +419,7 @@ class _SidebarPageState extends ConsumerState<SidebarPage> {
           left: 0,
           right: 0,
           bottom: 0,
-          child: ConduitChromeGradientFade.bottom(
+          child: NerdinChromeGradientFade.bottom(
             contentHeight:
                 MediaQuery.viewPaddingOf(context).bottom +
                 _kSidebarNativeBottomBarContentHeight,
@@ -477,7 +477,7 @@ class _SidebarPageState extends ConsumerState<SidebarPage> {
     ];
     final navigationItems = _sidebarNavigationItems(tabDefinitions);
 
-    final conduitTheme = context.conduitTheme;
+    final nerdinTheme = context.nerdinTheme;
     final isSearchExpanded = ref.watch(sidebarHeaderSearchExpandedProvider);
     final useNativeIos26Chrome = PlatformInfo.isIOS26OrHigher();
     final isTerminalTabActive =
@@ -549,7 +549,7 @@ class _SidebarPageState extends ConsumerState<SidebarPage> {
 
           final bottomNavigationBar = _sidebarBottomNavigationBar(
             navigationItems,
-            conduitTheme,
+            nerdinTheme,
             activeIndex,
             onTap,
           );

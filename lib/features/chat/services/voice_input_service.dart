@@ -4,7 +4,7 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:conduit/core/services/haptic_service.dart';
+import 'package:nerdin_mobile_workspace/core/services/haptic_service.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -596,7 +596,7 @@ class VoiceInputService {
     final hapticsEnabled = _ref?.read(hapticEnabledProvider) ?? false;
     if (hapticsEnabled) {
       try {
-        ConduitHaptics.heavyImpact();
+        NerdinHaptics.heavyImpact();
       } catch (_) {}
     }
 
@@ -959,7 +959,7 @@ class VoiceInputService {
     try {
       final wavBytes = _samplesToWav(samples);
       final fileName =
-          'conduit_voice_${DateTime.now().millisecondsSinceEpoch}.wav';
+          'nerdin_voice_${DateTime.now().millisecondsSinceEpoch}.wav';
 
       final response = await api.transcribeSpeech(
         audioBytes: wavBytes,

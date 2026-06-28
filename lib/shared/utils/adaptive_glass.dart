@@ -1,7 +1,7 @@
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 
-/// Whether Conduit can rely on native iOS Liquid Glass rendering.
-bool conduitSupportsNativeGlass({bool? isIOS, int? iosMajorVersion}) {
+/// Whether Nerdin can rely on native iOS Liquid Glass rendering.
+bool nerdinSupportsNativeGlass({bool? isIOS, int? iosMajorVersion}) {
   final effectiveIsIOS = isIOS ?? PlatformInfo.isIOS;
   if (!effectiveIsIOS) {
     return false;
@@ -11,8 +11,8 @@ bool conduitSupportsNativeGlass({bool? isIOS, int? iosMajorVersion}) {
   return effectiveIosVersion >= 26;
 }
 
-/// Whether glass-styled chrome should use Conduit's opaque fallback treatment.
-bool conduitUsesOpaqueGlassFallback({
+/// Whether glass-styled chrome should use Nerdin's opaque fallback treatment.
+bool nerdinUsesOpaqueGlassFallback({
   bool? isAndroid,
   bool? isIOS,
   int? iosMajorVersion,
@@ -23,7 +23,7 @@ bool conduitUsesOpaqueGlassFallback({
 
   final effectiveIsIOS = isIOS ?? PlatformInfo.isIOS;
   return effectiveIsIOS &&
-      !conduitSupportsNativeGlass(
+      !nerdinSupportsNativeGlass(
         isIOS: effectiveIsIOS,
         iosMajorVersion: iosMajorVersion,
       );

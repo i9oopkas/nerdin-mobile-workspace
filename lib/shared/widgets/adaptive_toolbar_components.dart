@@ -6,15 +6,15 @@ import 'package:flutter/material.dart';
 
 import '../theme/theme_extensions.dart';
 import '../utils/adaptive_glass.dart';
-import 'conduit_components.dart';
-import 'conduit_loading.dart';
+import 'nerdin_components.dart';
+import 'nerdin_loading.dart';
 import 'middle_ellipsis_text.dart';
 
-const double kConduitAdaptiveToolbarLeadingGap = Spacing.sm;
-const double kConduitAdaptiveToolbarMaxPillWidth = 220;
+const double kNerdinAdaptiveToolbarLeadingGap = Spacing.sm;
+const double kNerdinAdaptiveToolbarMaxPillWidth = 220;
 
 /// Builds the shared adaptive toolbar shell used by chat-style pages.
-AdaptiveAppBar buildConduitAdaptiveToolbarAppBar({
+AdaptiveAppBar buildNerdinAdaptiveToolbarAppBar({
   required Color tintColor,
   required Widget Function() buildLeading,
   required List<AdaptiveAppBarAction> Function() buildActions,
@@ -67,7 +67,7 @@ List<Widget> _buildMaterialToolbarActions(
   List<AdaptiveAppBarAction> actions, {
   required Color defaultTint,
 }) {
-  return buildConduitAdaptiveToolbarActionWidgets([
+  return buildNerdinAdaptiveToolbarActionWidgets([
     for (final action in actions)
       _buildMaterialToolbarAction(action, defaultTint: defaultTint),
   ]);
@@ -86,14 +86,14 @@ Widget _buildMaterialToolbarAction(
     );
   }
 
-  return ConduitAdaptiveAppBarIconButton(
+  return NerdinAdaptiveAppBarIconButton(
     icon: action.icon ?? Icons.circle,
     onPressed: action.onPressed,
     iconColor: tintColor,
   );
 }
 
-Widget buildConduitAdaptiveToolbarLeadingRow({required List<Widget> children}) {
+Widget buildNerdinAdaptiveToolbarLeadingRow({required List<Widget> children}) {
   if (Platform.isIOS) {
     return Row(mainAxisSize: MainAxisSize.min, children: children);
   }
@@ -104,7 +104,7 @@ Widget buildConduitAdaptiveToolbarLeadingRow({required List<Widget> children}) {
   );
 }
 
-List<Widget> buildConduitAdaptiveToolbarActionWidgets(List<Widget> actions) {
+List<Widget> buildNerdinAdaptiveToolbarActionWidgets(List<Widget> actions) {
   final widgets = <Widget>[];
   for (var i = 0; i < actions.length; i++) {
     if (i > 0) {
@@ -125,14 +125,14 @@ List<Widget> buildConduitAdaptiveToolbarActionWidgets(List<Widget> actions) {
   return widgets;
 }
 
-TextStyle conduitAdaptiveToolbarPillTextStyle(BuildContext context) {
+TextStyle nerdinAdaptiveToolbarPillTextStyle(BuildContext context) {
   return AppTypography.standard.copyWith(
-    color: context.conduitTheme.textPrimary,
+    color: context.nerdinTheme.textPrimary,
     fontWeight: FontWeight.w600,
   );
 }
 
-Widget buildConduitAdaptiveToolbarPillSurface({
+Widget buildNerdinAdaptiveToolbarPillSurface({
   required double width,
   required Widget child,
   VoidCallback? onPressed,
@@ -140,7 +140,7 @@ Widget buildConduitAdaptiveToolbarPillSurface({
 }) {
   final sizedChild = SizedBox(width: width, child: child);
 
-  if (conduitUsesOpaqueGlassFallback()) {
+  if (nerdinUsesOpaqueGlassFallback()) {
     if (onPressed == null) {
       return SizedBox(
         width: width,
@@ -166,9 +166,9 @@ Widget buildConduitAdaptiveToolbarPillSurface({
   );
 }
 
-double resolveConduitAdaptiveToolbarLeadingWidth({
+double resolveNerdinAdaptiveToolbarLeadingWidth({
   required double pillWidth,
-  double leadingGap = kConduitAdaptiveToolbarLeadingGap,
+  double leadingGap = kNerdinAdaptiveToolbarLeadingGap,
 }) {
   return Spacing.inputPadding +
       TouchTarget.minimum +
@@ -182,7 +182,7 @@ double resolveConduitAdaptiveToolbarLeadingWidth({
 /// The result never exceeds the available space. When the preferred padding
 /// would make the pill too small, the helper still keeps a small minimum gap so
 /// the title does not visually collide with neighboring controls.
-double resolveConduitAdaptiveToolbarPillWidth({
+double resolveNerdinAdaptiveToolbarPillWidth({
   required double availableWidth,
   required double maxWidth,
   double preferredPadding = 0,
@@ -206,11 +206,11 @@ double resolveConduitAdaptiveToolbarPillWidth({
 /// Native toolbars do not automatically rebalance the leading area against
 /// trailing actions, so callers provide the trailing action count and let this
 /// helper reserve the remaining space before sizing the pill.
-double resolveConduitAdaptiveLeadingPillWidth(
+double resolveNerdinAdaptiveLeadingPillWidth(
   BuildContext context, {
   required int trailingActionCount,
   required double maxWidth,
-  double leadingGap = kConduitAdaptiveToolbarLeadingGap,
+  double leadingGap = kNerdinAdaptiveToolbarLeadingGap,
   double trailingActionSpacing = Spacing.sm,
 }) {
   final trailingSpacing = trailingActionCount > 1
@@ -228,14 +228,14 @@ double resolveConduitAdaptiveLeadingPillWidth(
       trailingWidth -
       (Spacing.inputPadding * 2);
 
-  return resolveConduitAdaptiveToolbarPillWidth(
+  return resolveNerdinAdaptiveToolbarPillWidth(
     availableWidth: availableWidth,
     maxWidth: maxWidth,
   );
 }
 
 /// Measures a text pill and clamps it to the safe toolbar width budget.
-double resolveConduitAdaptiveTextPillWidth({
+double resolveNerdinAdaptiveTextPillWidth({
   required BuildContext context,
   required String label,
   required TextStyle textStyle,
@@ -263,7 +263,7 @@ double resolveConduitAdaptiveTextPillWidth({
   return measuredWidth.clamp(safeMinWidth, safeMaxWidth).toDouble();
 }
 
-Object conduitAdaptivePopupMenuIcon({
+Object nerdinAdaptivePopupMenuIcon({
   required String iosSymbol,
   required IconData materialIcon,
 }) {
@@ -271,9 +271,9 @@ Object conduitAdaptivePopupMenuIcon({
 }
 
 /// Adaptive floating app-bar icon button for route-level toolbar actions.
-class ConduitAdaptiveAppBarIconButton extends StatelessWidget {
+class NerdinAdaptiveAppBarIconButton extends StatelessWidget {
   /// Creates an adaptive toolbar icon button.
-  const ConduitAdaptiveAppBarIconButton({
+  const NerdinAdaptiveAppBarIconButton({
     super.key,
     required this.icon,
     this.onPressed,
@@ -291,9 +291,9 @@ class ConduitAdaptiveAppBarIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveIconColor = iconColor ?? context.conduitTheme.textPrimary;
+    final effectiveIconColor = iconColor ?? context.nerdinTheme.textPrimary;
 
-    if (conduitUsesOpaqueGlassFallback()) {
+    if (nerdinUsesOpaqueGlassFallback()) {
       return FloatingAppBarIconButton(
         icon: icon,
         onTap: onPressed,
@@ -314,9 +314,9 @@ class ConduitAdaptiveAppBarIconButton extends StatelessWidget {
 }
 
 /// Adaptive model-selector control used by floating route toolbars.
-class ConduitAdaptiveAppBarModelSelector extends StatelessWidget {
+class NerdinAdaptiveAppBarModelSelector extends StatelessWidget {
   /// Creates an adaptive toolbar model selector.
-  const ConduitAdaptiveAppBarModelSelector({
+  const NerdinAdaptiveAppBarModelSelector({
     super.key,
     required this.label,
     required this.maxWidth,
@@ -346,7 +346,7 @@ class ConduitAdaptiveAppBarModelSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveTextStyle =
-        textStyle ?? conduitAdaptiveToolbarPillTextStyle(context);
+        textStyle ?? nerdinAdaptiveToolbarPillTextStyle(context);
     final safeMaxWidth = maxWidth.clamp(0.0, double.infinity).toDouble();
     if (safeMaxWidth == 0) {
       return const SizedBox.shrink();
@@ -355,7 +355,7 @@ class ConduitAdaptiveAppBarModelSelector extends StatelessWidget {
     const leadingPadding = 10.0;
     final targetWidth = isLoading
         ? safeMaxWidth.clamp(0.0, 104.0).toDouble()
-        : resolveConduitAdaptiveTextPillWidth(
+        : resolveNerdinAdaptiveTextPillWidth(
             context: context,
             label: label,
             textStyle: effectiveTextStyle,
@@ -373,7 +373,7 @@ class ConduitAdaptiveAppBarModelSelector extends StatelessWidget {
           child: Center(
             widthFactor: 1,
             child: isLoading
-                ? ConduitLoading.skeleton(
+                ? NerdinLoading.skeleton(
                     width: 80,
                     height: 14,
                     borderRadius: BorderRadius.circular(AppBorderRadius.sm),
@@ -398,7 +398,7 @@ class ConduitAdaptiveAppBarModelSelector extends StatelessWidget {
                         Platform.isIOS
                             ? CupertinoIcons.chevron_down
                             : Icons.keyboard_arrow_down,
-                        color: context.conduitTheme.iconSecondary,
+                        color: context.nerdinTheme.iconSecondary,
                         size: chevronSize,
                       ),
                     ],
@@ -408,7 +408,7 @@ class ConduitAdaptiveAppBarModelSelector extends StatelessWidget {
       ),
     );
 
-    if (conduitUsesOpaqueGlassFallback()) {
+    if (nerdinUsesOpaqueGlassFallback()) {
       return FloatingAppBarButton(
         onTap: isLoading ? null : onPressed,
         semanticLabel: label,
@@ -428,8 +428,8 @@ class ConduitAdaptiveAppBarModelSelector extends StatelessWidget {
   }
 }
 
-class ConduitAdaptiveToolbarOverflowButton<T> extends StatelessWidget {
-  const ConduitAdaptiveToolbarOverflowButton({
+class NerdinAdaptiveToolbarOverflowButton<T> extends StatelessWidget {
+  const NerdinAdaptiveToolbarOverflowButton({
     super.key,
     required this.tintColor,
     required this.items,
@@ -453,7 +453,7 @@ class ConduitAdaptiveToolbarOverflowButton<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (conduitUsesOpaqueGlassFallback()) {
+    if (nerdinUsesOpaqueGlassFallback()) {
       return AdaptivePopupMenuButton.widget<T>(
         items: items,
         onSelected: _handleSelected,

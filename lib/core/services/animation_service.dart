@@ -155,9 +155,9 @@ class AnimationService {
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
               colors: [
-                baseColor ?? context.conduitTheme.shimmerBase,
-                highlightColor ?? context.conduitTheme.shimmerHighlight,
-                baseColor ?? context.conduitTheme.shimmerBase,
+                baseColor ?? context.nerdinTheme.shimmerBase,
+                highlightColor ?? context.nerdinTheme.shimmerHighlight,
+                baseColor ?? context.nerdinTheme.shimmerBase,
               ],
               stops: [0.0, value, 1.0],
             ).createShader(bounds);

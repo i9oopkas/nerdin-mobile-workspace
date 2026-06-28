@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/theme/theme_extensions.dart';
 import '../../shared/widgets/adaptive_route_shell.dart';
 import '../error/enhanced_error_service.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 
 /// Error boundary widget that catches and handles errors in child widgets
 class ErrorBoundary extends ConsumerStatefulWidget {
@@ -153,15 +153,15 @@ class _ErrorBoundaryState extends ConsumerState<ErrorBoundary> {
               child: Container(
                 constraints: const BoxConstraints(maxWidth: 480),
                 decoration: BoxDecoration(
-                  color: context.conduitTheme.cardBackground,
+                  color: context.nerdinTheme.cardBackground,
                   borderRadius: BorderRadius.circular(
-                    context.conduitTheme.radiusLg,
+                    context.nerdinTheme.radiusLg,
                   ),
                   border: Border.all(
-                    color: context.conduitTheme.cardBorder,
+                    color: context.nerdinTheme.cardBorder,
                     width: BorderWidth.regular,
                   ),
-                  boxShadow: context.conduitTheme.cardShadows,
+                  boxShadow: context.nerdinTheme.cardShadows,
                 ),
                 padding: const EdgeInsets.all(Spacing.xl),
                 child: Column(
@@ -172,13 +172,13 @@ class _ErrorBoundaryState extends ConsumerState<ErrorBoundary> {
                       width: 80,
                       height: 80,
                       decoration: BoxDecoration(
-                        color: context.conduitTheme.errorBackground,
+                        color: context.nerdinTheme.errorBackground,
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         Icons.error_outline_rounded,
                         size: 40,
-                        color: context.conduitTheme.error,
+                        color: context.nerdinTheme.error,
                       ),
                     ),
                     const SizedBox(height: Spacing.lg),
@@ -187,7 +187,7 @@ class _ErrorBoundaryState extends ConsumerState<ErrorBoundary> {
                     Text(
                       AppLocalizations.of(context)?.errorMessage ??
                           'Something went wrong',
-                      style: context.conduitTheme.headingSmall,
+                      style: context.nerdinTheme.headingSmall,
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: Spacing.sm),
@@ -196,8 +196,8 @@ class _ErrorBoundaryState extends ConsumerState<ErrorBoundary> {
                     Text(
                       enhancedErrorService.getUserMessage(_error!),
                       textAlign: TextAlign.center,
-                      style: context.conduitTheme.bodySmall?.copyWith(
-                        color: context.conduitTheme.textSecondary,
+                      style: context.nerdinTheme.bodySmall?.copyWith(
+                        color: context.nerdinTheme.textSecondary,
                       ),
                     ),
 
@@ -209,10 +209,10 @@ class _ErrorBoundaryState extends ConsumerState<ErrorBoundary> {
                         width: double.infinity,
                         child: AdaptiveButton.child(
                           onPressed: _retry,
-                          color: context.conduitTheme.buttonPrimary,
+                          color: context.nerdinTheme.buttonPrimary,
                           style: AdaptiveButtonStyle.filled,
                           borderRadius: BorderRadius.circular(
-                            context.conduitTheme.radiusMd,
+                            context.nerdinTheme.radiusMd,
                           ),
                           padding: const EdgeInsets.symmetric(
                             horizontal: Spacing.lg,
@@ -226,9 +226,9 @@ class _ErrorBoundaryState extends ConsumerState<ErrorBoundary> {
                               Text(
                                 AppLocalizations.of(context)?.retry ??
                                     'Try Again',
-                                style: context.conduitTheme.bodySmall?.copyWith(
+                                style: context.nerdinTheme.bodySmall?.copyWith(
                                   fontWeight: FontWeight.w600,
-                                  color: context.conduitTheme.buttonPrimaryText,
+                                  color: context.nerdinTheme.buttonPrimaryText,
                                 ),
                               ),
                             ],
@@ -318,7 +318,7 @@ class AsyncErrorBoundary extends ConsumerWidget {
                   Icon(
                     Icons.error_outline,
                     size: 48,
-                    color: context.conduitTheme.error,
+                    color: context.nerdinTheme.error,
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -405,7 +405,7 @@ class StreamErrorBoundary<T> extends ConsumerWidget {
                   Icon(
                     Icons.error_outline,
                     size: 48,
-                    color: context.conduitTheme.error,
+                    color: context.nerdinTheme.error,
                   ),
                   const SizedBox(height: 16),
                   Text(

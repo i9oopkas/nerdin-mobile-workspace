@@ -13,11 +13,11 @@ import '../../../shared/widgets/markdown/markdown_preprocessor.dart';
 import '../providers/text_to_speech_provider.dart';
 import '../providers/queued_completion_provider.dart';
 import 'enhanced_image_attachment.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import 'enhanced_attachment.dart';
-import 'package:conduit/shared/widgets/chat_action_button.dart';
+import 'package:nerdin_mobile_workspace/shared/widgets/chat_action_button.dart';
 import '../../../shared/widgets/model_avatar.dart';
-import '../../../shared/widgets/conduit_components.dart';
+import '../../../shared/widgets/nerdin_components.dart';
 import '../../../shared/widgets/middle_ellipsis_text.dart';
 import '../../../shared/widgets/web_content_embed.dart';
 import '../providers/chat_providers.dart'
@@ -627,7 +627,7 @@ class _AssistantMessageWidgetState extends ConsumerState<AssistantMessageWidget>
   }
 
   Widget _buildKaraokeBar(TextToSpeechState ttsState) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final idx = ttsState.activeSentenceIndex;
     if (idx < 0 || idx >= ttsState.sentences.length) {
       return const SizedBox.shrink();
@@ -668,7 +668,7 @@ class _AssistantMessageWidgetState extends ConsumerState<AssistantMessageWidget>
       );
     }
 
-    return ConduitCard(
+    return NerdinCard(
       padding: const EdgeInsets.all(Spacing.sm),
       child: RichText(
         text: buildSpans(),
@@ -739,7 +739,7 @@ class _AssistantMessageWidgetState extends ConsumerState<AssistantMessageWidget>
   }
 
   void _buildCachedAvatar() {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final modelName = _resolveActiveModelName();
     final iconUrl = _resolveActiveModelIconUrl();
     if (_cachedAvatar != null &&
@@ -1216,7 +1216,7 @@ class _AssistantMessageWidgetState extends ConsumerState<AssistantMessageWidget>
         key: const ValueKey('typing'),
         child: Padding(
           padding: EdgeInsets.only(
-            top: ConduitMarkdownStyle.fromTheme(context).paragraphSpacing,
+            top: NerdinMarkdownStyle.fromTheme(context).paragraphSpacing,
           ),
           child: _buildTypingIndicator(),
         ),
@@ -1229,7 +1229,7 @@ class _AssistantMessageWidgetState extends ConsumerState<AssistantMessageWidget>
         children.add(
           Padding(
             padding: EdgeInsets.only(
-              top: ConduitMarkdownStyle.fromTheme(context).paragraphSpacing,
+              top: NerdinMarkdownStyle.fromTheme(context).paragraphSpacing,
             ),
             child: footer,
           ),
@@ -1255,9 +1255,9 @@ class _AssistantMessageWidgetState extends ConsumerState<AssistantMessageWidget>
 
   Widget _buildQueuedCompletionBanner(QueuedCompletionInfo info) {
     final l10n = AppLocalizations.of(context)!;
-    final conduitTheme = context.conduitTheme;
+    final nerdinTheme = context.nerdinTheme;
     final errorColor = Theme.of(context).colorScheme.error;
-    final accentColor = info.isFailed ? errorColor : conduitTheme.buttonPrimary;
+    final accentColor = info.isFailed ? errorColor : nerdinTheme.buttonPrimary;
     final title = info.isFailed
         ? l10n.chatQueuedFailedTitle
         : info.isOffline
@@ -1301,7 +1301,7 @@ class _AssistantMessageWidgetState extends ConsumerState<AssistantMessageWidget>
                     Text(
                       title,
                       style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: conduitTheme.textPrimary,
+                        color: nerdinTheme.textPrimary,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -1309,7 +1309,7 @@ class _AssistantMessageWidgetState extends ConsumerState<AssistantMessageWidget>
                     Text(
                       message,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: conduitTheme.textSecondary,
+                        color: nerdinTheme.textSecondary,
                       ),
                     ),
                   ],
@@ -1347,7 +1347,7 @@ class _AssistantMessageWidgetState extends ConsumerState<AssistantMessageWidget>
                 ),
                 label: Text(l10n.cancel),
                 style: TextButton.styleFrom(
-                  foregroundColor: conduitTheme.textSecondary,
+                  foregroundColor: nerdinTheme.textSecondary,
                   minimumSize: const Size(0, 34),
                   padding: const EdgeInsets.symmetric(
                     horizontal: Spacing.sm,
@@ -1461,7 +1461,7 @@ class _AssistantMessageWidgetState extends ConsumerState<AssistantMessageWidget>
         content: processedContent,
         isStreaming: bodyTreatsAsStreaming,
         enableStreamingTextFade: bodyTreatsAsStreaming && !_disableAnimations,
-        askConduitComposerTargetId: chatComposerTextInsertionTargetId,
+        askNerdinComposerTargetId: chatComposerTextInsertionTargetId,
         stateScopeId: _markdownStateScopeId(),
         onTapLink: (url, _) => launchExternalLink(url, scope: 'chat/assistant'),
         sources: activeSources,
@@ -1826,7 +1826,7 @@ class _AssistantMessageWidgetState extends ConsumerState<AssistantMessageWidget>
   }
 
   Widget _buildTypingIndicator() {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final dotColor = theme.textSecondary.withValues(alpha: 0.75);
 
     return Padding(
@@ -2079,7 +2079,7 @@ class _AssistantMessageWidgetState extends ConsumerState<AssistantMessageWidget>
         ? totalVersions
         : _activeVersionIndex + 1;
 
-    return ConduitChip(
+    return NerdinChip(
       label: '$currentVersion/$totalVersions',
       isCompact: true,
       isSelected: _activeVersionIndex >= 0,
@@ -2090,7 +2090,7 @@ class _AssistantMessageWidgetState extends ConsumerState<AssistantMessageWidget>
     List<_AssistantFooterAction> overflowActions,
   ) {
     final l10n = AppLocalizations.of(context)!;
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     return AdaptivePopupMenuButton.widget<String>(
       items: overflowActions
@@ -2197,7 +2197,7 @@ String _buildTtsPlainTextFromRaw(String raw) {
     return '';
   }
 
-  final sanitized = ConduitMarkdownPreprocessor.sanitize(raw);
+  final sanitized = NerdinMarkdownPreprocessor.sanitize(raw);
   final withoutDetails = sanitized.replaceAll(_ttsDetailsPattern, '');
-  return ConduitMarkdownPreprocessor.cleanText(withoutDetails).trim();
+  return NerdinMarkdownPreprocessor.cleanText(withoutDetails).trim();
 }

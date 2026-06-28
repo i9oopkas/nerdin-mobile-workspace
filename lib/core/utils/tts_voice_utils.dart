@@ -1,4 +1,4 @@
-import '../../l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import '../services/settings_service.dart';
 
 const ttsSystemDefaultVoiceId = '__system_default__';

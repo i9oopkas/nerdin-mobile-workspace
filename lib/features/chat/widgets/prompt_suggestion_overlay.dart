@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/prompt.dart';
 import '../../../shared/theme/theme_extensions.dart';
 import '../../prompts/providers/prompts_providers.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 
 /// Autocomplete overlay that appears when the user types `/` commands.
 ///
@@ -34,8 +34,8 @@ class PromptSuggestionOverlay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final Brightness brightness = Theme.of(context).brightness;
-    final overlayColor = context.conduitTheme.cardBackground;
-    final borderColor = context.conduitTheme.cardBorder.withValues(
+    final overlayColor = context.nerdinTheme.cardBackground;
+    final borderColor = context.nerdinTheme.cardBorder.withValues(
       alpha: brightness == Brightness.dark ? 0.6 : 0.4,
     );
 
@@ -50,7 +50,7 @@ class PromptSuggestionOverlay extends ConsumerWidget {
         border: Border.all(color: borderColor, width: BorderWidth.thin),
         boxShadow: [
           BoxShadow(
-            color: context.conduitTheme.cardShadow.withValues(
+            color: context.nerdinTheme.cardShadow.withValues(
               alpha: brightness == Brightness.dark ? 0.28 : 0.16,
             ),
             blurRadius: 22,
@@ -69,7 +69,7 @@ class PromptSuggestionOverlay extends ConsumerWidget {
               leading: Icon(
                 Icons.inbox_outlined,
                 size: IconSize.medium,
-                color: context.conduitTheme.textSecondary.withValues(
+                color: context.nerdinTheme.textSecondary.withValues(
                   alpha: Alpha.medium,
                 ),
               ),
@@ -97,7 +97,7 @@ class PromptSuggestionOverlay extends ConsumerWidget {
                 final prompt = filtered[index];
                 final bool isSelected = index == activeIndex;
                 final Color highlight = isSelected
-                    ? context.conduitTheme.navigationSelectedBackground
+                    ? context.nerdinTheme.navigationSelectedBackground
                           .withValues(alpha: 0.4)
                     : Colors.transparent;
 
@@ -126,7 +126,7 @@ class PromptSuggestionOverlay extends ConsumerWidget {
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(
                                   fontWeight: FontWeight.w600,
-                                  color: context.conduitTheme.textPrimary,
+                                  color: context.nerdinTheme.textPrimary,
                                 ),
                           ),
                           if (prompt.title.trim().isNotEmpty)
@@ -136,7 +136,7 @@ class PromptSuggestionOverlay extends ConsumerWidget {
                                 prompt.title,
                                 style: Theme.of(context).textTheme.bodySmall
                                     ?.copyWith(
-                                      color: context.conduitTheme.textSecondary,
+                                      color: context.nerdinTheme.textSecondary,
                                     ),
                               ),
                             ),
@@ -156,7 +156,7 @@ class PromptSuggestionOverlay extends ConsumerWidget {
             child: CircularProgressIndicator(
               strokeWidth: BorderWidth.regular,
               valueColor: AlwaysStoppedAnimation<Color>(
-                context.conduitTheme.loadingIndicator,
+                context.nerdinTheme.loadingIndicator,
               ),
             ),
           ),
@@ -165,7 +165,7 @@ class PromptSuggestionOverlay extends ConsumerWidget {
           leading: Icon(
             Icons.error_outline,
             size: IconSize.medium,
-            color: context.conduitTheme.error,
+            color: context.nerdinTheme.error,
           ),
         ),
       ),
@@ -197,7 +197,7 @@ class _PromptOverlayPlaceholder extends StatelessWidget {
               child: Text(
                 message!,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: context.conduitTheme.textSecondary,
+                  color: context.nerdinTheme.textSecondary,
                 ),
               ),
             ),

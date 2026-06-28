@@ -465,7 +465,7 @@ class ChatVoiceModeController extends Notifier<ChatVoiceModeSnapshot> {
 
     final callId = await callKit.startOutgoingVoiceCall(
       calleeName: modelName,
-      handle: 'Conduit AI',
+      handle: 'Nerdin AI',
     );
     if (token != _token || callId == null) {
       return;

@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
 
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show ScrollCacheExtent;
@@ -24,7 +24,7 @@ import '../../../theme/theme_extensions.dart';
 
 const Duration _pdfCacheStalePeriod = Duration(days: 7);
 const Duration _pdfCacheNamespaceSweepInterval = Duration(minutes: 15);
-const String _pdfCacheKeyPrefix = 'conduit_pdf_cache_';
+const String _pdfCacheKeyPrefix = 'nerdin_pdf_cache_';
 const int _pdfCacheMaxObjects = 30;
 const int _pdfCacheMaxContexts = 6;
 
@@ -667,14 +667,14 @@ class _PdfInlineViewState extends ConsumerState<PdfInlineView> {
       fallback: l10n?.document ?? 'PDF document',
     );
     final scheme = Theme.of(context).colorScheme;
-    final conduitTheme = context.conduitTheme;
+    final nerdinTheme = context.nerdinTheme;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: Spacing.xs),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 560),
         child: Material(
-          color: conduitTheme.surfaceContainer,
+          color: nerdinTheme.surfaceContainer,
           borderRadius: BorderRadius.circular(AppBorderRadius.md),
           clipBehavior: Clip.antiAlias,
           child: Semantics(
@@ -693,11 +693,11 @@ class _PdfInlineViewState extends ConsumerState<PdfInlineView> {
                   SizedBox(
                     height: _previewHeight,
                     child: ColoredBox(
-                      color: conduitTheme.surfaceBackground,
-                      child: _buildPreview(scheme, conduitTheme, title),
+                      color: nerdinTheme.surfaceBackground,
+                      child: _buildPreview(scheme, nerdinTheme, title),
                     ),
                   ),
-                  _buildBar(context, title, scheme, conduitTheme),
+                  _buildBar(context, title, scheme, nerdinTheme),
                 ],
               ),
             ),
@@ -709,7 +709,7 @@ class _PdfInlineViewState extends ConsumerState<PdfInlineView> {
 
   Widget _buildPreview(
     ColorScheme scheme,
-    ConduitThemeExtension conduitTheme,
+    NerdinThemeExtension nerdinTheme,
     String title,
   ) {
     final image = _previewImage;
@@ -743,7 +743,7 @@ class _PdfInlineViewState extends ConsumerState<PdfInlineView> {
         child: Icon(
           Icons.picture_as_pdf,
           size: 48,
-          color: conduitTheme.iconSecondary,
+          color: nerdinTheme.iconSecondary,
         ),
       );
     } else {
@@ -753,7 +753,7 @@ class _PdfInlineViewState extends ConsumerState<PdfInlineView> {
           height: 26,
           child: CircularProgressIndicator(
             strokeWidth: 2,
-            color: conduitTheme.loadingIndicator,
+            color: nerdinTheme.loadingIndicator,
           ),
         ),
       );
@@ -790,7 +790,7 @@ class _PdfInlineViewState extends ConsumerState<PdfInlineView> {
     BuildContext context,
     String title,
     ColorScheme scheme,
-    ConduitThemeExtension conduitTheme,
+    NerdinThemeExtension nerdinTheme,
   ) {
     final l10n = AppLocalizations.of(context);
     final status = _canOpen
@@ -832,7 +832,7 @@ class _PdfInlineViewState extends ConsumerState<PdfInlineView> {
             ),
           Text(
             status,
-            style: TextStyle(color: conduitTheme.textSecondary, fontSize: 12),
+            style: TextStyle(color: nerdinTheme.textSecondary, fontSize: 12),
           ),
         ],
       ),
@@ -1056,9 +1056,9 @@ class _PdfFullscreenPageState extends State<_PdfFullscreenPage> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final conduitTheme = context.conduitTheme;
+    final nerdinTheme = context.nerdinTheme;
     return Scaffold(
-      backgroundColor: conduitTheme.surfaceBackground,
+      backgroundColor: nerdinTheme.surfaceBackground,
       appBar: AppBar(
         title: Text(widget.title, maxLines: 1, overflow: TextOverflow.ellipsis),
         actions: <Widget>[
@@ -1069,11 +1069,11 @@ class _PdfFullscreenPageState extends State<_PdfFullscreenPage> {
           ),
         ],
       ),
-      body: _buildBody(scheme, conduitTheme),
+      body: _buildBody(scheme, nerdinTheme),
     );
   }
 
-  Widget _buildBody(ColorScheme scheme, ConduitThemeExtension conduitTheme) {
+  Widget _buildBody(ColorScheme scheme, NerdinThemeExtension nerdinTheme) {
     final l10n = AppLocalizations.of(context);
     if (_error != null) {
       return Center(
@@ -1100,7 +1100,7 @@ class _PdfFullscreenPageState extends State<_PdfFullscreenPage> {
     }
     if (!_opened) {
       return Center(
-        child: CircularProgressIndicator(color: conduitTheme.loadingIndicator),
+        child: CircularProgressIndicator(color: nerdinTheme.loadingIndicator),
       );
     }
     if (_pageCount == 0) {
@@ -1110,7 +1110,7 @@ class _PdfFullscreenPageState extends State<_PdfFullscreenPage> {
           children: <Widget>[
             Icon(
               Icons.picture_as_pdf,
-              color: conduitTheme.iconSecondary,
+              color: nerdinTheme.iconSecondary,
               size: 40,
             ),
             const SizedBox(height: Spacing.sm),
@@ -1148,7 +1148,7 @@ class _PdfFullscreenPageState extends State<_PdfFullscreenPage> {
         return AspectRatio(
           aspectRatio: aspect,
           child: ColoredBox(
-            color: conduitTheme.surfaceContainer,
+            color: nerdinTheme.surfaceContainer,
             child: Center(
               child: _failed.contains(index)
                   ? Icon(Icons.broken_image_outlined, color: scheme.error)
@@ -1157,7 +1157,7 @@ class _PdfFullscreenPageState extends State<_PdfFullscreenPage> {
                       height: 24,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: conduitTheme.loadingIndicator,
+                        color: nerdinTheme.loadingIndicator,
                       ),
                     ),
             ),

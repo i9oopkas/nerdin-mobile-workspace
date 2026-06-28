@@ -1,7 +1,7 @@
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import '../../shared/theme/theme_extensions.dart';
 import '../../shared/widgets/themed_dialogs.dart';
 import 'navigation_service.dart';
@@ -491,7 +491,7 @@ class ErrorCard extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(Spacing.md),
                     decoration: BoxDecoration(
-                      color: context.conduitTheme.surfaceContainer,
+                      color: context.nerdinTheme.surfaceContainer,
                       borderRadius: BorderRadius.circular(AppBorderRadius.xs),
                     ),
                     child: SelectableText(

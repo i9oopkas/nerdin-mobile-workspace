@@ -8,7 +8,7 @@
 -dontwarn io.flutter.embedding.**
 
 # Keep your app's classes
--keep class app.cogwheel.conduit.** { *; }
+-keep class app.nerdin.mobile.** { *; }
 
 # Keep Gson and JSON serialization
 -keepattributes Signature

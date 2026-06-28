@@ -4,10 +4,9 @@ import 'dart:io' show Platform;
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:conduit/core/services/haptic_service.dart';
+import 'package:nerdin_mobile_workspace/core/services/haptic_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/database/local_conversation_loader.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/services/native_sheet_bridge.dart';
 import '../../../shared/theme/theme_extensions.dart';
@@ -15,9 +14,9 @@ import '../../../shared/utils/platform_scroll_physics.dart';
 import '../../chat/providers/chat_providers.dart' as chat;
 import '../../../core/utils/debug_logger.dart';
 import '../../../core/services/navigation_service.dart';
-import '../../../shared/widgets/conduit_loading.dart';
+import '../../../shared/widgets/nerdin_loading.dart';
 import '../../../shared/widgets/themed_dialogs.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import '../../../shared/utils/conversation_context_menu.dart';
 import '../../../shared/widgets/responsive_drawer_layout.dart';
 import '../../../shared/widgets/themed_sheets.dart';
@@ -193,7 +192,7 @@ class _ChatsDrawerState extends ConsumerState<ChatsDrawer>
       slivers: paddedSlivers,
     );
 
-    final refreshableScroll = ConduitRefreshIndicator(
+    final refreshableScroll = NerdinRefreshIndicator(
       edgeOffset: sidebarRefreshIndicatorEdgeOffset(context),
       onRefresh: _refreshChats,
       child: scroll,
@@ -210,7 +209,7 @@ class _ChatsDrawerState extends ConsumerState<ChatsDrawer>
   }
 
   Widget _buildPaginationFooter() {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final showSpinner = _isLoadingMoreConversations;
 
     return SliverToBoxAdapter(
@@ -262,7 +261,7 @@ class _ChatsDrawerState extends ConsumerState<ChatsDrawer>
       return;
     }
 
-    ConduitHaptics.selectionClick();
+    NerdinHaptics.selectionClick();
     ref.read(pendingFolderIdProvider.notifier).clear();
     NavigationService.router.goNamed(
       RouteNames.folder,
@@ -494,7 +493,7 @@ class _ChatsDrawerState extends ConsumerState<ChatsDrawer>
   }
 
   Widget _buildConversationList(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     if (_query.isEmpty) {
       final conversationsAsync = ref.watch(conversationsProvider);
@@ -893,7 +892,7 @@ class _ChatsDrawerState extends ConsumerState<ChatsDrawer>
       onToggle = () => ref.read(showRecentProvider.notifier).toggle();
     }
 
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final titleStyle = AppTypography.labelStyle.copyWith(
       color: theme.textSecondary,
       fontWeight: FontWeight.w700,
@@ -947,7 +946,7 @@ class _ChatsDrawerState extends ConsumerState<ChatsDrawer>
 
   /// Header for the Folders section with a create button on the right
   Widget _buildFoldersSectionHeader() {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final isExpanded = ref.watch(showFoldersProvider);
 
     return Row(
@@ -1004,7 +1003,7 @@ class _ChatsDrawerState extends ConsumerState<ChatsDrawer>
   }) {
     final folderId = folder.id;
     final name = folder.name;
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final routeListenable = NavigationService.router.routeInformationProvider;
 
     return ValueListenableBuilder<RouteInformation>(
@@ -1024,7 +1023,7 @@ class _ChatsDrawerState extends ConsumerState<ChatsDrawer>
           behavior: HitTestBehavior.opaque,
           key: ValueKey<String>('folder-open-$folderId'),
           onTap: () => _openFolderPage(folderId),
-          onLongPress: null, // Handled by ConduitContextMenu
+          onLongPress: null, // Handled by NerdinContextMenu
           child: Container(
             decoration: BoxDecoration(
               color: baseColor,
@@ -1080,7 +1079,7 @@ class _ChatsDrawerState extends ConsumerState<ChatsDrawer>
                           size: IconSize.listItem,
                         ),
                         onPressed: () {
-                          ConduitHaptics.selectionClick();
+                          NerdinHaptics.selectionClick();
                           _setFolderExpanded(folderId, !isExpanded);
                         },
                       ),
@@ -1102,7 +1101,7 @@ class _ChatsDrawerState extends ConsumerState<ChatsDrawer>
                 child: rowContent,
               );
 
-        return ConduitContextMenu(
+        return NerdinContextMenu(
           actions: _buildFolderActions(folder, allFolders),
           child: hierarchyWrapped,
         );
@@ -1138,7 +1137,7 @@ class _ChatsDrawerState extends ConsumerState<ChatsDrawer>
   Future<void> _showDrawerError(String message) async {
     if (!mounted) return;
     final l10n = AppLocalizations.of(context)!;
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     await ThemedDialogs.show<void>(
       context,
       title: l10n.errorMessage,
@@ -1158,7 +1157,7 @@ class _ChatsDrawerState extends ConsumerState<ChatsDrawer>
     );
   }
 
-  List<ConduitContextMenuAction> _buildFolderActions(
+  List<NerdinContextMenuAction> _buildFolderActions(
     Folder folder,
     List<Folder> folders,
   ) {
@@ -1169,11 +1168,11 @@ class _ChatsDrawerState extends ConsumerState<ChatsDrawer>
         _normalizeParentId(folder.parentId) != null || moveTargets.isNotEmpty;
 
     return [
-      ConduitContextMenuAction(
+      NerdinContextMenuAction(
         cupertinoIcon: CupertinoIcons.folder_badge_plus,
         materialIcon: Icons.create_new_folder_outlined,
         label: l10n.newFolder,
-        onBeforeClose: () => ConduitHaptics.selectionClick(),
+        onBeforeClose: () => NerdinHaptics.selectionClick(),
         onSelected: () async {
           _setFolderExpanded(folderId, true);
           await CreateFolderDialog.show(
@@ -1184,31 +1183,31 @@ class _ChatsDrawerState extends ConsumerState<ChatsDrawer>
           );
         },
       ),
-      ConduitContextMenuAction(
+      NerdinContextMenuAction(
         cupertinoIcon: CupertinoIcons.pencil,
         materialIcon: Icons.edit_rounded,
         label: l10n.rename,
-        onBeforeClose: () => ConduitHaptics.selectionClick(),
+        onBeforeClose: () => NerdinHaptics.selectionClick(),
         onSelected: () async {
           await _renameFolder(context, folder);
         },
       ),
       if (canMove)
-        ConduitContextMenuAction(
+        NerdinContextMenuAction(
           cupertinoIcon: CupertinoIcons.folder,
           materialIcon: Icons.drive_file_move_outline,
           label: l10n.move,
-          onBeforeClose: () => ConduitHaptics.selectionClick(),
+          onBeforeClose: () => NerdinHaptics.selectionClick(),
           onSelected: () async {
             await _moveFolder(folder, folders);
           },
         ),
-      ConduitContextMenuAction(
+      NerdinContextMenuAction(
         cupertinoIcon: CupertinoIcons.delete,
         materialIcon: Icons.delete_rounded,
         label: l10n.delete,
         destructive: true,
-        onBeforeClose: () => ConduitHaptics.mediumImpact(),
+        onBeforeClose: () => NerdinHaptics.mediumImpact(),
         onSelected: () async {
           await _confirmAndDeleteFolder(context, folder);
         },
@@ -1275,7 +1274,7 @@ class _ChatsDrawerState extends ConsumerState<ChatsDrawer>
       await api.updateFolderParent(folder.id, nextParentId);
       if (!mounted) return;
 
-      ConduitHaptics.selectionClick();
+      NerdinHaptics.selectionClick();
       ref
           .read(foldersProvider.notifier)
           .updateFolderFromRemote(
@@ -1356,7 +1355,7 @@ class _ChatsDrawerState extends ConsumerState<ChatsDrawer>
       context: context,
       isScrollControlled: true,
       builder: (sheetContext) {
-        final theme = sheetContext.conduitTheme;
+        final theme = sheetContext.nerdinTheme;
         final maxListHeight = MediaQuery.sizeOf(sheetContext).height * 0.62;
 
         return Column(
@@ -1433,7 +1432,7 @@ class _ChatsDrawerState extends ConsumerState<ChatsDrawer>
       final api = ref.read(apiServiceProvider);
       if (api == null) throw Exception('No API service');
       await api.updateFolder(folder.id, name: newName);
-      ConduitHaptics.selectionClick();
+      NerdinHaptics.selectionClick();
       ref
           .read(foldersProvider.notifier)
           .updateFolderFromRemote(
@@ -1474,7 +1473,7 @@ class _ChatsDrawerState extends ConsumerState<ChatsDrawer>
       final api = ref.read(apiServiceProvider);
       if (api == null) throw Exception('No API service');
       await api.deleteFolder(folder.id);
-      ConduitHaptics.mediumImpact();
+      NerdinHaptics.mediumImpact();
       ref.read(foldersProvider.notifier).removeFolderFromRemote(folder.id);
       refreshConversationsCache(ref, includeFolders: true);
     } catch (e, stackTrace) {
@@ -1539,7 +1538,7 @@ class _ChatsDrawerState extends ConsumerState<ChatsDrawer>
           )
         : tileWidget;
 
-    final tile = ConduitContextMenu(
+    final tile = NerdinContextMenu(
       actions: buildConversationActionsWithFolders(
         context: context,
         ref: ref,
@@ -1554,7 +1553,7 @@ class _ChatsDrawerState extends ConsumerState<ChatsDrawer>
   }
 
   Widget _buildArchivedHeader(int count) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final show = ref.watch(showArchivedProvider);
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -1680,42 +1679,30 @@ class _ChatsDrawerState extends ConsumerState<ChatsDrawer>
         }
       }
 
-      // DB-first open (CDT-RFC-001 Phase 1): a synced local row renders
-      // instantly — offline included — and a background pull freshens it.
-      final local = await loadLocalConversation(container, id);
-      if (local != null) {
+      // Load from the server.
+      final api = container.read(apiServiceProvider);
+      if (api != null) {
+        final full = await api.getConversation(id);
         container
             .read(activeConversationProvider.notifier)
-            .set(withOptimisticReadAt(local));
-        schedulePullChatNow(container, id);
+            .set(withOptimisticReadAt(full));
       } else {
-        // No row / envelope stub / reviewer mode: load from the server.
-        final api = container.read(apiServiceProvider);
-        if (api != null) {
-          final full = await api.getConversation(id);
+        // Fallback: use the lightweight item to update the active
+        // conversation
+        final conversations = await container.read(
+          conversationsProvider.future,
+        );
+        Conversation? fallback;
+        for (final conversation in conversations) {
+          if (conversation.id == id) {
+            fallback = conversation;
+            break;
+          }
+        }
+        if (fallback != null) {
           container
               .read(activeConversationProvider.notifier)
-              .set(withOptimisticReadAt(full));
-          // Materialize the local row so the next open is DB-first.
-          schedulePullChatNow(container, id);
-        } else {
-          // Fallback: use the lightweight item to update the active
-          // conversation
-          final conversations = await container.read(
-            conversationsProvider.future,
-          );
-          Conversation? fallback;
-          for (final conversation in conversations) {
-            if (conversation.id == id) {
-              fallback = conversation;
-              break;
-            }
-          }
-          if (fallback != null) {
-            container
-                .read(activeConversationProvider.notifier)
-                .set(withOptimisticReadAt(fallback));
-          }
+              .set(withOptimisticReadAt(fallback));
         }
       }
 
@@ -1766,7 +1753,7 @@ class _FolderMoveTargetTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,

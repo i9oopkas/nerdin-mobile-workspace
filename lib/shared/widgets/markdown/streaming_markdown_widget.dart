@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/models/chat_message.dart';
-import '../../utils/ask_conduit_context_menu.dart';
+import '../../utils/ask_nerdin_context_menu.dart';
 import 'compiled_markdown_document.dart';
 import 'markdown_config.dart';
 import 'markdown_compile_service.dart';
 import 'markdown_document_controller.dart';
 import 'markdown_loading_skeleton.dart';
 import 'renderer/block_renderer.dart';
-import 'renderer/conduit_markdown_widget.dart';
+import 'renderer/nerdin_markdown_widget.dart';
 
 @visibleForTesting
 Map<String, Object> buildStreamingMarkdownSnapshotForTesting(
@@ -59,7 +59,7 @@ class StreamingMarkdownWidget extends ConsumerStatefulWidget {
     this.imageBuilderOverride,
     this.sources,
     this.onSourceTap,
-    this.askConduitComposerTargetId,
+    this.askNerdinComposerTargetId,
     this.stateScopeId,
     this.enableStreamingTextFade = true,
     this.debugTreatAsWidgetTest,
@@ -83,10 +83,10 @@ class StreamingMarkdownWidget extends ConsumerStatefulWidget {
   /// Callback when a source badge is tapped.
   final void Function(int sourceIndex)? onSourceTap;
 
-  /// Composer target that should receive "Ask Conduit" insertions.
+  /// Composer target that should receive "Ask Nerdin" insertions.
   ///
   /// When null, this markdown surface uses Flutter's default selection menu.
-  final String? askConduitComposerTargetId;
+  final String? askNerdinComposerTargetId;
 
   /// Optional scope used to preserve state for remounted markdown blocks.
   final String? stateScopeId;
@@ -427,11 +427,11 @@ class _StreamingMarkdownWidgetState
 
     return SelectionArea(
       contextMenuBuilder: (context, selectableRegionState) {
-        return buildAskConduitSelectionAreaContextMenu(
+        return buildAskNerdinSelectionAreaContextMenu(
           selectableRegionState: selectableRegionState,
           ref: ref,
           selectedText: _selectedText,
-          composerTargetId: widget.askConduitComposerTargetId,
+          composerTargetId: widget.askNerdinComposerTargetId,
         );
       },
       onSelectionChanged: (content) {
@@ -446,7 +446,7 @@ class _StreamingMarkdownWidgetState
   /// Citations like [1], [2] are rendered as clickable
   /// badges inline with the text.
   Widget _buildMarkdownWithCitations(CompiledMarkdownDocument document) {
-    return ConduitMarkdownWidget(
+    return NerdinMarkdownWidget(
       compiledDocument: document,
       onLinkTap: widget.onTapLink,
       imageBuilder: _adaptImageBuilder(),
@@ -568,7 +568,7 @@ extension StreamingMarkdownExtension on String {
     MarkdownLinkTapCallback? onTapLink,
     List<ChatSourceReference>? sources,
     void Function(int sourceIndex)? onSourceTap,
-    String? askConduitComposerTargetId,
+    String? askNerdinComposerTargetId,
     String? stateScopeId,
   }) {
     return StreamingMarkdownWidget(
@@ -577,7 +577,7 @@ extension StreamingMarkdownExtension on String {
       onTapLink: onTapLink,
       sources: sources,
       onSourceTap: onSourceTap,
-      askConduitComposerTargetId: askConduitComposerTargetId,
+      askNerdinComposerTargetId: askNerdinComposerTargetId,
       stateScopeId: stateScopeId,
     );
   }

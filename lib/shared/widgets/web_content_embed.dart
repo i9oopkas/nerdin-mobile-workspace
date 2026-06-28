@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 
 import '../theme/theme_extensions.dart';
 import 'webview_content_height.dart';
@@ -272,7 +272,7 @@ class _WebContentEmbedState extends State<WebContentEmbed> {
         }
         await controller.loadUrl(urlRequest: URLRequest(url: WebUri.uri(uri)));
       } else {
-        final baseUrl = WebUri('https://embed.conduit.local/');
+        final baseUrl = WebUri('https://embed.nerdin.local/');
         await controller.loadData(
           data: _wrapHtmlDocument(widget.source, argsText: widget.argsText),
           baseUrl: baseUrl,
@@ -349,7 +349,7 @@ class _WebContentEmbedState extends State<WebContentEmbed> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     if (!_isSupported) {
       return _EmbedFallbackCard(
@@ -499,7 +499,7 @@ class _WebContentEmbedState extends State<WebContentEmbed> {
         const maxHeight = $_embedMaxHeight;
         window.addEventListener('message', (event) => {
           const data = event.data || {};
-          if (data.type !== 'conduit-embed-height') return;
+          if (data.type !== 'nerdin-embed-height') return;
 
           const height = Number(data.height);
           if (!Number.isFinite(height) || height <= 0) return;
@@ -549,7 +549,7 @@ class _WebContentEmbedState extends State<WebContentEmbed> {
         html?.scrollHeight || 0,
         html?.offsetHeight || 0
       ));
-      parent.postMessage({ type: 'conduit-embed-height', height }, '*');
+      parent.postMessage({ type: 'nerdin-embed-height', height }, '*');
     };
 
     window.addEventListener('load', reportHeight);
@@ -606,7 +606,7 @@ class _EmbedLoadingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -635,7 +635,7 @@ class _EmbedDeferredCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final l10n = AppLocalizations.of(context);
 
     return DecoratedBox(
@@ -691,7 +691,7 @@ class _EmbedFallbackCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     return DecoratedBox(
       decoration: BoxDecoration(

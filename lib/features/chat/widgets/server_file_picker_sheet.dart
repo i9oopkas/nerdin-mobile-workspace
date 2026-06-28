@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io' show Platform;
 
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,8 +10,8 @@ import '../../../core/models/file_info.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../shared/theme/theme_extensions.dart';
 import '../../../shared/utils/file_type_utils.dart';
-import '../../../shared/widgets/conduit_components.dart';
-import '../../../shared/widgets/conduit_loading.dart';
+import '../../../shared/widgets/nerdin_components.dart';
+import '../../../shared/widgets/nerdin_loading.dart';
 import '../../../shared/widgets/modal_safe_area.dart';
 import '../../../shared/widgets/sheet_handle.dart';
 
@@ -58,7 +58,7 @@ class _ServerFilePickerSheetState extends ConsumerState<ServerFilePickerSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final l10n = AppLocalizations.of(context)!;
     final filesAsync = _query.isEmpty
         ? ref.watch(userFilesProvider)
@@ -80,7 +80,7 @@ class _ServerFilePickerSheetState extends ConsumerState<ServerFilePickerSheet> {
               color: theme.dividerColor,
               width: BorderWidth.thin,
             ),
-            boxShadow: ConduitShadows.modal(context),
+            boxShadow: NerdinShadows.modal(context),
           ),
           child: ModalSheetSafeArea(
             padding: const EdgeInsets.fromLTRB(
@@ -104,7 +104,7 @@ class _ServerFilePickerSheetState extends ConsumerState<ServerFilePickerSheet> {
                   ),
                 ),
                 const SizedBox(height: Spacing.sm),
-                ConduitGlassSearchField(
+                NerdinGlassSearchField(
                   controller: _searchController,
                   hintText: l10n.searchFiles,
                   onChanged: _onSearchChanged,
@@ -183,14 +183,14 @@ class _ServerFileTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final extension = file.extension;
     final accentColor = FileTypeUtils.colorForExtension(
       extension,
       fallback: theme.buttonPrimary,
     );
 
-    return ConduitCard(
+    return NerdinCard(
       padding: EdgeInsets.zero,
       onTap: onTap,
       child: Padding(

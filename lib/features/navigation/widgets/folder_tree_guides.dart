@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:conduit/core/models/folder.dart';
-import 'package:conduit/shared/theme/theme_extensions.dart';
+import 'package:nerdin_mobile_workspace/core/models/folder.dart';
+import 'package:nerdin_mobile_workspace/shared/theme/theme_extensions.dart';
 
 String? _normalizeFolderParentId(String? parentId) {
   if (parentId == null || parentId.isEmpty) {

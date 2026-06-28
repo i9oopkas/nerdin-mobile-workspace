@@ -8,7 +8,7 @@ part 'note.g.dart';
 /// Transient metadata key used by cached note-list rows to carry a bounded
 /// preview without pretending it is the full note body.
 const String kNoteListPreviewMarkdownMetaKey =
-    '__conduit_list_preview_markdown';
+    '__nerdin_list_preview_markdown';
 
 /// Helper to extract user_id from JSON, falling back to user.id if not present.
 /// OpenWebUI's NoteItemResponse (list endpoint) doesn't include user_id directly

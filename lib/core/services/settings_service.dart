@@ -558,7 +558,7 @@ class SettingsService {
     AndroidAssistantTrigger trigger,
   ) async {
     // Stored in shared_preferences as `flutter.android_assistant_trigger`; the
-    // native Android voice-interaction session (ConduitVoiceInteractionSession)
+    // native Android voice-interaction session (NerdinVoiceInteractionSession)
     // reads that key directly, so no separate native dual-write is needed.
     await _putPreference(_androidAssistantTriggerKey, trigger.storageValue);
   }

@@ -1,4 +1,4 @@
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import 'package:flutter/material.dart';
 
 /// Represents a single tweakcn theme variant (light or dark) and exposes the
@@ -112,7 +112,7 @@ Color mix(Color a, Color b, double amount) {
 }
 
 class TweakcnThemes {
-  static final TweakcnThemeVariant _conduitLight = TweakcnThemeVariant(
+  static final TweakcnThemeVariant _nerdinLight = TweakcnThemeVariant(
     background: const Color(0xFFFFFFFF), // background
     foreground: const Color(0xFF000000), // onBackground
     card: const Color(0xFFF4F4F4), // surface
@@ -149,7 +149,7 @@ class TweakcnThemes {
     radius: 10,
   );
 
-  static final TweakcnThemeVariant _conduitDark = TweakcnThemeVariant(
+  static final TweakcnThemeVariant _nerdinDark = TweakcnThemeVariant(
     background: const Color(0xFF000000), // background
     foreground: const Color(0xFFECECEC), // onBackground
     card: const Color(0xFF141414), // surface
@@ -511,11 +511,11 @@ class TweakcnThemes {
   );
 
   static final TweakcnThemeDefinition conduit = TweakcnThemeDefinition(
-    id: 'conduit',
-    labelBuilder: (l10n) => l10n.themePaletteConduitLabel,
-    descriptionBuilder: (l10n) => l10n.themePaletteConduitDescription,
-    light: _conduitLight,
-    dark: _conduitDark,
+    id: 'nerdin',
+    labelBuilder: (l10n) => l10n.themePaletteNerdinLabel,
+    descriptionBuilder: (l10n) => l10n.themePaletteNerdinDescription,
+    light: _nerdinLight,
+    dark: _nerdinDark,
     preview: const <Color>[
       Color(0xFF000000), // primary
       Color(0xFF10A37F), // tertiary / accent

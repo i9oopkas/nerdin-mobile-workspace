@@ -3,7 +3,7 @@ import 'dart:io' show Platform;
 import 'dart:typed_data';
 
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -19,7 +19,7 @@ import '../../../core/utils/user_avatar_utils.dart';
 import '../../../core/utils/user_display_name.dart';
 import '../../../shared/theme/theme_extensions.dart';
 import '../../../shared/utils/adaptive_glass.dart';
-import '../../../shared/widgets/conduit_components.dart';
+import '../../../shared/widgets/nerdin_components.dart';
 import '../../../shared/widgets/user_avatar.dart';
 import '../../auth/providers/unified_auth_providers.dart';
 import '../../terminal/providers/terminal_providers.dart';
@@ -86,8 +86,8 @@ class SidebarProfileAppBarLeading extends ConsumerWidget {
         ? 'U'
         : displayName.characters.first.toUpperCase();
     final avatarUrl = resolveUserAvatarUrlForUser(api, user);
-    final iconColor = context.conduitTheme.textPrimary;
-    final useOpaqueFallback = conduitUsesOpaqueGlassFallback();
+    final iconColor = context.nerdinTheme.textPrimary;
+    final useOpaqueFallback = nerdinUsesOpaqueGlassFallback();
     final style = useOpaqueFallback
         ? AdaptiveButtonStyle.plain
         : AdaptiveButtonStyle.glass;
@@ -251,8 +251,8 @@ class SidebarProfileAppBarLeading extends ConsumerWidget {
           ],
         ),
         NativeSheetSectionConfig(
-          title: l10n.supportConduit,
-          footer: l10n.supportConduitSubtitle,
+          title: l10n.supportNerdin,
+          footer: l10n.supportNerdinSubtitle,
           items: [
             NativeSheetItemConfig(
               id: 'buy-me-a-coffee',
@@ -451,7 +451,7 @@ class SidebarSearchAppBarLeading extends ConsumerWidget {
       child: ValueListenableBuilder<TextEditingValue>(
         valueListenable: controller,
         builder: (context, value, _) {
-          return ConduitGlassSearchField(
+          return NerdinGlassSearchField(
             controller: controller,
             focusNode: focusNode,
             hintText: hintText,

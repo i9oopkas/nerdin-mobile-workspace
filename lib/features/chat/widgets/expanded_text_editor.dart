@@ -5,10 +5,10 @@ import 'package:flutter/cupertino.dart';
 import 'dart:io' show Platform;
 
 import '../../../shared/utils/adaptive_glass.dart';
-import '../../../shared/theme/conduit_input_styles.dart';
+import '../../../shared/theme/nerdin_input_styles.dart';
 import '../../../shared/theme/theme_extensions.dart';
 import '../../../shared/widgets/themed_sheets.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 
 /// Full-screen bottom sheet editor shown when the chat input grows large.
 ///
@@ -59,7 +59,7 @@ class _ExpandedTextEditorSheetState extends State<ExpandedTextEditorSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final l10n = AppLocalizations.of(context)!;
     final viewInsets = MediaQuery.of(context).viewInsets;
     final viewPadding = MediaQuery.of(context).viewPadding;
@@ -78,7 +78,7 @@ class _ExpandedTextEditorSheetState extends State<ExpandedTextEditorSheet> {
     final sendButton = AdaptiveButton.child(
       onPressed: _hasText ? widget.onSend : null,
       enabled: _hasText,
-      style: conduitUsesOpaqueGlassFallback()
+      style: nerdinUsesOpaqueGlassFallback()
           ? AdaptiveButtonStyle.filled
           : AdaptiveButtonStyle.prominentGlass,
       color: theme.buttonPrimary,
@@ -134,7 +134,7 @@ class _ExpandedTextEditorSheetState extends State<ExpandedTextEditorSheet> {
                 color: theme.textPrimary,
                 height: 1.5,
               ),
-              decoration: context.conduitInputStyles
+              decoration: context.nerdinInputStyles
                   .borderless(hint: l10n.messageHintText)
                   .copyWith(
                     contentPadding: const EdgeInsets.fromLTRB(

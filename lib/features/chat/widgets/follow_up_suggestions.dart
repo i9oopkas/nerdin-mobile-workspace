@@ -56,7 +56,7 @@ class _MinimalFollowUpButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final textStyle = AppTypography.chatMessageStyle.copyWith(
       color: enabled
           ? theme.buttonPrimary.withValues(alpha: 0.75)

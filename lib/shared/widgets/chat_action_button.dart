@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:conduit/shared/theme/theme_extensions.dart';
-import 'package:conduit/core/services/platform_service.dart';
-import 'package:conduit/core/services/settings_service.dart';
+import 'package:nerdin_mobile_workspace/shared/theme/theme_extensions.dart';
+import 'package:nerdin_mobile_workspace/core/services/platform_service.dart';
+import 'package:nerdin_mobile_workspace/core/services/settings_service.dart';
 
 class ChatActionButton extends ConsumerWidget {
   final IconData icon;
@@ -18,7 +18,7 @@ class ChatActionButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final hapticEnabled = ref.read(hapticEnabledProvider);
     final handleTap = onTap == null
         ? null

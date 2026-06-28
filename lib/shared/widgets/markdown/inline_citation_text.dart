@@ -33,7 +33,7 @@ class InlineCitationText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final segments = CitationParser.parse(text);
-    final markdownStyle = ConduitMarkdownStyle.fromTheme(context);
+    final markdownStyle = NerdinMarkdownStyle.fromTheme(context);
 
     // If no citations found, render as plain text
     if (segments == null || segments.isEmpty) {

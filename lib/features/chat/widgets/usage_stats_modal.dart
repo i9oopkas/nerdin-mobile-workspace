@@ -3,7 +3,7 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import '../../../core/services/native_sheet_bridge.dart';
 import '../../../shared/theme/theme_extensions.dart';
 import '../../../shared/widgets/themed_sheets.dart';
@@ -15,7 +15,7 @@ class UsageStatsModal {
 
   /// Shows a bottom sheet with usage/performance statistics for the response.
   static void show(BuildContext context, Map<String, dynamic> usage) async {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final l10n = AppLocalizations.of(context)!;
 
     if (Platform.isIOS) {
@@ -90,7 +90,7 @@ class UsageStatsModal {
     BuildContext context,
     Map<String, dynamic> usage,
     AppLocalizations l10n,
-    ConduitThemeExtension theme,
+    NerdinThemeExtension theme,
   ) {
     final stats = <Widget>[];
 
@@ -339,7 +339,7 @@ class _UsageStatRow extends StatelessWidget {
   final String label;
   final String value;
   final String? detail;
-  final ConduitThemeExtension theme;
+  final NerdinThemeExtension theme;
 
   @override
   Widget build(BuildContext context) {

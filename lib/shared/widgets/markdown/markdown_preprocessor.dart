@@ -7,8 +7,8 @@ import 'package:html_unescape/html_unescape.dart';
 /// - [sanitize] - Cleans content for copy/API (removes reasoning blocks)
 /// - [toPlainText] - Converts to plain text for TTS
 /// - [softenInlineCode] - Breaks long inline code spans
-class ConduitMarkdownPreprocessor {
-  const ConduitMarkdownPreprocessor._();
+class NerdinMarkdownPreprocessor {
+  const NerdinMarkdownPreprocessor._();
 
   static final _htmlUnescape = HtmlUnescape();
 

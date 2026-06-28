@@ -31,13 +31,13 @@ String? buildSelfSignedImageCacheNamespace(ServerConfig server) {
   final tlsMode = server.hasMutualTlsCredentials ? 'mtls' : 'selfsigned';
   final host = uri.host.toLowerCase();
   final port = uri.hasPort ? uri.port : 0;
-  return 'conduit-$tlsMode-$host:$port';
+  return 'nerdin-$tlsMode-$host:$port';
 }
 
 @visibleForTesting
 String buildSelfSignedImageCacheDirectoryName(String namespace) {
   final digest = sha256.convert(utf8.encode(namespace)).toString();
-  return 'conduit-image-cache-$digest';
+  return 'nerdin-image-cache-$digest';
 }
 
 BaseCacheManager? buildSelfSignedImageCacheManager(

@@ -5,7 +5,6 @@ import 'package:drift/drift.dart';
 import '../app_database.dart';
 import '../mappers/note_mapper.dart';
 import '../tables/folders.dart';
-import 'outbox_dao.dart';
 
 part 'folders_dao.g.dart';
 

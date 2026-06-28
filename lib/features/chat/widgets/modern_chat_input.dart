@@ -6,8 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:conduit/core/services/haptic_service.dart';
-import '../../../shared/theme/conduit_input_styles.dart';
+import 'package:nerdin_mobile_workspace/core/services/haptic_service.dart';
+import '../../../shared/theme/nerdin_input_styles.dart';
 import '../../../shared/theme/theme_extensions.dart';
 // app_theme not required here; using theme extension tokens
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,8 +39,8 @@ import '../../../core/models/knowledge_base_file.dart';
 
 import '../../../shared/utils/platform_utils.dart';
 import '../../../shared/utils/adaptive_glass.dart';
-import '../../../shared/utils/ask_conduit_context_menu.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import '../../../shared/utils/ask_nerdin_context_menu.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import '../../../shared/widgets/modal_safe_area.dart';
 import '../../../shared/widgets/model_avatar.dart';
 import '../../../shared/widgets/themed_sheets.dart';
@@ -523,7 +523,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
       }
     }
 
-    return withAskConduitContextMenuItem(
+    return withAskNerdinContextMenuItem(
       items: items,
       ref: ref,
       selectedText: selectedTextFromEditableTextState(editableTextState),
@@ -993,7 +993,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
     final TextRange? range = _currentPromptRange;
     if (range == null) return;
 
-    ConduitHaptics.selectionClick();
+    NerdinHaptics.selectionClick();
 
     final result = _removeCommandToken(_controller.text, range);
     _controller.value = TextEditingValue(
@@ -1415,11 +1415,11 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
                   return Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: innerContext.conduitTheme.surfaceBackground,
+                      color: innerContext.nerdinTheme.surfaceBackground,
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(AppBorderRadius.modal),
                       ),
-                      boxShadow: ConduitShadows.modal(innerContext),
+                      boxShadow: NerdinShadows.modal(innerContext),
                     ),
                     child: SizedBox(
                       height: MediaQuery.of(innerContext).size.height * 0.6,
@@ -1511,8 +1511,8 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
 
   /// Returns the correct overlay widget for the current trigger character.
   Widget _buildActiveOverlay() {
-    final overlayColor = context.conduitTheme.cardBackground;
-    final borderColor = context.conduitTheme.cardBorder.withValues(
+    final overlayColor = context.nerdinTheme.cardBackground;
+    final borderColor = context.nerdinTheme.cardBorder.withValues(
       alpha: Theme.of(context).brightness == Brightness.dark ? 0.6 : 0.4,
     );
 
@@ -1550,7 +1550,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
             child: CircularProgressIndicator(
               strokeWidth: BorderWidth.regular,
               valueColor: AlwaysStoppedAnimation<Color>(
-                context.conduitTheme.loadingIndicator,
+                context.nerdinTheme.loadingIndicator,
               ),
             ),
           ),
@@ -1587,7 +1587,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
             final bool showSectionHeader = previousType != suggestion.type;
             final bool isSelected = index == activeIndex;
             final highlight = isSelected
-                ? context.conduitTheme.navigationSelectedBackground.withValues(
+                ? context.nerdinTheme.navigationSelectedBackground.withValues(
                     alpha: 0.4,
                   )
                 : Colors.transparent;
@@ -1615,7 +1615,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
                     child: Text(
                       sectionTitle(suggestion.type),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: context.conduitTheme.textSecondary,
+                        color: context.nerdinTheme.textSecondary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -1647,7 +1647,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
                           Icon(
                             suggestion.icon,
                             size: IconSize.medium,
-                            color: context.conduitTheme.textSecondary,
+                            color: context.nerdinTheme.textSecondary,
                           ),
                           const SizedBox(width: Spacing.sm),
                           Expanded(
@@ -1660,7 +1660,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
                                   overflow: TextOverflow.ellipsis,
                                   style: Theme.of(context).textTheme.bodyMedium
                                       ?.copyWith(
-                                        color: context.conduitTheme.textPrimary,
+                                        color: context.nerdinTheme.textPrimary,
                                         fontWeight: FontWeight.w600,
                                       ),
                                 ),
@@ -1679,7 +1679,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
                                           .bodySmall
                                           ?.copyWith(
                                             color: context
-                                                .conduitTheme
+                                                .nerdinTheme
                                                 .textSecondary,
                                           ),
                                     ),
@@ -1713,7 +1713,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
         border: Border.all(color: borderColor, width: BorderWidth.thin),
         boxShadow: [
           BoxShadow(
-            color: context.conduitTheme.cardShadow.withValues(
+            color: context.nerdinTheme.cardShadow.withValues(
               alpha: Theme.of(context).brightness == Brightness.dark
                   ? 0.28
                   : 0.16,
@@ -1846,7 +1846,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
   Future<void> _handleOverflowButtonPressed(
     List<IosKeyboardAttachmentActionConfig> nativeActions,
   ) async {
-    ConduitHaptics.selectionClick();
+    NerdinHaptics.selectionClick();
 
     if (!kIsWeb && Platform.isIOS && nativeActions.isNotEmpty) {
       final handled = await _toggleNativeKeyboardAttachmentPanel(nativeActions);
@@ -2031,13 +2031,13 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
     final Brightness brightness = Theme.of(context).brightness;
 
     // Keep mention highlight colors in sync with the theme.
-    final mentionColor = context.conduitTheme.buttonPrimary;
+    final mentionColor = context.nerdinTheme.buttonPrimary;
     _controller.mentionColor = mentionColor;
     _controller.mentionBackground = mentionColor.withValues(alpha: 0.12);
 
     final bool hasComposerFocus = _focusNode.hasFocus;
     final bool isActive = hasComposerFocus || _hasText || _isRecording;
-    final Color placeholderColor = context.conduitTheme.textSecondary
+    final Color placeholderColor = context.nerdinTheme.textSecondary
         .withValues(alpha: 0.5);
     final Color placeholderBase = placeholderColor;
     final Color placeholderFocused = placeholderColor;
@@ -2584,7 +2584,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
                 placeholderFocused,
                 factor,
               )!;
-              final textLabel = context.conduitTheme.inputText;
+              final textLabel = context.nerdinTheme.inputText;
               final Color animatedTextColor = Color.lerp(
                 textLabel.withValues(alpha: 0.88),
                 textLabel,
@@ -2679,7 +2679,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
                   fontStyle: _isRecording ? FontStyle.italic : FontStyle.normal,
                   fontWeight: recordingWeight,
                 ),
-                decoration: context.conduitInputStyles
+                decoration: context.nerdinInputStyles
                     .borderless(hint: inputPlaceholder)
                     .copyWith(
                       hintStyle: baseChatStyle.copyWith(
@@ -2735,7 +2735,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
 
     final bool nativePanelVisible =
         !kIsWeb && Platform.isIOS && _isNativeAttachmentPanelVisible;
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     final Color iconColor = !enabled
         ? theme.textPrimary.withValues(alpha: Alpha.disabled)
@@ -2776,14 +2776,14 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
         child: Icon(
           Icons.open_in_full,
           size: IconSize.large,
-          color: context.conduitTheme.textSecondary.withValues(alpha: 0.7),
+          color: context.nerdinTheme.textSecondary.withValues(alpha: 0.7),
         ),
       ),
     );
   }
 
   Widget _buildDictationStopButton({double size = TouchTarget.minimum}) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final iconSize = size <= 36.0 ? IconSize.medium : IconSize.large;
     final background = theme.surfaceContainerHighest.withValues(alpha: 0.96);
     final border = theme.cardBorder.withValues(alpha: 0.75);
@@ -2822,7 +2822,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
 
   Widget _buildInlineMicAction(bool voiceAvailable, {double? size}) {
     final bool enabledMic = widget.enabled && (voiceAvailable || _isRecording);
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final bool active = _isRecording;
     final double buttonSize = size ?? 36.0;
     final IconData iconData = active
@@ -2852,7 +2852,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
     );
     final onPressed = enabledMic
         ? () {
-            ConduitHaptics.selectionClick();
+            NerdinHaptics.selectionClick();
             _toggleVoice();
           }
         : null;
@@ -2879,8 +2879,8 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
     final l10n = AppLocalizations.of(context)!;
     final bool enabled = widget.enabled && !isLoading && !_isRecording;
     final iconColor = enabled
-        ? context.conduitTheme.textSecondary.withValues(alpha: Alpha.strong)
-        : context.conduitTheme.textSecondary.withValues(alpha: Alpha.disabled);
+        ? context.nerdinTheme.textSecondary.withValues(alpha: Alpha.strong)
+        : context.nerdinTheme.textSecondary.withValues(alpha: Alpha.disabled);
 
     return AdaptiveTooltip(
       message: l10n.createNote,
@@ -2895,7 +2895,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
                 height: IconSize.large,
                 child: CircularProgressIndicator(
                   strokeWidth: 2.5,
-                  color: context.conduitTheme.textSecondary,
+                  color: context.nerdinTheme.textSecondary,
                 ),
               )
             : Icon(
@@ -2931,7 +2931,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
         child: _buildComposerIconButton(
           key: const ValueKey('primary-btn-stop'),
           onPressed: () {
-            ConduitHaptics.lightImpact();
+            NerdinHaptics.lightImpact();
             stopGeneration();
           },
           size: buttonSize,
@@ -2939,7 +2939,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
           child: Icon(
             Platform.isIOS ? CupertinoIcons.stop_fill : Icons.stop,
             size: dense ? IconSize.large : IconSize.xl,
-            color: context.conduitTheme.buttonPrimaryText,
+            color: context.nerdinTheme.buttonPrimaryText,
           ),
         ),
       );
@@ -2964,15 +2964,15 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
               height: IconSize.large,
               child: CircularProgressIndicator(
                 strokeWidth: 2.5,
-                color: context.conduitTheme.textSecondary,
+                color: context.nerdinTheme.textSecondary,
               ),
             )
           : Icon(
               CupertinoIcons.arrow_up,
               size: IconSize.large,
               color: enabled
-                  ? context.conduitTheme.buttonPrimaryText
-                  : context.conduitTheme.textPrimary.withValues(
+                  ? context.nerdinTheme.buttonPrimaryText
+                  : context.nerdinTheme.textPrimary.withValues(
                       alpha: Alpha.disabled,
                     ),
             );
@@ -3010,8 +3010,8 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
             Platform.isIOS ? CupertinoIcons.waveform : Icons.graphic_eq,
             size: dense ? IconSize.large : IconSize.xl,
             color: enabledVoiceCall
-                ? context.conduitTheme.buttonPrimaryText
-                : context.conduitTheme.textPrimary.withValues(
+                ? context.nerdinTheme.buttonPrimaryText
+                : context.nerdinTheme.textPrimary.withValues(
                     alpha: Alpha.disabled,
                   ),
           ),
@@ -3028,7 +3028,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
       child: Icon(
         CupertinoIcons.arrow_up,
         size: IconSize.large,
-        color: context.conduitTheme.textPrimary.withValues(
+        color: context.nerdinTheme.textPrimary.withValues(
           alpha: Alpha.disabled,
         ),
       ),
@@ -3044,7 +3044,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
     bool dense = false,
   }) {
     final bool enabled = onTap != null;
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     final Color background = isActive
         ? theme.buttonPrimary.withValues(alpha: 0.10)
@@ -3071,7 +3071,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
           onTap: onTap == null
               ? null
               : () {
-                  ConduitHaptics.mediumImpact();
+                  NerdinHaptics.mediumImpact();
                   onTap();
                 },
           child: AnimatedContainer(
@@ -3136,11 +3136,11 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
     bool androidShowBackground = false,
     Color? color,
   }) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final effectiveColor = color ?? theme.buttonPrimary;
     final androidBackgroundColor =
         color ?? theme.surfaceContainerHighest.withValues(alpha: 0.95);
-    final usesOpaqueFallback = conduitUsesOpaqueGlassFallback();
+    final usesOpaqueFallback = nerdinUsesOpaqueGlassFallback();
     final buttonStyle = usesOpaqueFallback
         ? (isProminent || androidShowBackground
               ? AdaptiveButtonStyle.filled
@@ -3176,14 +3176,14 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
     bool useSmoothRectangleBorder = true,
     bool isRecording = false,
   }) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final recordingBorderColor = theme.buttonPrimary.withValues(alpha: 0.56);
     final recordingSurfaceColor = Color.alphaBlend(
       theme.buttonPrimary.withValues(alpha: 0.045),
       theme.surfaceContainerHighest,
     );
 
-    if (conduitSupportsNativeGlass()) {
+    if (nerdinSupportsNativeGlass()) {
       return Stack(
         key: key,
         fit: StackFit.passthrough,
@@ -3284,7 +3284,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
   }
 
   void _showOverflowSheet() {
-    ConduitHaptics.selectionClick();
+    NerdinHaptics.selectionClick();
     final prevCanRequest = _focusNode.canRequestFocus;
     final wasFocused = _focusNode.hasFocus;
     _focusNode.canRequestFocus = false;
@@ -3468,7 +3468,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
     await _voiceService.stopListening();
     if (!mounted) return;
     setState(() => _isRecording = false);
-    ConduitHaptics.selectionClick();
+    NerdinHaptics.selectionClick();
   }
 
   Future<void> _stopVoiceAndSend() async {
@@ -3479,7 +3479,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
     await _voiceService.stopListening();
     if (!mounted) return;
     setState(() => _isRecording = false);
-    ConduitHaptics.lightImpact();
+    NerdinHaptics.lightImpact();
     _sendMessage();
   }
 
@@ -3505,7 +3505,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
       return;
     }
 
-    ConduitHaptics.lightImpact();
+    NerdinHaptics.lightImpact();
 
     final title = DateFormat('yyyy-MM-dd').format(DateTime.now());
     final note = await ref
@@ -3517,7 +3517,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
     }
 
     if (note == null) {
-      ConduitHaptics.error();
+      NerdinHaptics.error();
       AdaptiveSnackBar.show(
         context,
         message: AppLocalizations.of(context)!.errorMessage,
@@ -3530,7 +3530,7 @@ class _ModernChatInputState extends ConsumerState<ModernChatInput>
     _controller.clearMentions();
     _controller.clear();
     _hidePromptOverlay();
-    ConduitHaptics.success();
+    NerdinHaptics.success();
     NavigationService.router.go('/notes/${note.id}');
   }
 }

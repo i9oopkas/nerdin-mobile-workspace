@@ -5,7 +5,6 @@ import '../../sync/note_conflict.dart';
 import '../app_database.dart';
 import '../mappers/note_mapper.dart';
 import '../tables/notes.dart';
-import 'outbox_dao.dart';
 
 part 'notes_dao.g.dart';
 

@@ -39,7 +39,7 @@ final class PreferenceKeys {
   static const String pinnedModels = 'pinned_models';
 
   // Notifications. The first three mirror Open WebUI's user-settings fields and
-  // are synced to the server; the rest are Conduit-only client preferences.
+  // are synced to the server; the rest are Nerdin-only client preferences.
   static const String notificationsEnabled = 'notifications_enabled';
   static const String notificationSound = 'notification_sound';
   static const String notificationSoundAlways = 'notification_sound_always';

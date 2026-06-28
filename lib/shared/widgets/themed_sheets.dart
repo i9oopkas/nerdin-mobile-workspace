@@ -22,7 +22,7 @@ abstract final class DraggableModalSheetSizes {
 /// Centralized helper for modal bottom sheets.
 ///
 /// Use [showCustom] when the sheet widget draws its own rounded surface. Use
-/// [showSurface] when the route should provide the standard Conduit sheet
+/// [showSurface] when the route should provide the standard Nerdin sheet
 /// chrome around simpler content.
 class ThemedSheets {
   ThemedSheets._();
@@ -80,7 +80,7 @@ class ThemedSheets {
       routeSettings: routeSettings,
       constraints: constraints,
       builder: (sheetContext) {
-        Widget sheet = ConduitModalSheetSurface(
+        Widget sheet = NerdinModalSheetSurface(
           padding: padding,
           showHandle: showHandle,
           child: builder(sheetContext),
@@ -121,7 +121,7 @@ class SheetCloseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final iconColor = color ?? theme.textSecondary;
     final icon = Icon(
       Platform.isIOS ? CupertinoIcons.xmark : Icons.close,
@@ -129,7 +129,7 @@ class SheetCloseButton extends StatelessWidget {
       color: iconColor,
     );
 
-    if (conduitSupportsNativeGlass()) {
+    if (nerdinSupportsNativeGlass()) {
       final button = AdaptiveButton.child(
         onPressed: onPressed,
         enabled: onPressed != null,
@@ -161,8 +161,8 @@ class SheetCloseButton extends StatelessWidget {
   }
 }
 
-class ConduitModalSheetSurface extends StatelessWidget {
-  const ConduitModalSheetSurface({
+class NerdinModalSheetSurface extends StatelessWidget {
+  const NerdinModalSheetSurface({
     super.key,
     required this.child,
     this.padding,
@@ -175,7 +175,7 @@ class ConduitModalSheetSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     Widget content = child;
     if (showHandle) {
@@ -196,7 +196,7 @@ class ConduitModalSheetSurface extends StatelessWidget {
           color: theme.dividerColor,
           width: BorderWidth.regular,
         ),
-        boxShadow: ConduitShadows.modal(context),
+        boxShadow: NerdinShadows.modal(context),
       ),
       child: ModalSheetSafeArea(padding: padding, child: content),
     );

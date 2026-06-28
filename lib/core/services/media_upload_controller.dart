@@ -128,7 +128,7 @@ class MediaUploadController {
     // The work below (image-bytes read + enqueue) runs after the converted temp
     // dir exists but before the queueStream listener / onCancel cleanup is
     // wired. If any of it throws, control unwinds past the normal terminal
-    // cleanup, so the converted conduit_img_* temp dir would leak. Clean it up
+    // cleanup, so the converted nerdin_img_* temp dir would leak. Clean it up
     // on this abort/error path only — never on the success path, where the queue
     // still reads the file asynchronously during processQueue.
     final Uint8List? imageBytes;
@@ -339,7 +339,7 @@ class MediaUploadController {
       );
 
       if (result != null && result.isNotEmpty) {
-        final tempDir = await Directory.systemTemp.createTemp('conduit_img_');
+        final tempDir = await Directory.systemTemp.createTemp('nerdin_img_');
         final tempFile = File('${tempDir.path}/converted.jpg');
         await tempFile.writeAsBytes(result);
 

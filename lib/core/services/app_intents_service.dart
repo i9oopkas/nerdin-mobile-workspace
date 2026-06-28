@@ -6,7 +6,6 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../platform/conduit_platform_apis.g.dart';
 import '../providers/app_providers.dart';
 import '../utils/debug_logger.dart';
 import 'navigation_service.dart';
@@ -19,55 +18,28 @@ import 'media_upload_controller.dart';
 
 part 'app_intents_service.g.dart';
 
+// TODO: iOS platform APIs deleted; restore when iOS directory is re-added.
 /// Handles iOS App Intents for Siri/Shortcuts.
 ///
 /// Native Swift code in AppDelegate.swift defines the App Intents with proper
 /// titles, descriptions, and parameters. This coordinator sets up a method
 /// channel to receive invocations and execute Flutter-side business logic.
 @Riverpod(keepAlive: true)
-class AppIntentCoordinator extends _$AppIntentCoordinator
-    implements AppIntentFlutterApi {
+class AppIntentCoordinator extends _$AppIntentCoordinator {
   @override
   FutureOr<void> build() {
     if (kIsWeb || defaultTargetPlatform != TargetPlatform.iOS) {
       return null;
     }
-    AppIntentFlutterApi.setUp(this);
-    ref.onDispose(() => AppIntentFlutterApi.setUp(null));
+    // TODO: AppIntentFlutterApi.setUp unavailable; re-add with iOS platform APIs.
+    ref.onDispose(() {});
   }
 
-  @override
-  Future<PlatformAppIntentResponse> askChat(String? prompt) {
-    return _dispatchAppIntent(() => _handleAskIntent({'prompt': prompt}));
-  }
-
-  @override
-  Future<PlatformAppIntentResponse> startVoiceCall() {
-    return _dispatchAppIntent(() => _handleVoiceCallIntent(const {}));
-  }
-
-  @override
-  Future<PlatformAppIntentResponse> sendText(String text) {
-    return _dispatchAppIntent(() => _handleSendTextIntent({'text': text}));
-  }
-
-  @override
-  Future<PlatformAppIntentResponse> sendUrl(String url) {
-    return _dispatchAppIntent(() => _handleSendUrlIntent({'url': url}));
-  }
-
-  @override
-  Future<PlatformAppIntentResponse> sendImage(
-    PlatformAppIntentImagePayload payload,
-  ) {
-    return _dispatchAppIntent(() => _handleSendImageIntent(payload));
-  }
-
-  Future<PlatformAppIntentResponse> _dispatchAppIntent(
+  Future<Map<String, dynamic>> _dispatchAppIntent(
     Future<Map<String, dynamic>> Function() handler,
   ) async {
     try {
-      return _responseFromMap(await handler());
+      return await handler();
     } catch (error, stackTrace) {
       DebugLogger.error(
         'app-intents-dispatch',
@@ -75,16 +47,8 @@ class AppIntentCoordinator extends _$AppIntentCoordinator
         error: error,
         stackTrace: stackTrace,
       );
-      return PlatformAppIntentResponse(success: false, error: error.toString());
+      return {'success': false, 'error': error.toString()};
     }
-  }
-
-  PlatformAppIntentResponse _responseFromMap(Map<String, dynamic> result) {
-    return PlatformAppIntentResponse(
-      success: result['success'] == true,
-      value: result['value'] as String?,
-      error: result['error'] as String?,
-    );
   }
 
   Future<Map<String, dynamic>> _handleAskIntent(
@@ -96,7 +60,7 @@ class AppIntentCoordinator extends _$AppIntentCoordinator
       await _prepareChat(prompt: prompt);
       final summary = prompt != null && prompt.isNotEmpty
           ? 'Opening chat for "$prompt"'
-          : 'Opening Conduit chat';
+          : 'Opening Nerdin chat';
 
       return {'success': true, 'value': summary};
     } catch (error, stackTrace) {
@@ -140,7 +104,7 @@ class AppIntentCoordinator extends _$AppIntentCoordinator
     try {
       await _startVoiceCall();
       DebugLogger.log('Voice call launched from Siri/Shortcuts', scope: 'siri');
-      return {'success': true, 'value': 'Starting Conduit voice call'};
+      return {'success': true, 'value': 'Starting Nerdin voice call'};
     } catch (error, stackTrace) {
       DebugLogger.error(
         'app-intents-voice',
@@ -166,7 +130,7 @@ class AppIntentCoordinator extends _$AppIntentCoordinator
         focusComposer: true,
         resetChat: true,
       );
-      return {'success': true, 'value': 'Sent to Conduit'};
+      return {'success': true, 'value': 'Sent to Nerdin'};
     } catch (error, stackTrace) {
       DebugLogger.error(
         'app-intents-text',
@@ -248,13 +212,13 @@ class AppIntentCoordinator extends _$AppIntentCoordinator
         return {
           'success': true,
           'value': isYoutube
-              ? 'YouTube video attached in Conduit'
-              : 'Webpage attached in Conduit',
+              ? 'YouTube video attached in Nerdin'
+              : 'Webpage attached in Nerdin',
         };
       } else {
         return {
           'success': true,
-          'value': 'Opening Conduit with URL (content could not be fetched)',
+          'value': 'Opening Nerdin with URL (content could not be fetched)',
         };
       }
     } catch (error, stackTrace) {
@@ -269,21 +233,22 @@ class AppIntentCoordinator extends _$AppIntentCoordinator
   }
 
   Future<Map<String, dynamic>> _handleSendImageIntent(
-    PlatformAppIntentImagePayload payload,
+    Map<String, dynamic> payload,
   ) async {
-    if (payload.bytes.isEmpty) {
+    final bytes = (payload['bytes'] as Uint8List?);
+    if (bytes == null || bytes.isEmpty) {
       return {'success': false, 'error': 'No image data provided.'};
     }
-    final filenameRaw = payload.filename.trim();
+    final filenameRaw = (payload['filename'] as String?)?.trim() ?? '';
 
     try {
       final file = await _materializeTempFile(
-        payload.bytes,
+        bytes,
         preferredName: filenameRaw,
       );
       await _prepareChatWithOptions(focusComposer: true, resetChat: true);
       await _attachFiles([file]);
-      return {'success': true, 'value': 'Image attached in Conduit'};
+      return {'success': true, 'value': 'Image attached in Nerdin'};
     } catch (error, stackTrace) {
       DebugLogger.error(
         'app-intents-image',
@@ -360,7 +325,7 @@ class AppIntentCoordinator extends _$AppIntentCoordinator
     final tempDir = await getTemporaryDirectory();
     final safeName = (preferredName != null && preferredName.isNotEmpty)
         ? preferredName
-        : 'conduit_image_${DateTime.now().millisecondsSinceEpoch}.jpg';
+        : 'nerdin_image_${DateTime.now().millisecondsSinceEpoch}.jpg';
     final sanitizedName = safeName.replaceAll(RegExp(r'[^\w\.\-]'), '_');
     final file = File(p.join(tempDir.path, sanitizedName));
     await file.writeAsBytes(bytes, flush: true);

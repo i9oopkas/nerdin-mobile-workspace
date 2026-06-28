@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 
 import '../../../../core/utils/reasoning_parser.dart';
 import '../../assistant_detail_header.dart';
@@ -188,7 +188,7 @@ class _MarkdownDetailsBlockState extends State<MarkdownDetailsBlock> {
   }
 
   Widget _buildInlineBody(BuildContext context, Widget body) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     return Padding(
       padding: const EdgeInsets.only(top: Spacing.xs, left: Spacing.sm),
       child: DecoratedBox(
@@ -238,7 +238,7 @@ class _MarkdownDetailsBlockState extends State<MarkdownDetailsBlock> {
   }
 
   Widget _buildDetailsBottomSheet(BuildContext sheetContext) {
-    final liveTheme = sheetContext.conduitTheme;
+    final liveTheme = sheetContext.nerdinTheme;
     final sheetSurface = liveTheme.surfaceBackground;
     final bottomSafePadding = MediaQuery.paddingOf(sheetContext).bottom;
 
@@ -261,7 +261,7 @@ class _MarkdownDetailsBlockState extends State<MarkdownDetailsBlock> {
               child: ValueListenableBuilder<int>(
                 valueListenable: _sheetRevision,
                 builder: (context, value, child) {
-                  final markdownStyle = ConduitMarkdownStyle.fromTheme(
+                  final markdownStyle = NerdinMarkdownStyle.fromTheme(
                     sheetContext,
                   );
                   final liveBody = _buildBody(sheetContext);
@@ -317,8 +317,8 @@ class _MarkdownDetailsBlockState extends State<MarkdownDetailsBlock> {
 
   Widget _buildSheetHeader(
     BuildContext sheetContext, {
-    required ConduitThemeExtension theme,
-    required ConduitMarkdownStyle markdownStyle,
+    required NerdinThemeExtension theme,
+    required NerdinMarkdownStyle markdownStyle,
     required String title,
   }) {
     return Column(
@@ -378,7 +378,7 @@ class _MarkdownDetailsBlockState extends State<MarkdownDetailsBlock> {
   }
 
   Widget _buildLeadingIcon(
-    ConduitThemeExtension theme, {
+    NerdinThemeExtension theme, {
     double iconSize = 16,
     double spinnerSize = 16,
   }) {
@@ -494,8 +494,8 @@ class _MarkdownDetailsBlockState extends State<MarkdownDetailsBlock> {
       return null;
     }
 
-    final theme = context.conduitTheme;
-    final markdownStyle = ConduitMarkdownStyle.fromTheme(context);
+    final theme = context.nerdinTheme;
+    final markdownStyle = NerdinMarkdownStyle.fromTheme(context);
     var expandedResult = false;
 
     return StatefulBuilder(
@@ -536,7 +536,7 @@ class _MarkdownDetailsBlockState extends State<MarkdownDetailsBlock> {
           children.add(_buildSectionTitle('Input', markdownStyle));
           children.add(const SizedBox(height: 6));
           children.add(
-            ConduitMarkdown.buildCodeBlock(
+            NerdinMarkdown.buildCodeBlock(
               context: context,
               code: data.argumentsCode,
               language: 'json',
@@ -554,7 +554,7 @@ class _MarkdownDetailsBlockState extends State<MarkdownDetailsBlock> {
 
           if (data.resultCode.isNotEmpty) {
             children.add(
-              ConduitMarkdown.buildCodeBlock(
+              NerdinMarkdown.buildCodeBlock(
                 context: context,
                 code: data.resultCode,
                 language: 'json',
@@ -645,7 +645,7 @@ class _MarkdownDetailsBlockState extends State<MarkdownDetailsBlock> {
     );
   }
 
-  Widget _buildSectionTitle(String title, ConduitMarkdownStyle markdownStyle) {
+  Widget _buildSectionTitle(String title, NerdinMarkdownStyle markdownStyle) {
     return Text(title, style: markdownStyle.detailLabel);
   }
 
@@ -663,7 +663,7 @@ class _MarkdownDetailsBlockState extends State<MarkdownDetailsBlock> {
       return const [];
     }
 
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     return [
       const SizedBox(height: Spacing.xs),
       Wrap(
@@ -676,7 +676,7 @@ class _MarkdownDetailsBlockState extends State<MarkdownDetailsBlock> {
                   maxWidth: 220,
                   maxHeight: 220,
                 ),
-                child: ConduitMarkdown.buildImage(context, uri, theme),
+                child: NerdinMarkdown.buildImage(context, uri, theme),
               );
             })
             .toList(growable: false),

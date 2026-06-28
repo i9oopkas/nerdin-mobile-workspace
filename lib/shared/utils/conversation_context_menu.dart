@@ -1,23 +1,23 @@
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
-import 'package:conduit/core/models/folder.dart';
-import 'package:conduit/core/providers/app_providers.dart';
-import 'package:conduit/core/services/native_sheet_bridge.dart';
-import 'package:conduit/l10n/app_localizations.dart';
-import 'package:conduit/shared/theme/theme_extensions.dart';
-import 'package:conduit/shared/widgets/measure_size.dart';
-import 'package:conduit/shared/widgets/themed_dialogs.dart';
-import 'package:conduit/shared/widgets/themed_sheets.dart';
+import 'package:nerdin_mobile_workspace/core/models/folder.dart';
+import 'package:nerdin_mobile_workspace/core/providers/app_providers.dart';
+import 'package:nerdin_mobile_workspace/core/services/native_sheet_bridge.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
+import 'package:nerdin_mobile_workspace/shared/theme/theme_extensions.dart';
+import 'package:nerdin_mobile_workspace/shared/widgets/measure_size.dart';
+import 'package:nerdin_mobile_workspace/shared/widgets/themed_dialogs.dart';
+import 'package:nerdin_mobile_workspace/shared/widgets/themed_sheets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:conduit/core/services/haptic_service.dart';
+import 'package:nerdin_mobile_workspace/core/services/haptic_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:conduit/features/chat/providers/chat_providers.dart' as chat;
-import 'package:conduit/features/chat/widgets/chat_share_sheet.dart';
-import 'package:conduit/features/navigation/widgets/folder_tree_guides.dart';
+import 'package:nerdin_mobile_workspace/features/chat/providers/chat_providers.dart' as chat;
+import 'package:nerdin_mobile_workspace/features/chat/widgets/chat_share_sheet.dart';
+import 'package:nerdin_mobile_workspace/features/navigation/widgets/folder_tree_guides.dart';
 
-/// Defines an action for use in Conduit context menus.
-class ConduitContextMenuAction {
+/// Defines an action for use in Nerdin context menus.
+class NerdinContextMenuAction {
   final IconData cupertinoIcon;
   final String? sfSymbol;
   final IconData materialIcon;
@@ -26,7 +26,7 @@ class ConduitContextMenuAction {
   final VoidCallback? onBeforeClose;
   final bool destructive;
 
-  const ConduitContextMenuAction({
+  const NerdinContextMenuAction({
     required this.cupertinoIcon,
     this.sfSymbol,
     required this.materialIcon,
@@ -44,13 +44,13 @@ class ConduitContextMenuAction {
 /// keep the child size stable during preview because stock
 /// [CupertinoContextMenu] can assert when the child is laid out by flex-based
 /// parents.
-class ConduitContextMenu extends StatefulWidget {
-  final List<ConduitContextMenuAction> actions;
+class NerdinContextMenu extends StatefulWidget {
+  final List<NerdinContextMenuAction> actions;
   final Widget child;
   final WidgetBuilder? topWidgetBuilder;
   final bool stabilizePreviewSize;
 
-  const ConduitContextMenu({
+  const NerdinContextMenu({
     super.key,
     required this.actions,
     required this.child,
@@ -59,10 +59,10 @@ class ConduitContextMenu extends StatefulWidget {
   });
 
   @override
-  State<ConduitContextMenu> createState() => _ConduitContextMenuState();
+  State<NerdinContextMenu> createState() => _NerdinContextMenuState();
 }
 
-class _ConduitContextMenuState extends State<ConduitContextMenu> {
+class _NerdinContextMenuState extends State<NerdinContextMenu> {
   Size? _childSize;
 
   @override
@@ -83,7 +83,7 @@ class _ConduitContextMenuState extends State<ConduitContextMenu> {
             icon: action.materialIcon,
             isDestructive: action.destructive,
             onPressed: () {
-              ConduitHaptics.selectionClick();
+              NerdinHaptics.selectionClick();
               action.onBeforeClose?.call();
               action.onSelected();
             },
@@ -103,7 +103,7 @@ class _ConduitContextMenuState extends State<ConduitContextMenu> {
             onPressed: () {
               Navigator.of(context, rootNavigator: true).pop();
               Future.microtask(() {
-                ConduitHaptics.selectionClick();
+                NerdinHaptics.selectionClick();
                 action.onBeforeClose?.call();
                 action.onSelected();
               });
@@ -163,14 +163,14 @@ class _ConduitContextMenuState extends State<ConduitContextMenu> {
 
 /// Builds a list of actions for conversation context menus.
 ///
-/// Use with [ConduitContextMenu]:
+/// Use with [NerdinContextMenu]:
 /// ```dart
-/// ConduitContextMenu(
+/// NerdinContextMenu(
 ///   actions: buildConversationActions(context: context, ref: ref, conversation: conv),
 ///   child: MyWidget(),
 /// )
 /// ```
-List<ConduitContextMenuAction> buildConversationActions({
+List<NerdinContextMenuAction> buildConversationActions({
   required BuildContext context,
   required WidgetRef ref,
   required dynamic conversation,
@@ -194,7 +194,7 @@ List<ConduitContextMenuAction> buildConversationActions({
   );
 }
 
-List<ConduitContextMenuAction> buildConversationActionsWithFolders({
+List<NerdinContextMenuAction> buildConversationActionsWithFolders({
   required BuildContext context,
   required WidgetRef ref,
   required dynamic conversation,
@@ -263,17 +263,17 @@ List<ConduitContextMenuAction> buildConversationActionsWithFolders({
   }
 
   return [
-    ConduitContextMenuAction(
+    NerdinContextMenuAction(
       cupertinoIcon: isPinned
           ? CupertinoIcons.pin_slash
           : CupertinoIcons.pin_fill,
       sfSymbol: isPinned ? 'pin.slash' : 'pin.fill',
       materialIcon: isPinned ? Icons.push_pin_outlined : Icons.push_pin_rounded,
       label: isPinned ? l10n.unpin : l10n.pin,
-      onBeforeClose: () => ConduitHaptics.lightImpact(),
+      onBeforeClose: () => NerdinHaptics.lightImpact(),
       onSelected: togglePin,
     ),
-    ConduitContextMenuAction(
+    NerdinContextMenuAction(
       cupertinoIcon: isArchived
           ? CupertinoIcons.archivebox_fill
           : CupertinoIcons.archivebox,
@@ -282,41 +282,41 @@ List<ConduitContextMenuAction> buildConversationActionsWithFolders({
           ? Icons.unarchive_rounded
           : Icons.archive_rounded,
       label: isArchived ? l10n.unarchive : l10n.archive,
-      onBeforeClose: () => ConduitHaptics.lightImpact(),
+      onBeforeClose: () => NerdinHaptics.lightImpact(),
       onSelected: toggleArchive,
     ),
-    ConduitContextMenuAction(
+    NerdinContextMenuAction(
       cupertinoIcon: CupertinoIcons.share,
       sfSymbol: 'square.and.arrow.up',
       materialIcon: Icons.ios_share_rounded,
       label: l10n.shareChat,
-      onBeforeClose: () => ConduitHaptics.selectionClick(),
+      onBeforeClose: () => NerdinHaptics.selectionClick(),
       onSelected: shareConversation,
     ),
-    ConduitContextMenuAction(
+    NerdinContextMenuAction(
       cupertinoIcon: CupertinoIcons.pencil,
       sfSymbol: 'pencil',
       materialIcon: Icons.edit_rounded,
       label: l10n.rename,
-      onBeforeClose: () => ConduitHaptics.selectionClick(),
+      onBeforeClose: () => NerdinHaptics.selectionClick(),
       onSelected: rename,
     ),
     if (canMove)
-      ConduitContextMenuAction(
+      NerdinContextMenuAction(
         cupertinoIcon: CupertinoIcons.folder,
         sfSymbol: 'folder',
         materialIcon: Icons.drive_file_move_outline,
         label: l10n.move,
-        onBeforeClose: () => ConduitHaptics.selectionClick(),
+        onBeforeClose: () => NerdinHaptics.selectionClick(),
         onSelected: moveConversation,
       ),
-    ConduitContextMenuAction(
+    NerdinContextMenuAction(
       cupertinoIcon: CupertinoIcons.delete,
       sfSymbol: 'trash',
       materialIcon: Icons.delete_rounded,
       label: l10n.delete,
       destructive: true,
-      onBeforeClose: () => ConduitHaptics.mediumImpact(),
+      onBeforeClose: () => NerdinHaptics.mediumImpact(),
       onSelected: deleteConversation,
     ),
   ];
@@ -360,7 +360,7 @@ Future<void> _moveConversation(
     await api.moveConversationToFolder(conversationId, target.folderId);
     if (!context.mounted) return;
 
-    ConduitHaptics.selectionClick();
+    NerdinHaptics.selectionClick();
     ref
         .read(conversationsProvider.notifier)
         .updateConversation(
@@ -449,7 +449,7 @@ Future<_ConversationMoveTarget?> _showConversationMoveSheet(
     context: context,
     isScrollControlled: true,
     builder: (sheetContext) {
-      final theme = sheetContext.conduitTheme;
+      final theme = sheetContext.nerdinTheme;
       final maxListHeight = MediaQuery.sizeOf(sheetContext).height * 0.62;
 
       return Column(
@@ -519,7 +519,7 @@ class _MoveTargetTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
@@ -578,7 +578,7 @@ Future<void> _renameConversation(
     final api = ref.read(apiServiceProvider);
     if (api == null) throw Exception('No API service');
     await api.updateConversation(conversationId, title: newName);
-    ConduitHaptics.selectionClick();
+    NerdinHaptics.selectionClick();
     ref
         .read(conversationsProvider.notifier)
         .updateConversationFromRemote(
@@ -621,7 +621,7 @@ Future<void> _confirmAndDeleteConversation(
     final api = ref.read(apiServiceProvider);
     if (api == null) throw Exception('No API service');
     await api.deleteConversation(conversationId);
-    ConduitHaptics.mediumImpact();
+    NerdinHaptics.mediumImpact();
     ref.read(conversationsProvider.notifier).removeConversation(conversationId);
     final active = ref.read(activeConversationProvider);
     if (active?.id == conversationId) {
@@ -643,7 +643,7 @@ Future<void> _showConversationError(
 ) async {
   if (!context.mounted) return;
   final l10n = AppLocalizations.of(context)!;
-  final theme = context.conduitTheme;
+  final theme = context.nerdinTheme;
   await ThemedDialogs.show<void>(
     context,
     title: l10n.errorMessage,

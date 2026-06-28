@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:conduit/core/services/haptic_service.dart';
+import 'package:nerdin_mobile_workspace/core/services/haptic_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/theme/theme_extensions.dart';
 import '../../../shared/widgets/skeleton_loader.dart';
@@ -180,7 +180,7 @@ class _EnhancedAttachmentState extends ConsumerState<EnhancedAttachment> {
     final resolvedHeight = hasPreviewSizedConstraints
         ? maxHeight.clamp(90.0, 220.0).toDouble()
         : 84.0;
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final borderRadius = BorderRadius.circular(AppBorderRadius.md);
 
     return Container(
@@ -221,17 +221,17 @@ class _EnhancedAttachmentState extends ConsumerState<EnhancedAttachment> {
       return Container(
         padding: const EdgeInsets.all(Spacing.sm),
         decoration: BoxDecoration(
-          color: context.conduitTheme.surfaceContainer,
+          color: context.nerdinTheme.surfaceContainer,
           borderRadius: BorderRadius.circular(AppBorderRadius.md),
           border: Border.all(
-            color: context.conduitTheme.error.withValues(alpha: 0.3),
+            color: context.nerdinTheme.error.withValues(alpha: 0.3),
             width: BorderWidth.regular,
           ),
         ),
         child: Text(
           _error!,
           style: AppTypography.labelMediumStyle.copyWith(
-            color: context.conduitTheme.error,
+            color: context.nerdinTheme.error,
           ),
         ),
       );
@@ -269,10 +269,10 @@ class _EnhancedAttachmentState extends ConsumerState<EnhancedAttachment> {
       constraints: widget.constraints,
       padding: const EdgeInsets.all(Spacing.md),
       decoration: BoxDecoration(
-        color: context.conduitTheme.cardBackground,
+        color: context.nerdinTheme.cardBackground,
         borderRadius: BorderRadius.circular(AppBorderRadius.md),
         border: Border.all(
-          color: context.conduitTheme.textPrimary.withValues(alpha: 0.12),
+          color: context.nerdinTheme.textPrimary.withValues(alpha: 0.12),
           width: BorderWidth.regular,
         ),
       ),
@@ -291,7 +291,7 @@ class _EnhancedAttachmentState extends ConsumerState<EnhancedAttachment> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppTypography.labelStyle.copyWith(
-                    color: context.conduitTheme.textPrimary,
+                    color: context.nerdinTheme.textPrimary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -299,7 +299,7 @@ class _EnhancedAttachmentState extends ConsumerState<EnhancedAttachment> {
                   Text(
                     metaLabel,
                     style: AppTypography.labelMediumStyle.copyWith(
-                      color: context.conduitTheme.textSecondary.withValues(
+                      color: context.nerdinTheme.textSecondary.withValues(
                         alpha: 0.7,
                       ),
                     ),
@@ -316,7 +316,7 @@ class _EnhancedAttachmentState extends ConsumerState<EnhancedAttachment> {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () async {
-          await ConduitHaptics.mediumImpact();
+          await NerdinHaptics.mediumImpact();
           await _shareFile();
         },
         child: card,

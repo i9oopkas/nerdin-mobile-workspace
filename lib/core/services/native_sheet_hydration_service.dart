@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../features/tools/providers/tools_providers.dart';
 import '../../features/chat/providers/text_to_speech_provider.dart';
-import '../../l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import '../../shared/theme/tweakcn_themes.dart';
 import '../models/model.dart';
 import '../network/image_header_utils.dart';
@@ -222,9 +221,9 @@ class NativeSheetHydrationService {
             NativeSheetItemConfig(
               id: 'github',
               title: l10n.githubRepository,
-              subtitle: 'github.com/cogwheel0/conduit',
+              subtitle: 'github.com/cogwheel0/nerdin',
               sfSymbol: 'chevron.left.forwardslash.chevron.right',
-              url: 'https://github.com/cogwheel0/conduit',
+              url: 'https://github.com/cogwheel0/nerdin',
             ),
           ],
         ),
@@ -593,9 +592,7 @@ class NativeSheetHydrationService {
     try {
       final platformBrightness = MediaQuery.platformBrightnessOf(context);
       final modelsFuture = _ref.read(modelsProvider.future);
-      final toolsFuture = _ref.read(toolsListProvider.future);
       final models = await modelsFuture;
-      final tools = await toolsFuture;
       if (!context.mounted) return;
 
       final appSettings = _ref.read(appSettingsProvider);
@@ -631,7 +628,6 @@ class NativeSheetHydrationService {
       final allowedQuickIds = <String>{
         'web',
         'image',
-        ...tools.map((tool) => tool.id),
         ...filters.map((filter) => 'filter:${filter.id}'),
       };
       final selectedQuickPills = appSettings.quickPills
@@ -855,9 +851,7 @@ class NativeSheetHydrationService {
     try {
       final platformBrightness = MediaQuery.platformBrightnessOf(context);
       final modelsFuture = _ref.read(modelsProvider.future);
-      final toolsFuture = _ref.read(toolsListProvider.future);
       final models = await modelsFuture;
-      final tools = await toolsFuture;
       if (!context.mounted) return;
       final appSettings = _ref.read(appSettingsProvider);
       final themeMode = _ref.read(appThemeModeProvider);
@@ -892,7 +886,6 @@ class NativeSheetHydrationService {
       final allowedQuickIds = <String>{
         'web',
         'image',
-        ...tools.map((tool) => tool.id),
         ...filters.map((filter) => 'filter:${filter.id}'),
       };
       final selectedQuickPills = appSettings.quickPills
@@ -1325,7 +1318,6 @@ class NativeSheetHydrationService {
     AppLocalizations l10n,
   ) async {
     try {
-      final tools = await _ref.read(toolsListProvider.future);
       if (!context.mounted) return;
       final quickActionsTitle = nativeQuickActionsTitle(l10n);
       final appSettings = _ref.read(appSettingsProvider);
@@ -1334,7 +1326,6 @@ class NativeSheetHydrationService {
       final allowedIds = <String>{
         'web',
         'image',
-        ...tools.map((tool) => tool.id),
         ...filters.map((filter) => 'filter:${filter.id}'),
       };
       final selected = appSettings.quickPills
@@ -1358,14 +1349,6 @@ class NativeSheetHydrationService {
             kind: NativeSheetItemKind.toggle,
             value: selected.contains('image'),
           ),
-          for (final tool in tools)
-            NativeSheetItemConfig(
-              id: 'quick-pill:${tool.id}',
-              title: tool.name,
-              sfSymbol: 'puzzlepiece.extension',
-              kind: NativeSheetItemKind.toggle,
-              value: selected.contains(tool.id),
-            ),
           for (final filter in filters)
             NativeSheetItemConfig(
               id: 'quick-pill:filter:${filter.id}',

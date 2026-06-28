@@ -1,4 +1,4 @@
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../shared/widgets/themed_dialogs.dart';
@@ -136,6 +136,7 @@ class Routes {
   static const String notes = '/notes';
   static const String noteEditor = '/notes/:id';
   static const String channel = '/channel/:id';
+  static const String agent = '/agent';
 
   static String folderPath(String id) => '/folder/$id';
 }
@@ -161,4 +162,5 @@ class RouteNames {
   static const String notes = 'notes';
   static const String noteEditor = 'note-editor';
   static const String channel = 'channel';
+  static const String agent = 'agent';
 }

@@ -1,19 +1,12 @@
 import 'dart:async';
-import 'dart:io' show Platform;
 
-import '../../../core/platform/conduit_platform_apis.g.dart';
-
-class IosKeyboardAttachmentBridge
-    implements NativeKeyboardAttachmentFlutterApi {
-  IosKeyboardAttachmentBridge._() {
-    NativeKeyboardAttachmentFlutterApi.setUp(this);
-  }
+// TODO: iOS platform APIs deleted; restore when iOS directory is re-added.
+class IosKeyboardAttachmentBridge {
+  IosKeyboardAttachmentBridge._();
 
   static final IosKeyboardAttachmentBridge instance =
       IosKeyboardAttachmentBridge._();
 
-  final NativeKeyboardAttachmentHostApi _api =
-      NativeKeyboardAttachmentHostApi();
   final StreamController<IosKeyboardAttachmentEvent> _events =
       StreamController<IosKeyboardAttachmentEvent>.broadcast();
 
@@ -22,60 +15,17 @@ class IosKeyboardAttachmentBridge
   Future<void> configure({
     required List<IosKeyboardAttachmentActionConfig> actions,
   }) {
-    if (!Platform.isIOS || actions.isEmpty) {
-      return Future<void>.value();
-    }
-    return _invokeVoid(() => _api.configure(_platformConfig(actions)));
+    return Future<void>.value();
   }
 
   Future<bool> toggle({
     required List<IosKeyboardAttachmentActionConfig> actions,
   }) async {
-    if (!Platform.isIOS || actions.isEmpty) {
-      return false;
-    }
-
-    return _invokeBool(() => _api.toggle(_platformConfig(actions)));
+    return false;
   }
 
   Future<void> hide() {
-    if (!Platform.isIOS) {
-      return Future<void>.value();
-    }
-    return _invokeVoid(_api.hide);
-  }
-
-  Future<void> _invokeVoid(Future<void> Function() invoke) async {
-    try {
-      await invoke();
-    } catch (_) {}
-  }
-
-  Future<bool> _invokeBool(Future<bool> Function() invoke) async {
-    try {
-      return await invoke();
-    } catch (_) {
-      return false;
-    }
-  }
-
-  PlatformKeyboardAttachmentConfig _platformConfig(
-    List<IosKeyboardAttachmentActionConfig> actions,
-  ) {
-    return PlatformKeyboardAttachmentConfig(
-      actions: actions.map((action) => action.toPlatform()).toList(),
-    );
-  }
-
-  @override
-  void onAction(PlatformKeyboardAttachmentActionEvent event) {
-    if (event.id.isEmpty) return;
-    _events.add(IosKeyboardAttachmentAction(event.id));
-  }
-
-  @override
-  void onVisibilityChanged(PlatformKeyboardAttachmentVisibilityEvent event) {
-    _events.add(IosKeyboardAttachmentVisibilityChanged(visible: event.visible));
+    return Future<void>.value();
   }
 }
 
@@ -113,18 +63,7 @@ class IosKeyboardAttachmentActionConfig {
     };
   }
 
-  PlatformKeyboardAttachmentActionConfig toPlatform() {
-    return PlatformKeyboardAttachmentActionConfig(
-      id: id,
-      label: label,
-      subtitle: subtitle,
-      sfSymbol: sfSymbol,
-      section: section,
-      enabled: enabled,
-      selected: selected,
-      dismissesKeyboard: dismissesKeyboard,
-    );
-  }
+  // TODO: toPlatform() removed with Pigeon-generated types; restore when iOS dir is re-added.
 }
 
 sealed class IosKeyboardAttachmentEvent {

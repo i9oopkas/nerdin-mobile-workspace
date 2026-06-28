@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import '../../../shared/theme/theme_extensions.dart';
 import '../../../shared/utils/adaptive_glass.dart';
 import 'chat_voice_mode_controller.dart';
@@ -48,7 +48,7 @@ class _ExpandedVoicePanel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final l10n = AppLocalizations.of(context)!;
     final controller = ref.read(chatVoiceModeControllerProvider.notifier);
 
@@ -58,7 +58,7 @@ class _ExpandedVoicePanel extends ConsumerWidget {
         color: theme.cardBackground.withValues(alpha: 0.96),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: theme.cardBorder),
-        boxShadow: ConduitShadows.messageBubble(context),
+        boxShadow: NerdinShadows.messageBubble(context),
       ),
       child: Padding(
         padding: const EdgeInsets.all(Spacing.md),
@@ -169,7 +169,7 @@ class _CollapsedVoicePill extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final l10n = AppLocalizations.of(context)!;
     final controller = ref.read(chatVoiceModeControllerProvider.notifier);
 
@@ -183,7 +183,7 @@ class _CollapsedVoicePill extends ConsumerWidget {
             color: theme.cardBackground.withValues(alpha: 0.96),
             borderRadius: BorderRadius.circular(28),
             border: Border.all(color: theme.cardBorder),
-            boxShadow: ConduitShadows.messageBubble(context),
+            boxShadow: NerdinShadows.messageBubble(context),
           ),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 10, 10, 10),
@@ -242,10 +242,10 @@ class _StatusDot extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = switch (snapshot.phase) {
       ChatVoiceModePhase.listening => Colors.green,
-      ChatVoiceModePhase.speaking => context.conduitTheme.buttonPrimary,
+      ChatVoiceModePhase.speaking => context.nerdinTheme.buttonPrimary,
       ChatVoiceModePhase.paused || ChatVoiceModePhase.muted => Colors.orange,
       ChatVoiceModePhase.error => Theme.of(context).colorScheme.error,
-      _ => context.conduitTheme.textSecondary,
+      _ => context.nerdinTheme.textSecondary,
     };
     final size = compact ? 10.0 : 14.0 + snapshot.intensity.clamp(0, 10) * 0.8;
     return AnimatedContainer(
@@ -281,7 +281,7 @@ class _VoiceText extends StatelessWidget {
     return Text(
       text.trim(),
       style: AppTypography.bodyMediumStyle.copyWith(
-        color: context.conduitTheme.textPrimary,
+        color: context.nerdinTheme.textPrimary,
       ),
       maxLines: 3,
       overflow: TextOverflow.ellipsis,
@@ -296,7 +296,7 @@ class _KaraokeResponseBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final rawText = snapshot.spokenResponse;
     final text = rawText.trim();
     final leadingTrim = rawText.length - rawText.trimLeft().length;
@@ -429,8 +429,8 @@ class _AdaptiveVoiceAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
-    final usesOpaqueFallback = conduitUsesOpaqueGlassFallback();
+    final theme = context.nerdinTheme;
+    final usesOpaqueFallback = nerdinUsesOpaqueGlassFallback();
     final size = compact ? TouchTarget.micro : TouchTarget.medium;
     final color = destructive ? Theme.of(context).colorScheme.error : null;
     final iconColor = onPressed == null

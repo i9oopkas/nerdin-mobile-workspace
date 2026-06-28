@@ -2,14 +2,14 @@ import 'dart:io' show Platform;
 import 'dart:math' as math;
 
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
-import 'package:conduit/core/services/haptic_service.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/services/haptic_service.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/services/navigation_service.dart';
-import '../../../shared/theme/conduit_input_styles.dart';
+import '../../../shared/theme/nerdin_input_styles.dart';
 import '../../../shared/theme/theme_extensions.dart';
 import '../../../shared/utils/conversation_context_menu.dart';
 import '../../tools/providers/tools_providers.dart';
@@ -504,7 +504,7 @@ class _UserMessageBubbleState extends ConsumerState<UserMessageBubble> {
 
   Widget _buildNoteAttachmentCard(dynamic file) {
     final l10n = AppLocalizations.of(context)!;
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final noteId = file is Map ? file['id']?.toString() : null;
     final rawTitle = file is Map
         ? (file['name'] ?? file['title'])?.toString().trim() ?? ''
@@ -518,7 +518,7 @@ class _UserMessageBubbleState extends ConsumerState<UserMessageBubble> {
         onTap: noteId == null || noteId.isEmpty
             ? null
             : () {
-                ConduitHaptics.selectionClick();
+                NerdinHaptics.selectionClick();
                 NavigationService.router.go('/notes/$noteId');
               },
         child: Container(
@@ -597,37 +597,37 @@ class _UserMessageBubbleState extends ConsumerState<UserMessageBubble> {
     super.dispose();
   }
 
-  List<ConduitContextMenuAction> _buildMessageActions(BuildContext context) {
+  List<NerdinContextMenuAction> _buildMessageActions(BuildContext context) {
     // Don't show menu while editing - return empty list
     if (_isEditing) return [];
 
     final l10n = AppLocalizations.of(context)!;
 
     return [
-      ConduitContextMenuAction(
+      NerdinContextMenuAction(
         cupertinoIcon: CupertinoIcons.pencil,
         materialIcon: Icons.edit_outlined,
         label: l10n.edit,
-        onBeforeClose: () => ConduitHaptics.selectionClick(),
+        onBeforeClose: () => NerdinHaptics.selectionClick(),
         onSelected: () async => _startInlineEdit(),
       ),
-      ConduitContextMenuAction(
+      NerdinContextMenuAction(
         cupertinoIcon: CupertinoIcons.doc_on_clipboard,
         materialIcon: Icons.content_copy,
         label: l10n.copy,
-        onBeforeClose: () => ConduitHaptics.selectionClick(),
+        onBeforeClose: () => NerdinHaptics.selectionClick(),
         onSelected: () async {
           if (widget.onCopy != null) {
             widget.onCopy!();
           }
         },
       ),
-      ConduitContextMenuAction(
+      NerdinContextMenuAction(
         cupertinoIcon: CupertinoIcons.delete,
         materialIcon: Icons.delete_outline,
         label: l10n.delete,
         destructive: true,
-        onBeforeClose: () => ConduitHaptics.mediumImpact(),
+        onBeforeClose: () => NerdinHaptics.mediumImpact(),
         onSelected: () async {
           widget.onDelete();
         },
@@ -641,7 +641,7 @@ class _UserMessageBubbleState extends ConsumerState<UserMessageBubble> {
   }
 
   Widget _buildUserMessage() {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final hasImages =
         widget.message.attachmentIds != null &&
         widget.message.attachmentIds!.isNotEmpty;
@@ -680,7 +680,7 @@ class _UserMessageBubbleState extends ConsumerState<UserMessageBubble> {
           // Display images outside and above the text bubble (iMessage style)
           // Prioritize files array over attachmentIds to avoid duplication
           if (attachmentContent != null)
-            ConduitContextMenu(actions: actions, child: attachmentContent),
+            NerdinContextMenu(actions: actions, child: attachmentContent),
 
           // Display text bubble if there's text content
           if (hasText) const SizedBox(height: Spacing.xs),
@@ -691,7 +691,7 @@ class _UserMessageBubbleState extends ConsumerState<UserMessageBubble> {
                 Flexible(
                   child: ConstrainedBox(
                     constraints: BoxConstraints(maxWidth: bubbleMaxWidth),
-                    child: ConduitContextMenu(
+                    child: NerdinContextMenu(
                       actions: actions,
                       child: Container(
                         key: const Key('user-message-bubble-surface'),
@@ -734,7 +734,7 @@ class _UserMessageBubbleState extends ConsumerState<UserMessageBubble> {
                                       padding: EdgeInsets.zero,
                                       cupertinoDecoration:
                                           const BoxDecoration(),
-                                      decoration: context.conduitInputStyles
+                                      decoration: context.nerdinInputStyles
                                           .borderless()
                                           .copyWith(
                                             isCollapsed: true,
@@ -778,7 +778,7 @@ class _UserMessageBubbleState extends ConsumerState<UserMessageBubble> {
 
   Widget _buildEditActionButtons() {
     final l10n = AppLocalizations.of(context)!;
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,

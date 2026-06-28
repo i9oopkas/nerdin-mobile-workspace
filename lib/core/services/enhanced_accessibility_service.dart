@@ -1,9 +1,9 @@
 import 'dart:math' as math;
 import 'dart:ui' show FlutterView;
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:conduit/core/services/haptic_service.dart';
+import 'package:nerdin_mobile_workspace/core/services/haptic_service.dart';
 import 'package:flutter/semantics.dart';
 import '../../shared/theme/tweakcn_themes.dart';
 import '../../shared/theme/theme_extensions.dart';
@@ -115,7 +115,7 @@ class EnhancedAccessibilityService {
         enabled: onPressed != null,
         child: AdaptiveButton.child(
           onPressed: onPressed,
-          color: isDestructive ? context.conduitTheme.error : null,
+          color: isDestructive ? context.nerdinTheme.error : null,
           style: AdaptiveButtonStyle.filled,
           minSize: const Size(44, 44),
           child: child,
@@ -180,7 +180,7 @@ class EnhancedAccessibilityService {
             ? Builder(
                 builder: (context) => Icon(
                   Icons.error_outline,
-                  color: context.conduitTheme.error,
+                  color: context.nerdinTheme.error,
                 ),
               )
             : null,
@@ -195,7 +195,7 @@ class EnhancedAccessibilityService {
               ? Builder(
                   builder: (context) => Icon(
                     Icons.error_outline,
-                    color: context.conduitTheme.error,
+                    color: context.nerdinTheme.error,
                   ),
                 )
               : null,
@@ -291,14 +291,14 @@ class EnhancedAccessibilityService {
           title: Text(
             label,
             style: AppTypography.bodyMediumStyle.copyWith(
-              color: context.conduitTheme.textPrimary,
+              color: context.nerdinTheme.textPrimary,
             ),
           ),
           subtitle: description != null
               ? Text(
                   description,
                   style: AppTypography.bodySmallStyle.copyWith(
-                    color: context.conduitTheme.textSecondary,
+                    color: context.nerdinTheme.textSecondary,
                   ),
                 )
               : null,
@@ -406,7 +406,7 @@ class EnhancedAccessibilityService {
 
   /// Provide haptic feedback if available
   static void hapticFeedback() {
-    ConduitHaptics.lightImpact();
+    NerdinHaptics.lightImpact();
   }
 
   /// Create accessible focus border

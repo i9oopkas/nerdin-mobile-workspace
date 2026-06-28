@@ -1,13 +1,13 @@
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import 'package:flutter/material.dart';
 
-import '../../conduit_loading.dart';
+import '../../nerdin_loading.dart';
 import '../../../theme/theme_extensions.dart';
 import '../compiled_markdown_document.dart';
 import '../markdown_compile_service.dart';
 import '../markdown_config.dart';
 import '../streaming_markdown_widget.dart';
-import 'conduit_markdown_widget.dart';
+import 'nerdin_markdown_widget.dart';
 import 'details_block_widget.dart';
 import 'details_group_widget.dart';
 import 'inline_renderer.dart';
@@ -62,7 +62,7 @@ class BlockRenderer {
   final BuildContext context;
 
   /// Style configuration for all markdown elements.
-  final ConduitMarkdownStyle style;
+  final NerdinMarkdownStyle style;
 
   /// Renderer for inline-level nodes.
   final InlineRenderer inlineRenderer;
@@ -668,7 +668,7 @@ class BlockRenderer {
     final previewable = blockKind == CompiledMarkdownBlockKind.previewableCode;
     final inlinePreview = previewable && element.inlinePreview;
 
-    final conduitTheme = context.conduitTheme;
+    final nerdinTheme = context.nerdinTheme;
 
     if (element.isHeavyBlock) {
       if (heavyBlockPolicy == MarkdownHeavyBlockPolicy.defer) {
@@ -679,13 +679,13 @@ class BlockRenderer {
 
     final codeBlock = Padding(
       padding: EdgeInsets.symmetric(vertical: style.codeBlockSpacing),
-      child: ConduitMarkdown.buildCodeBlock(
+      child: NerdinMarkdown.buildCodeBlock(
         context: context,
         code: code,
         language: language,
-        theme: conduitTheme,
+        theme: nerdinTheme,
         onPreview: previewable
-            ? () => ConduitMarkdown.showCodePreviewSheet(
+            ? () => NerdinMarkdown.showCodePreviewSheet(
                 context,
                 code: code,
                 language: language,
@@ -701,7 +701,7 @@ class BlockRenderer {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ConduitMarkdown.buildInlineCodePreview(
+        NerdinMarkdown.buildInlineCodePreview(
           context,
           code: code,
           language: language,
@@ -715,11 +715,11 @@ class BlockRenderer {
     return switch (blockKind) {
       CompiledMarkdownBlockKind.mermaid => Padding(
         padding: EdgeInsets.symmetric(vertical: style.codeBlockSpacing),
-        child: ConduitMarkdown.buildMermaidBlock(context, code),
+        child: NerdinMarkdown.buildMermaidBlock(context, code),
       ),
       CompiledMarkdownBlockKind.chartJs => Padding(
         padding: EdgeInsets.symmetric(vertical: style.codeBlockSpacing),
-        child: ConduitMarkdown.buildChartJsBlock(context, code),
+        child: NerdinMarkdown.buildChartJsBlock(context, code),
       ),
       _ => const SizedBox.shrink(),
     };
@@ -729,7 +729,7 @@ class BlockRenderer {
     CompiledMarkdownBlockKind blockKind,
   ) {
     final l10n = AppLocalizations.of(context)!;
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     return Padding(
       padding: EdgeInsets.symmetric(vertical: style.codeBlockSpacing),
       child: Container(
@@ -744,7 +744,7 @@ class BlockRenderer {
           ),
         ),
         child: Center(
-          child: ConduitLoading.inline(
+          child: NerdinLoading.inline(
             context: context,
             message: l10n.previewDeferredLargeContent,
           ),
@@ -1374,7 +1374,7 @@ class BlockRenderer {
       return const SizedBox.shrink();
     }
 
-    return ConduitMarkdownWidget(
+    return NerdinMarkdownWidget(
       compiledDocument: document,
       stateScopeId: nestedStateScopeId,
       onLinkTap: onLinkTap,
@@ -1506,10 +1506,10 @@ class BlockRenderer {
 
     final uri = Uri.tryParse(src);
     if (uri == null) {
-      return ConduitMarkdown.buildImageError(context, context.conduitTheme);
+      return NerdinMarkdown.buildImageError(context, context.nerdinTheme);
     }
 
-    return ConduitMarkdown.buildImage(context, uri, context.conduitTheme);
+    return NerdinMarkdown.buildImage(context, uri, context.nerdinTheme);
   }
 
   // -- Fallback --

@@ -5,7 +5,7 @@ import 'package:uuid/uuid.dart';
 
 import '../utils/debug_logger.dart';
 
-const shareStagingDirectoryName = 'conduit-shared-intents';
+const shareStagingDirectoryName = 'nerdin-shared-intents';
 const _shareStagingDirectories = {
   'shared-incoming',
   'shared-intents',

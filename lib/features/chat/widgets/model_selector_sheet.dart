@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io' show Platform;
 
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show ScrollCacheExtent;
@@ -13,7 +13,7 @@ import '../../../core/utils/model_icon_utils.dart';
 import '../../../core/utils/model_sort_utils.dart';
 import '../../../shared/theme/theme_extensions.dart';
 import '../../../shared/utils/conversation_context_menu.dart';
-import '../../../shared/widgets/conduit_components.dart';
+import '../../../shared/widgets/nerdin_components.dart';
 import '../../../shared/widgets/modal_safe_area.dart';
 import '../../../shared/widgets/model_list_tile.dart';
 import '../../../shared/widgets/sheet_handle.dart';
@@ -111,15 +111,15 @@ class ModelSelectorSheetState extends ConsumerState<ModelSelectorSheet> {
           builder: (context, scrollController) {
             return Container(
               decoration: BoxDecoration(
-                color: context.conduitTheme.surfaceBackground,
+                color: context.nerdinTheme.surfaceBackground,
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(AppBorderRadius.bottomSheet),
                 ),
                 border: Border.all(
-                  color: context.conduitTheme.dividerColor,
+                  color: context.nerdinTheme.dividerColor,
                   width: BorderWidth.regular,
                 ),
-                boxShadow: ConduitShadows.modal(context),
+                boxShadow: NerdinShadows.modal(context),
               ),
               child: ModalSheetSafeArea(
                 padding: const EdgeInsets.symmetric(
@@ -147,7 +147,7 @@ class ModelSelectorSheetState extends ConsumerState<ModelSelectorSheet> {
                                                 : Icons.search_off,
                                             size: 48,
                                             color: context
-                                                .conduitTheme
+                                                .nerdinTheme
                                                 .iconSecondary,
                                           ),
                                           const SizedBox(height: Spacing.md),
@@ -156,7 +156,7 @@ class ModelSelectorSheetState extends ConsumerState<ModelSelectorSheet> {
                                             style: AppTypography.bodyLargeStyle
                                                 .copyWith(
                                                   color: context
-                                                      .conduitTheme
+                                                      .nerdinTheme
                                                       .textSecondary,
                                                 ),
                                           ),
@@ -181,10 +181,10 @@ class ModelSelectorSheetState extends ConsumerState<ModelSelectorSheet> {
                                               model,
                                             );
 
-                                        return ConduitContextMenu(
+                                        return NerdinContextMenu(
                                           actions: canTogglePinnedModels
                                               ? [
-                                                  ConduitContextMenuAction(
+                                                  NerdinContextMenuAction(
                                                     cupertinoIcon: isPinned
                                                         ? CupertinoIcons
                                                               .pin_slash
@@ -236,10 +236,10 @@ class ModelSelectorSheetState extends ConsumerState<ModelSelectorSheet> {
                                   end: Alignment.bottomCenter,
                                   stops: const [0.0, 0.65, 1.0],
                                   colors: [
-                                    context.conduitTheme.surfaceBackground,
-                                    context.conduitTheme.surfaceBackground
+                                    context.nerdinTheme.surfaceBackground,
+                                    context.nerdinTheme.surfaceBackground
                                         .withValues(alpha: 0.9),
-                                    context.conduitTheme.surfaceBackground
+                                    context.nerdinTheme.surfaceBackground
                                         .withValues(alpha: 0.0),
                                   ],
                                 ),
@@ -248,7 +248,7 @@ class ModelSelectorSheetState extends ConsumerState<ModelSelectorSheet> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   const SizedBox(height: Spacing.sm),
-                                  ConduitGlassSearchField(
+                                  NerdinGlassSearchField(
                                     controller: _searchController,
                                     hintText: AppLocalizations.of(
                                       context,

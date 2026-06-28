@@ -61,7 +61,7 @@ class AppTheme {
     final shadows = ShadowThemeExtension.standard();
     final shapes = ShapeThemeExtension.fromVariant(variant);
     final sidebar = SidebarThemeExtension.fromVariant(variant);
-    final conduitExtension = ConduitThemeExtension.create(
+    final nerdinExtension = NerdinThemeExtension.create(
       theme: theme,
       tokens: tokens,
       brightness: brightness,
@@ -133,25 +133,25 @@ class AppTheme {
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: conduitExtension.statusPalette.info.base,
+        backgroundColor: nerdinExtension.statusPalette.info.base,
         contentTextStyle: textTheme.bodyMedium?.copyWith(
-          color: conduitExtension.statusPalette.info.onBase,
+          color: nerdinExtension.statusPalette.info.onBase,
         ),
-        actionTextColor: conduitExtension.statusPalette.info.onBase,
+        actionTextColor: nerdinExtension.statusPalette.info.onBase,
         shape: RoundedRectangleBorder(borderRadius: shapes.medium),
         elevation: Elevation.low,
         insetPadding: const EdgeInsets.all(Spacing.md),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: conduitExtension.inputBackground,
+        fillColor: nerdinExtension.inputBackground,
         focusColor: surfaces.ring,
         hoverColor: Color.alphaBlend(
           shadows.shadowXs.first.color,
-          conduitExtension.inputBackground,
+          nerdinExtension.inputBackground,
         ),
         hintStyle: textTheme.bodyMedium?.copyWith(
-          color: conduitExtension.inputPlaceholder,
+          color: nerdinExtension.inputPlaceholder,
         ),
         border: baseInputBorder,
         enabledBorder: baseInputBorder,
@@ -177,8 +177,8 @@ class AppTheme {
           shadows.shadowXs.first.color,
           surfaces.card,
         ),
-        selectedColor: conduitExtension.statusPalette.success.background,
-        secondarySelectedColor: conduitExtension.statusPalette.info.background,
+        selectedColor: nerdinExtension.statusPalette.success.background,
+        secondarySelectedColor: nerdinExtension.statusPalette.info.background,
         shadowColor: shadows.shadowSm.first.color,
         selectedShadowColor: shadows.shadowSm.first.color,
         brightness: brightness,
@@ -186,13 +186,13 @@ class AppTheme {
           color: tokens.neutralOnSurface,
         ),
         secondaryLabelStyle: textTheme.bodySmall?.copyWith(
-          color: conduitExtension.statusPalette.info.onBase,
+          color: nerdinExtension.statusPalette.info.onBase,
         ),
         side: BorderSide(color: surfaces.border),
       ),
       badgeTheme: BadgeThemeData(
-        backgroundColor: conduitExtension.statusPalette.info.base,
-        textColor: conduitExtension.statusPalette.info.onBase,
+        backgroundColor: nerdinExtension.statusPalette.info.base,
+        textColor: nerdinExtension.statusPalette.info.onBase,
         padding: EdgeInsets.symmetric(
           horizontal: AppTypography.badgeHorizontalPadding,
           vertical: AppTypography.badgeVerticalPadding,
@@ -217,7 +217,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: shapes.medium),
         tileColor: Color.lerp(surfaces.card, surfaces.muted, 0.25),
         selectedTileColor: Color.alphaBlend(
-          conduitExtension.statusPalette.info.background,
+          nerdinExtension.statusPalette.info.background,
           surfaces.card,
         ),
         iconColor: tokens.neutralTone80,
@@ -263,7 +263,7 @@ class AppTheme {
         shadows,
         shapes,
         sidebar,
-        conduitExtension,
+        nerdinExtension,
         AppPaletteThemeExtension(palette: theme),
       ],
     );

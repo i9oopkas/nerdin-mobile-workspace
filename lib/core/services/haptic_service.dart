@@ -8,8 +8,8 @@ import 'package:flutter/services.dart';
 /// iOS can still use `gaimon` when it is available so notification-style
 /// feedback stays mapped to the native UIKit generators. Other platforms and
 /// tests fall back to Flutter's built-in `HapticFeedback` APIs.
-class ConduitHaptics {
-  ConduitHaptics._();
+class NerdinHaptics {
+  NerdinHaptics._();
 
   static const MethodChannel _pluginChannel = MethodChannel('gaimon');
 
@@ -102,7 +102,7 @@ class ConduitHaptics {
   static void _logFailure(String message, Object error, StackTrace stackTrace) {
     developer.log(
       message,
-      name: 'ConduitHaptics',
+      name: 'NerdinHaptics',
       level: 900,
       error: error,
       stackTrace: stackTrace,

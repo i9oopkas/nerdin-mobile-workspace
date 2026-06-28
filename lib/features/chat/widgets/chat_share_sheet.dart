@@ -1,16 +1,16 @@
 import 'dart:io' show Platform;
 
-import 'package:conduit/core/models/conversation.dart';
-import 'package:conduit/core/providers/app_providers.dart';
-import 'package:conduit/core/services/haptic_service.dart';
-import 'package:conduit/core/services/native_sheet_bridge.dart';
-import 'package:conduit/features/chat/providers/chat_providers.dart' as chat;
-import 'package:conduit/features/chat/utils/chat_share_url.dart';
-import 'package:conduit/l10n/app_localizations.dart';
-import 'package:conduit/shared/theme/theme_extensions.dart';
-import 'package:conduit/shared/widgets/conduit_components.dart';
-import 'package:conduit/shared/widgets/sheet_handle.dart';
-import 'package:conduit/shared/widgets/themed_sheets.dart';
+import 'package:nerdin_mobile_workspace/core/models/conversation.dart';
+import 'package:nerdin_mobile_workspace/core/providers/app_providers.dart';
+import 'package:nerdin_mobile_workspace/core/services/haptic_service.dart';
+import 'package:nerdin_mobile_workspace/core/services/native_sheet_bridge.dart';
+import 'package:nerdin_mobile_workspace/features/chat/providers/chat_providers.dart' as chat;
+import 'package:nerdin_mobile_workspace/features/chat/utils/chat_share_url.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
+import 'package:nerdin_mobile_workspace/shared/theme/theme_extensions.dart';
+import 'package:nerdin_mobile_workspace/shared/widgets/nerdin_components.dart';
+import 'package:nerdin_mobile_workspace/shared/widgets/sheet_handle.dart';
+import 'package:nerdin_mobile_workspace/shared/widgets/themed_sheets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -93,7 +93,7 @@ Future<void> _showNativeChatShareSheet({
     try {
       final url = await ensureShareUrl();
       await Clipboard.setData(ClipboardData(text: url));
-      ConduitHaptics.success();
+      NerdinHaptics.success();
       showMessage(l10n.sharedChatCopied);
     } catch (_) {
       showMessage(l10n.chatShareFailed);
@@ -132,7 +132,7 @@ Future<void> _showNativeChatShareSheet({
             .read(activeConversationProvider.notifier)
             .set(activeConversation!.copyWith(shareId: null));
       }
-      ConduitHaptics.success();
+      NerdinHaptics.success();
       showMessage(l10n.sharedLinkDeleted);
     } catch (_) {
       showMessage(l10n.deleteSharedLinkFailed);
@@ -235,7 +235,7 @@ class _ChatShareSheetState extends ConsumerState<ChatShareSheet> {
     try {
       final url = await _ensureShareUrl();
       await Clipboard.setData(ClipboardData(text: url));
-      ConduitHaptics.success();
+      NerdinHaptics.success();
       _showSnack(l10n.sharedChatCopied);
     } catch (_) {
       _showSnack(l10n.chatShareFailed);
@@ -271,7 +271,7 @@ class _ChatShareSheetState extends ConsumerState<ChatShareSheet> {
       if (mounted) {
         setState(() => _shareId = null);
       }
-      ConduitHaptics.success();
+      NerdinHaptics.success();
       _showSnack(l10n.sharedLinkDeleted);
     } catch (_) {
       _showSnack(l10n.deleteSharedLinkFailed);
@@ -292,7 +292,7 @@ class _ChatShareSheetState extends ConsumerState<ChatShareSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final shareId = _shareId;
     final hasExistingShare = shareId != null && shareId.isNotEmpty;
 
@@ -360,7 +360,7 @@ class _ChatShareSheetState extends ConsumerState<ChatShareSheet> {
               ),
             ],
             const SizedBox(height: Spacing.lg),
-            ConduitButton(
+            NerdinButton(
               text: hasExistingShare ? l10n.updateAndCopyLink : l10n.copyLink,
               onPressed: _isDeleting ? null : _copyLink,
               isLoading: _isSharing,
@@ -368,7 +368,7 @@ class _ChatShareSheetState extends ConsumerState<ChatShareSheet> {
               isFullWidth: true,
             ),
             const SizedBox(height: Spacing.sm),
-            ConduitButton(
+            NerdinButton(
               text: l10n.shareSystemSheet,
               onPressed: _isDeleting ? null : _shareLink,
               isSecondary: true,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 
 import '../../../theme/theme_extensions.dart';
 import '../../assistant_detail_header.dart';
@@ -107,7 +107,7 @@ class _MarkdownDetailsGroupState extends State<MarkdownDetailsGroup> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: Spacing.xs),

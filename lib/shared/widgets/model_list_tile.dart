@@ -1,9 +1,9 @@
 import 'dart:io' show Platform;
 
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:conduit/core/services/haptic_service.dart';
+import 'package:nerdin_mobile_workspace/core/services/haptic_service.dart';
 
 import '../../core/models/model.dart';
 import '../theme/theme_extensions.dart';
@@ -28,7 +28,7 @@ class ModelCapabilityChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     return Container(
       margin: const EdgeInsets.only(right: Spacing.xs),
       padding: const EdgeInsets.symmetric(horizontal: Spacing.xs, vertical: 2),
@@ -66,7 +66,7 @@ class ModelTagChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     return Container(
       margin: const EdgeInsets.only(right: Spacing.xs),
       padding: const EdgeInsets.symmetric(horizontal: Spacing.xs, vertical: 2),
@@ -119,7 +119,7 @@ class ModelListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final l10n = AppLocalizations.of(context)!;
     final borderRadius = BorderRadius.circular(AppBorderRadius.card);
 
@@ -162,7 +162,7 @@ class ModelListTile extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
-          ConduitHaptics.selectionClick();
+          NerdinHaptics.selectionClick();
           onTap();
         },
         child: Container(

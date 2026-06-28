@@ -1,6 +1,6 @@
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import 'package:flutter/widgets.dart';
-import 'package:conduit/core/services/haptic_service.dart';
+import 'package:nerdin_mobile_workspace/core/services/haptic_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/models/folder.dart';
@@ -45,7 +45,7 @@ class CreateFolderDialog {
         parentId: parentId,
       );
       final folder = Folder.fromJson(Map<String, dynamic>.from(created));
-      ConduitHaptics.lightImpact();
+      NerdinHaptics.lightImpact();
       ref.read(foldersProvider.notifier).upsertFolderFromRemote(folder);
       refreshConversationsCache(ref, includeFolders: true);
     } catch (e, stackTrace) {

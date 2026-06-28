@@ -7,8 +7,8 @@ import 'color_tokens.dart';
 
 /// Extended theme data for consistent styling across the app
 @immutable
-class ConduitThemeExtension extends ThemeExtension<ConduitThemeExtension> {
-  const ConduitThemeExtension._({
+class NerdinThemeExtension extends ThemeExtension<NerdinThemeExtension> {
+  const NerdinThemeExtension._({
     required this.tokens,
     required this.variant,
     required this.isDark,
@@ -17,7 +17,7 @@ class ConduitThemeExtension extends ThemeExtension<ConduitThemeExtension> {
     required this.shapes,
   });
 
-  factory ConduitThemeExtension.create({
+  factory NerdinThemeExtension.create({
     required TweakcnThemeDefinition theme,
     required AppColorTokens tokens,
     required Brightness brightness,
@@ -25,7 +25,7 @@ class ConduitThemeExtension extends ThemeExtension<ConduitThemeExtension> {
     required ShadowThemeExtension shadows,
     required ShapeThemeExtension shapes,
   }) {
-    return ConduitThemeExtension._(
+    return NerdinThemeExtension._(
       tokens: tokens,
       variant: theme.variantFor(brightness),
       isDark: brightness == Brightness.dark,
@@ -213,7 +213,7 @@ class ConduitThemeExtension extends ThemeExtension<ConduitThemeExtension> {
       AppTypography.codeStyle.copyWith(color: tokens.neutralOnSurface);
 
   @override
-  ConduitThemeExtension copyWith({
+  NerdinThemeExtension copyWith({
     AppColorTokens? tokens,
     TweakcnThemeVariant? variant,
     bool? isDark,
@@ -221,7 +221,7 @@ class ConduitThemeExtension extends ThemeExtension<ConduitThemeExtension> {
     ShadowThemeExtension? shadows,
     ShapeThemeExtension? shapes,
   }) {
-    return ConduitThemeExtension._(
+    return NerdinThemeExtension._(
       tokens: tokens ?? this.tokens,
       variant: variant ?? this.variant,
       isDark: isDark ?? this.isDark,
@@ -232,11 +232,11 @@ class ConduitThemeExtension extends ThemeExtension<ConduitThemeExtension> {
   }
 
   @override
-  ConduitThemeExtension lerp(
-    covariant ThemeExtension<ConduitThemeExtension>? other,
+  NerdinThemeExtension lerp(
+    covariant ThemeExtension<NerdinThemeExtension>? other,
     double t,
   ) {
-    if (other is! ConduitThemeExtension) return this;
+    if (other is! NerdinThemeExtension) return this;
     return t < 0.5 ? this : other;
   }
 
@@ -267,11 +267,11 @@ class ConduitThemeExtension extends ThemeExtension<ConduitThemeExtension> {
   }
 }
 
-/// Extension method to easily access Conduit theme from BuildContext
-extension ConduitThemeContext on BuildContext {
-  ConduitThemeExtension get conduitTheme {
+/// Extension method to easily access Nerdin theme from BuildContext
+extension NerdinThemeContext on BuildContext {
+  NerdinThemeExtension get nerdinTheme {
     final theme = Theme.of(this);
-    final extension = theme.extension<ConduitThemeExtension>();
+    final extension = theme.extension<NerdinThemeExtension>();
     if (extension != null) return extension;
     final palette =
         theme.extension<AppPaletteThemeExtension>()?.palette ??
@@ -289,7 +289,7 @@ extension ConduitThemeContext on BuildContext {
     final ShapeThemeExtension shapes =
         theme.extension<ShapeThemeExtension>() ??
         ShapeThemeExtension.fromVariant(variant);
-    return ConduitThemeExtension.create(
+    return NerdinThemeExtension.create(
       theme: palette,
       tokens: tokens,
       brightness: theme.brightness,
@@ -300,7 +300,7 @@ extension ConduitThemeContext on BuildContext {
   }
 }
 
-extension ConduitColorTokensContext on BuildContext {
+extension NerdinColorTokensContext on BuildContext {
   AppColorTokens get colorTokens {
     final theme = Theme.of(this);
     final tokens = theme.extension<AppColorTokens>();
@@ -314,8 +314,8 @@ extension ConduitColorTokensContext on BuildContext {
   }
 }
 
-extension ConduitPaletteContext on BuildContext {
-  TweakcnThemeDefinition get conduitPalette {
+extension NerdinPaletteContext on BuildContext {
+  TweakcnThemeDefinition get nerdinPalette {
     return Theme.of(this).extension<AppPaletteThemeExtension>()?.palette ??
         TweakcnThemes.t3Chat;
   }
@@ -866,7 +866,7 @@ class Elevation {
 }
 
 /// Helper class for consistent shadows - Enhanced for production with better hierarchy
-class ConduitShadows {
+class NerdinShadows {
   static List<BoxShadow> low(BuildContext context) => _shadow(
     context.colorTokens,
     opacity: 0.08,

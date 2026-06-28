@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 
 import '../../../shared/theme/theme_extensions.dart';
 import '../models/chat_context_attachment.dart';
@@ -67,7 +67,7 @@ class _ContextAttachmentChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final deleteTooltip = MaterialLocalizations.of(context).deleteButtonTooltip;
 
     return Container(

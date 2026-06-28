@@ -16,13 +16,13 @@ final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
       // Keep legacy Android storage readable until a storageNamespace migration
       // can move both encrypted data and wrapped keys.
       // ignore: deprecated_member_use
-      sharedPreferencesName: 'conduit_secure_prefs',
-      preferencesKeyPrefix: 'conduit_',
+      sharedPreferencesName: 'nerdin_secure_prefs',
+      preferencesKeyPrefix: 'nerdin_',
       // Avoid auto-wipe on transient errors; handled at call sites instead.
       resetOnError: false,
     ),
     iOptions: IOSOptions(
-      accountName: 'conduit_secure_storage',
+      accountName: 'nerdin_secure_storage',
       synchronizable: false,
     ),
   );

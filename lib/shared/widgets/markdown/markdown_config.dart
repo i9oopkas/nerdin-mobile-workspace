@@ -13,7 +13,7 @@ import 'package:flutter_highlight/themes/github.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:highlight/highlight.dart' show Node, highlight;
 
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 
 import '../web_content_embed.dart';
 import '../webview_content_height.dart';
@@ -21,8 +21,8 @@ import '../themed_sheets.dart';
 import '../../theme/color_tokens.dart';
 import '../../theme/theme_extensions.dart';
 import 'renderer/markdown_style.dart';
-import 'package:conduit/core/network/self_signed_image_cache_manager.dart';
-import 'package:conduit/core/network/image_header_utils.dart';
+import 'package:nerdin_mobile_workspace/core/network/self_signed_image_cache_manager.dart';
+import 'package:nerdin_mobile_workspace/core/network/image_header_utils.dart';
 
 typedef MarkdownLinkTapCallback = void Function(String url, String title);
 
@@ -36,8 +36,8 @@ bool _isRunningInWidgetTest() {
   );
 }
 
-class ConduitMarkdown {
-  const ConduitMarkdown._();
+class NerdinMarkdown {
+  const NerdinMarkdown._();
 
   /// Builds a syntax-highlighted code block with a
   /// language header and copy button.
@@ -45,11 +45,11 @@ class ConduitMarkdown {
     required BuildContext context,
     required String code,
     required String language,
-    required ConduitThemeExtension theme,
+    required NerdinThemeExtension theme,
     VoidCallback? onPreview,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final markdownStyle = ConduitMarkdownStyle.fromTheme(context);
+    final markdownStyle = NerdinMarkdownStyle.fromTheme(context);
     final normalizedLanguage = language.trim().isEmpty
         ? 'plaintext'
         : language.trim();
@@ -140,7 +140,7 @@ class ConduitMarkdown {
     required String code,
     required String language,
   }) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     return Container(
       margin: const EdgeInsets.only(top: Spacing.sm, bottom: Spacing.xs + 2),
@@ -172,7 +172,7 @@ class ConduitMarkdown {
     required String code,
     required String language,
   }) async {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final title = _previewTitleForLanguage(language);
 
     if (!context.mounted) {
@@ -184,7 +184,7 @@ class ConduitMarkdown {
       isScrollControlled: true,
       useSafeArea: true,
       builder: (sheetContext) {
-        final markdownStyle = ConduitMarkdownStyle.fromTheme(sheetContext);
+        final markdownStyle = NerdinMarkdownStyle.fromTheme(sheetContext);
         return SizedBox(
           height: MediaQuery.sizeOf(sheetContext).height,
           child: ColoredBox(
@@ -306,7 +306,7 @@ class ConduitMarkdown {
   static Widget buildImage(
     BuildContext context,
     Uri uri,
-    ConduitThemeExtension theme,
+    NerdinThemeExtension theme,
   ) {
     if (uri.scheme == 'data') {
       return _buildBase64Image(uri.toString(), context, theme);
@@ -320,7 +320,7 @@ class ConduitMarkdown {
   static Widget _buildBase64Image(
     String dataUrl,
     BuildContext context,
-    ConduitThemeExtension theme,
+    NerdinThemeExtension theme,
   ) {
     try {
       final commaIndex = dataUrl.indexOf(',');
@@ -356,7 +356,7 @@ class ConduitMarkdown {
   static Widget _buildNetworkImage(
     String url,
     BuildContext context,
-    ConduitThemeExtension theme,
+    NerdinThemeExtension theme,
   ) {
     // Read headers and optional self-signed cache manager from Riverpod
     final container = ProviderScope.containerOf(context, listen: false);
@@ -395,7 +395,7 @@ class ConduitMarkdown {
   /// Builds an error placeholder for broken images.
   static Widget buildImageError(
     BuildContext context,
-    ConduitThemeExtension theme,
+    NerdinThemeExtension theme,
   ) {
     return Container(
       height: 120,
@@ -414,13 +414,13 @@ class ConduitMarkdown {
   }
 
   static Widget buildMermaidBlock(BuildContext context, String code) {
-    final conduitTheme = context.conduitTheme;
+    final nerdinTheme = context.nerdinTheme;
     final materialTheme = Theme.of(context);
 
     if (MermaidDiagram.isSupported) {
       return _buildMermaidContainer(
         context: context,
-        conduitTheme: conduitTheme,
+        nerdinTheme: nerdinTheme,
         materialTheme: materialTheme,
         code: code,
       );
@@ -428,14 +428,14 @@ class ConduitMarkdown {
 
     return _buildUnsupportedMermaidContainer(
       context: context,
-      conduitTheme: conduitTheme,
+      nerdinTheme: nerdinTheme,
       code: code,
     );
   }
 
   static Widget _buildMermaidContainer({
     required BuildContext context,
-    required ConduitThemeExtension conduitTheme,
+    required NerdinThemeExtension nerdinTheme,
     required ThemeData materialTheme,
     required String code,
   }) {
@@ -445,7 +445,7 @@ class ConduitMarkdown {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppBorderRadius.sm),
         border: Border.all(
-          color: conduitTheme.cardBorder.withValues(alpha: 0.4),
+          color: nerdinTheme.cardBorder.withValues(alpha: 0.4),
           width: BorderWidth.micro,
         ),
       ),
@@ -464,21 +464,21 @@ class ConduitMarkdown {
 
   static Widget _buildUnsupportedMermaidContainer({
     required BuildContext context,
-    required ConduitThemeExtension conduitTheme,
+    required NerdinThemeExtension nerdinTheme,
     required String code,
   }) {
     final l10n = AppLocalizations.of(context);
-    final markdownStyle = ConduitMarkdownStyle.fromTheme(context);
-    final textStyle = _unsupportedPreviewTextStyle(markdownStyle, conduitTheme);
+    final markdownStyle = NerdinMarkdownStyle.fromTheme(context);
+    final textStyle = _unsupportedPreviewTextStyle(markdownStyle, nerdinTheme);
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: Spacing.sm),
       padding: const EdgeInsets.all(Spacing.sm),
       decoration: BoxDecoration(
-        color: conduitTheme.surfaceContainer.withValues(alpha: 0.35),
+        color: nerdinTheme.surfaceContainer.withValues(alpha: 0.35),
         borderRadius: BorderRadius.circular(AppBorderRadius.sm),
         border: Border.all(
-          color: conduitTheme.cardBorder.withValues(alpha: 0.4),
+          color: nerdinTheme.cardBorder.withValues(alpha: 0.4),
           width: BorderWidth.micro,
         ),
       ),
@@ -499,7 +499,7 @@ class ConduitMarkdown {
             textDirection: TextDirection.ltr,
             textWidthBasis: TextWidthBasis.parent,
             style: markdownStyle.detailCode.copyWith(
-              color: conduitTheme.codeText,
+              color: nerdinTheme.codeText,
             ),
           ),
         ],
@@ -525,13 +525,13 @@ class ConduitMarkdown {
 
   /// Builds a ChartJS block for rendering in a WebView.
   static Widget buildChartJsBlock(BuildContext context, String htmlContent) {
-    final conduitTheme = context.conduitTheme;
+    final nerdinTheme = context.nerdinTheme;
     final materialTheme = Theme.of(context);
 
     if (ChartJsDiagram.isSupported) {
       return _buildChartJsContainer(
         context: context,
-        conduitTheme: conduitTheme,
+        nerdinTheme: nerdinTheme,
         materialTheme: materialTheme,
         htmlContent: htmlContent,
       );
@@ -539,13 +539,13 @@ class ConduitMarkdown {
 
     return _buildUnsupportedChartJsContainer(
       context: context,
-      conduitTheme: conduitTheme,
+      nerdinTheme: nerdinTheme,
     );
   }
 
   static Widget _buildChartJsContainer({
     required BuildContext context,
-    required ConduitThemeExtension conduitTheme,
+    required NerdinThemeExtension nerdinTheme,
     required ThemeData materialTheme,
     required String htmlContent,
   }) {
@@ -555,7 +555,7 @@ class ConduitMarkdown {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppBorderRadius.sm),
         border: Border.all(
-          color: conduitTheme.cardBorder.withValues(alpha: 0.4),
+          color: nerdinTheme.cardBorder.withValues(alpha: 0.4),
           width: BorderWidth.micro,
         ),
       ),
@@ -574,20 +574,20 @@ class ConduitMarkdown {
 
   static Widget _buildUnsupportedChartJsContainer({
     required BuildContext context,
-    required ConduitThemeExtension conduitTheme,
+    required NerdinThemeExtension nerdinTheme,
   }) {
     final l10n = AppLocalizations.of(context);
-    final markdownStyle = ConduitMarkdownStyle.fromTheme(context);
-    final textStyle = _unsupportedPreviewTextStyle(markdownStyle, conduitTheme);
+    final markdownStyle = NerdinMarkdownStyle.fromTheme(context);
+    final textStyle = _unsupportedPreviewTextStyle(markdownStyle, nerdinTheme);
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: Spacing.sm),
       padding: const EdgeInsets.all(Spacing.sm),
       decoration: BoxDecoration(
-        color: conduitTheme.surfaceContainer.withValues(alpha: 0.35),
+        color: nerdinTheme.surfaceContainer.withValues(alpha: 0.35),
         borderRadius: BorderRadius.circular(AppBorderRadius.sm),
         border: Border.all(
-          color: conduitTheme.cardBorder.withValues(alpha: 0.4),
+          color: nerdinTheme.cardBorder.withValues(alpha: 0.4),
           width: BorderWidth.micro,
         ),
       ),
@@ -600,11 +600,11 @@ class ConduitMarkdown {
   }
 
   static TextStyle _unsupportedPreviewTextStyle(
-    ConduitMarkdownStyle markdownStyle,
-    ConduitThemeExtension conduitTheme,
+    NerdinMarkdownStyle markdownStyle,
+    NerdinThemeExtension nerdinTheme,
   ) {
     return markdownStyle.detailAction.copyWith(
-      color: conduitTheme.codeText.withValues(alpha: 0.7),
+      color: nerdinTheme.codeText.withValues(alpha: 0.7),
     );
   }
 }
@@ -874,7 +874,7 @@ class _CollapseToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final markdownStyle = ConduitMarkdownStyle.fromTheme(context);
+    final markdownStyle = NerdinMarkdownStyle.fromTheme(context);
     final labelColor = isDark
         ? const Color(0xFF9DA5B4)
         : const Color(0xFF57606A);
@@ -967,7 +967,7 @@ class _CodeBlockHeaderState extends State<CodeBlockHeader> {
 
   @override
   Widget build(BuildContext context) {
-    final markdownStyle = ConduitMarkdownStyle.fromTheme(context);
+    final markdownStyle = NerdinMarkdownStyle.fromTheme(context);
     final label = widget.language.isEmpty ? 'plaintext' : widget.language;
 
     // Colors derived from the code block theme for consistency
@@ -1115,7 +1115,7 @@ class _CodeBlockActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final markdownStyle = ConduitMarkdownStyle.fromTheme(context);
+    final markdownStyle = NerdinMarkdownStyle.fromTheme(context);
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -1348,7 +1348,7 @@ class _ChartJsDiagramState extends State<ChartJsDiagram> {
         _isLoading = true;
       });
     }
-    final baseUrl = WebUri('https://chart-preview.conduit.local/');
+    final baseUrl = WebUri('https://chart-preview.nerdin.local/');
     try {
       await controller.loadData(
         data: _buildHtml(widget.htmlContent, script),
@@ -1819,7 +1819,7 @@ class _MermaidDiagramState extends State<MermaidDiagram> {
         _isLoading = true;
       });
     }
-    final baseUrl = WebUri('https://mermaid-preview.conduit.local/');
+    final baseUrl = WebUri('https://mermaid-preview.nerdin.local/');
     try {
       await controller.loadData(
         data: _buildHtml(_sanitizeMermaidCode(widget.code), script),

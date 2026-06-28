@@ -30,17 +30,17 @@ class WidgetActions {
 }
 
 /// App group identifier for iOS widget data sharing.
-const String _releaseAppGroupId = 'group.app.cogwheel.conduit';
-const String _debugAppGroupId = 'group.app.cogwheel.conduit.x2662v5dt2.debug';
+const String _releaseAppGroupId = 'group.com.nerdin.mobile';
+const String _debugAppGroupId = 'group.com.nerdin.mobile.x2662v5dt2.debug';
 
 String get _appGroupId => kReleaseMode ? _releaseAppGroupId : _debugAppGroupId;
 
 /// Android widget provider class name.
 const String _qualifiedAndroidWidgetName =
-    'app.cogwheel.conduit.ConduitWidgetProvider';
+    'com.nerdin.mobile.NerdinWidgetProvider';
 
 /// iOS widget kind identifier.
-const String _iOSWidgetKind = 'ConduitWidget';
+const String _iOSWidgetKind = 'NerdinWidget';
 
 /// Handles home screen widget interactions for Android and iOS.
 ///

@@ -15,18 +15,10 @@ import '../../../core/models/model.dart';
 import '../../../core/models/conversation.dart';
 import '../../../core/models/file_info.dart';
 import '../../../core/database/app_database.dart';
-import '../../../core/database/daos/outbox_dao.dart';
 import '../../../core/database/database_provider.dart';
-import '../../../core/database/local_conversation_loader.dart';
 import '../../../core/database/mappers/chat_blob_mapper.dart';
 import '../../../core/database/mappers/conversation_assembler.dart';
 import '../../../core/providers/app_providers.dart';
-import '../../../core/sync/chat_locks.dart';
-import '../../../core/sync/clock.dart';
-import '../../../core/sync/id_remapper.dart';
-import '../../../core/sync/outbox_drainer.dart' show OutboxDeferralException;
-import '../../../core/sync/sync_engine.dart';
-
 import '../../../core/services/chat_completion_transport.dart';
 import '../../../core/services/location_service.dart';
 import '../../../core/services/settings_service.dart';
@@ -520,7 +512,7 @@ class ChatMessagesNotifier extends Notifier<List<ChatMessage>> {
       if (generation != _dbMessagesGeneration) {
         return;
       }
-      if (chat == null || !chat.bodySynced) {
+      if (chat == null) {
         return;
       }
       final conversation = assembleConversation(chat, rows);
@@ -1128,11 +1120,8 @@ class ChatMessagesNotifier extends Notifier<List<ChatMessage>> {
 
     _passiveConversationRefreshInFlight = true;
     try {
-      // Pull through the sync engine: the raw fetch persists via
-      // upsertServerChat under the chat lock, then returns the assembled
-      // conversation (CDT-RFC-001 Phase 1). Falls back to a direct fetch when
-      // the engine is inert/unavailable (no database, reviewer mode).
-      final refreshed = await pullChatOrFetch(ref, conversationId);
+      final api = ref.read(apiServiceProvider);
+      final refreshed = api != null ? await api.getConversation(conversationId) : null;
       if (refreshed == null) {
         return;
       }
@@ -1751,7 +1740,8 @@ class ChatMessagesNotifier extends Notifier<List<ChatMessage>> {
           hasActiveTasks &&
           !_shouldProtectLocalStreamingState) {
         try {
-          final refreshed = await pullChatOrFetch(ref, activeConversation.id);
+          final api = ref.read(apiServiceProvider);
+          final refreshed = api != null ? await api.getConversation(activeConversation.id) : null;
           // Bail if we switched chats or a real stream started during the await.
           if (refreshed == null ||
               _disposed ||
@@ -2661,16 +2651,9 @@ class ChatMessagesNotifier extends Notifier<List<ChatMessage>> {
       return;
     }
     final trailingUser = _trailingUserMessage(messages);
-    final ChatLocks locks;
-    try {
-      locks = ref.read(chatLocksProvider);
-    } catch (_) {
-      return;
-    }
     unawaited(
       _writeTurnEcho(
         db: db,
-        locks: locks,
         chatId: activeId,
         trailingUser: trailingUser,
         assistant: assistant,
@@ -2704,15 +2687,8 @@ class ChatMessagesNotifier extends Notifier<List<ChatMessage>> {
       return;
     }
     final trailingUser = _trailingUserMessage(messages);
-    final ChatLocks locks;
-    try {
-      locks = ref.read(chatLocksProvider);
-    } catch (_) {
-      return;
-    }
     await _writeTurnEcho(
       db: db,
-      locks: locks,
       chatId: activeId,
       trailingUser: trailingUser,
       assistant: assistant,
@@ -2721,21 +2697,18 @@ class ChatMessagesNotifier extends Notifier<List<ChatMessage>> {
 
   Future<void> _writeTurnEcho({
     required AppDatabase db,
-    required ChatLocks locks,
     required String chatId,
     required ChatMessage? trailingUser,
     required ChatMessage assistant,
   }) async {
     try {
-      await locks.runExclusive(chatId, () async {
-        await db.messagesDao.upsertLocalEchoTurn(
-          chatId: chatId,
-          user: trailingUser == null
-              ? null
-              : _localEchoRow(chatId, trailingUser),
-          assistant: _localEchoRow(chatId, assistant),
-        );
-      });
+      await db.messagesDao.upsertLocalEchoTurn(
+        chatId: chatId,
+        user: trailingUser == null
+            ? null
+            : _localEchoRow(chatId, trailingUser),
+        assistant: _localEchoRow(chatId, assistant),
+      );
     } catch (error, stackTrace) {
       DebugLogger.error(
         'turn-echo-failed',
@@ -4577,18 +4550,15 @@ Future<void> runHeadlessCompletion(
   );
 
   // Pull the chat (bounded) until the server-persisted assistant reply lands
-  // locally. The Phase 3 merge applies it under the chat lock. Both transport
-  // flows persist the assistant message ASYNCHRONOUSLY (the server defaults
-  // ENABLE_REALTIME_CHAT_SAVE=False, so even after the HTTP byte stream drains
-  // to EOF the final upsert can trail the stream close), so BOTH paths poll
-  // with a short backoff rather than trusting a single immediate pull. If it
-  // still hasn't landed within the window the content is safe on the server and
-  // the next sync cycle collects it — this only tightens the latency.
-  final engine = ref.read(syncEngineProvider.notifier);
+  // locally. Both transport flows persist the assistant message ASYNCHRONOUSLY
+  // (the server defaults ENABLE_REALTIME_CHAT_SAVE=False, so even after the
+  // HTTP byte stream drains to EOF the final upsert can trail the stream close),
+  // so BOTH paths poll with a short backoff rather than trusting a single
+  // immediate pull.
   for (var attempt = 0; attempt < 6; attempt++) {
     if (attempt > 0) await Future<void>.delayed(const Duration(seconds: 2));
-    final convo = await engine.pullChatNow(chatId);
-    final asst = convo?.messages
+    final convo = await api.getConversation(chatId);
+    final asst = convo.messages
         .where((m) => m.id == assistantMessageId)
         .firstOrNull;
     if (asst != null && _headlessAssistantLanded(asst)) {
@@ -4624,7 +4594,7 @@ bool _headlessAssistantLanded(ChatMessage message) {
 bool headlessAssistantLandedForTest(ChatMessage message) =>
     _headlessAssistantLanded(message);
 
-class _QueuedCompletionDeferred implements OutboxDeferralException {
+class _QueuedCompletionDeferred {
   const _QueuedCompletionDeferred(this.message);
 
   final String message;
@@ -4686,15 +4656,11 @@ AppDatabase? _readAppDatabaseOrNull(dynamic ref) {
 /// Durable send (CDT-RFC-001 §7.2 write path; Group 1 of the task_queue
 /// retirement). Replaces the legacy `taskQueueProvider.enqueueSendText` path.
 ///
-/// Writes the user message + assistant placeholder rows AND the outbox op(s)
-/// (createChat or updateChat, plus requestCompletion) in ONE transaction via the
-/// `*WithOutbox` DAO methods, under `ChatLocks.runExclusive(chatId)`, so a send
-/// composed offline survives a force-quit (NON-NEGOTIABLE 4). The optimistic UI
-/// add is separate + instant. The SAME [assistantMessageId] is threaded into the
-/// in-memory placeholder, the DB row, and `RequestCompletionPayload`
-/// (NON-NEGOTIABLE 1, R8). Streaming is then driven by the requestCompletion op
-/// via the drainer's runner — `drainNow()` fires immediately so an online send
-/// streams with no perceptible delay.
+/// Writes the user message + assistant placeholder rows and the requestCompletion
+/// op in ONE transaction via the DAO methods, so a send composed offline survives
+/// a force-quit. The optimistic UI add is separate + instant. The SAME
+/// [assistantMessageId] is threaded into the in-memory placeholder, the DB row,
+/// and the completion payload.
 ///
 /// Falls back to the legacy inline send ([_sendMessageInternal]) when there is
 /// no active database (reviewer mode / no active server), preserving behavior.
@@ -4739,7 +4705,7 @@ Future<void> durableSend(
   }
 
   final filterIds = ref.read(selectedFilterIdsProvider);
-  final now = ref.read(syncClockProvider).nowEpochSeconds();
+  final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
   final selectedTerminalId = ref.read(selectedTerminalIdProvider);
   final terminalIdForCompletion = modelSupportsTerminal(selectedModel)
       ? _resolveTerminalIdForRequest(selectedTerminalId: selectedTerminalId)
@@ -4796,7 +4762,6 @@ Future<void> durableSend(
     assistantPlaceholder,
   ]);
 
-  final chatLocks = ref.read(chatLocksProvider);
   final attachmentList = attachments ?? const <String>[];
   final toolIdList = toolIds ?? const <String>[];
   final durableAttachmentFiles = await _resolveDurableFilesFor(
@@ -4861,15 +4826,13 @@ Future<void> durableSend(
     activeConversation = localConversation;
     ref.read(pendingFolderIdProvider.notifier).clear();
 
-    await chatLocks.runExclusive(localId, () async {
-      await db.chatsDao.insertLocalChatWithCreateOp(
-        chat: rows.chat,
-        messages: rows.messages,
-        blobRows: rows,
-        contentHash: contentHash,
-        completion: completion,
-      );
-    });
+    await db.chatsDao.insertLocalChatWithCreateOp(
+      chat: rows.chat,
+      messages: rows.messages,
+      blobRows: rows,
+      contentHash: contentHash,
+      completion: completion,
+    );
   } else {
     // ---- EXISTING chat ----
     final chatId = activeConversation.id;
@@ -4910,16 +4873,14 @@ Future<void> durableSend(
       ),
     );
 
-    await chatLocks.runExclusive(chatId, () async {
-      await db.chatsDao.appendMessagesWithUpdateOp(
-        chatId: chatId,
-        messages: [userRow, asstRow],
-        currentMessageId: assistantMessageId,
-        updatedAt: now,
-        enqueueCompletion: true,
-        completion: completion,
-      );
-    });
+    await db.chatsDao.appendMessagesWithUpdateOp(
+      chatId: chatId,
+      messages: [userRow, asstRow],
+      currentMessageId: assistantMessageId,
+      updatedAt: now,
+      enqueueCompletion: true,
+      completion: completion,
+    );
   }
 
   // Context attachments (web page / YouTube transcript / KB doc) have now been
@@ -4928,8 +4889,6 @@ Future<void> durableSend(
   // (mirrors `_sendMessageInternal`).
   ref.read(contextAttachmentsProvider.notifier).clear();
 
-  // Drive streaming immediately (online) via the requestCompletion op.
-  await ref.read(syncEngineProvider.notifier).drainNow();
 }
 
 Map<String, dynamic> _buildDurableNewChatBlob({
@@ -5426,10 +5385,6 @@ Future<void> _sendMessageInternal(
                     updatedConversation.folderId!.isNotEmpty,
               );
 
-          // CDT-RFC-001 Phase 1 (E4): materialize the chats row so the
-          // stream-completion echo and pause checkpoint have a parent row.
-          schedulePullChatNow(ref, serverConversation.id);
-
           // Invalidate conversations provider to refresh the list
           // Adding a small delay to prevent rapid invalidations that could cause duplicates
           Future.delayed(const Duration(milliseconds: 100), () {
@@ -5840,25 +5795,20 @@ Future<void> _saveConversationLocally(dynamic ref) async {
     final db = _readAppDatabaseOrNull(ref);
     if (db != null && !isTemporaryChat(updatedConversation.id)) {
       final lastReadAt = updatedConversation.lastReadAt;
-      // ChatLocks discipline: serialize with pull merges / turn echoes so a
-      // stale optimistic stub can never overwrite a just-merged server row.
-      final ChatLocks locks = ref.read(chatLocksProvider);
-      await locks.runExclusive(updatedConversation.id, () async {
-        await db.chatsDao.upsertEnvelopeStub(
-          id: updatedConversation.id,
-          title: updatedConversation.title,
-          createdAt:
-              updatedConversation.createdAt.millisecondsSinceEpoch ~/ 1000,
-          updatedAt:
-              updatedConversation.updatedAt.millisecondsSinceEpoch ~/ 1000,
-          pinned: updatedConversation.pinned,
-          archived: updatedConversation.archived,
-          folderId: Value(updatedConversation.folderId),
-          lastReadAt: lastReadAt == null
-              ? null
-              : lastReadAt.millisecondsSinceEpoch ~/ 1000,
-        );
-      });
+      await db.chatsDao.upsertEnvelopeStub(
+        id: updatedConversation.id,
+        title: updatedConversation.title,
+        createdAt:
+            updatedConversation.createdAt.millisecondsSinceEpoch ~/ 1000,
+        updatedAt:
+            updatedConversation.updatedAt.millisecondsSinceEpoch ~/ 1000,
+        pinned: updatedConversation.pinned,
+        archived: updatedConversation.archived,
+        folderId: Value(updatedConversation.folderId),
+        lastReadAt: lastReadAt == null
+            ? null
+            : lastReadAt.millisecondsSinceEpoch ~/ 1000,
+      );
     }
     ref.read(activeConversationProvider.notifier).set(updatedConversation);
     refreshConversationsCache(ref);
@@ -6190,13 +6140,8 @@ final stopGenerationProvider = Provider<void Function()>((ref) {
         try {
           final db = ref.read(appDatabaseProvider);
           if (db != null) {
-            final chatLocks = ref.read(chatLocksProvider);
-            // Fire-and-forget; the lock serializes against the drainer.
             // ignore: unawaited_futures
-            chatLocks.runExclusive(
-              activeConv.id,
-              () => db.chatsDao.cancelPendingCompletion(activeConv.id),
-            );
+            db.chatsDao.cancelPendingCompletion(activeConv.id);
           }
         } catch (_) {}
       }

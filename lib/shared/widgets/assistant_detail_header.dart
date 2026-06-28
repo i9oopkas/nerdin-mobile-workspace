@@ -92,7 +92,7 @@ class _AssistantDetailHeaderState extends State<AssistantDetailHeader>
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final textTheme = Theme.of(context).textTheme;
     final header = Row(
       mainAxisSize: MainAxisSize.min,

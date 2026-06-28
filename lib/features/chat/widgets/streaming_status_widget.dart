@@ -81,7 +81,7 @@ class _StreamingStatusWidgetState extends State<StreamingStatusWidget> {
     required List<ChatStatusUpdate> updates,
     required bool isStreaming,
   }) async {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final current = updates.last;
     final title = _resolveStatusDescription(current);
 
@@ -278,7 +278,7 @@ class _MinimalHistoryTimeline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     final items = updates.asMap().entries.map((entry) {
       final index = entry.key;
@@ -360,7 +360,7 @@ class _TimelineMarker extends StatelessWidget {
   final bool isFirst;
   final bool isLast;
   final bool isPending;
-  final ConduitThemeExtension theme;
+  final NerdinThemeExtension theme;
 
   @override
   Widget build(BuildContext context) {
@@ -429,7 +429,7 @@ class _MinimalQueryChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     return Wrap(
       spacing: 4,
@@ -487,7 +487,7 @@ class _MinimalSourceLinks extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final displayLinks = links.take(4).toList();
     final remaining = links.length - 4;
 

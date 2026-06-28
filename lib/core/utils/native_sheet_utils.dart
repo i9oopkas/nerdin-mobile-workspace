@@ -1,6 +1,6 @@
 import 'package:intl/intl.dart';
 
-import '../../l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import '../models/model.dart';
 import '../models/server_memory.dart';
 import '../models/socket_health.dart';

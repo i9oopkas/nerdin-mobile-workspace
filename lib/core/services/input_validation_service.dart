@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../shared/theme/conduit_input_styles.dart';
+import '../../shared/theme/nerdin_input_styles.dart';
 
 /// Comprehensive input validation service
 class InputValidationService {
@@ -484,7 +484,7 @@ class _ValidatedFormFieldState extends State<ValidatedFormField> {
         widget.onChanged?.call(value);
       },
       onFieldSubmitted: widget.onFieldSubmitted,
-      decoration: context.conduitInputStyles
+      decoration: context.nerdinInputStyles
           .standard(hint: widget.hint, error: _errorText)
           .copyWith(labelText: widget.label, suffixIcon: widget.suffixIcon),
     );

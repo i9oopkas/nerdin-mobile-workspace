@@ -21,22 +21,18 @@ import 'core/services/native_sheet_hydration_service.dart';
 import 'core/services/performance_profiler.dart';
 import 'core/services/carplay_service.dart';
 import 'core/services/settings_service.dart';
-import 'core/sync/request_completion_runner_provider.dart';
 import 'core/utils/tts_voice_utils.dart';
 import 'core/utils/current_localizations.dart';
 import 'features/auth/providers/unified_auth_providers.dart';
-import 'features/chat/services/request_completion_runner.dart';
 import 'features/chat/providers/text_to_speech_provider.dart';
 import 'features/chat/providers/chat_providers.dart' show restoreDefaultModel;
-import 'features/tools/providers/tools_providers.dart';
 import 'core/utils/debug_logger.dart';
 import 'core/utils/system_ui_style.dart';
-import 'core/models/tool.dart';
 
-import 'package:conduit/l10n/app_localizations.dart';
 import 'core/services/quick_actions_service.dart';
 import 'core/providers/app_startup_providers.dart';
-import 'features/notifications/services/local_notification_service.dart';
+import 'package:nerdin_mobile_workspace/features/agent/permissions/permission_providers.dart';
+import 'package:nerdin_mobile_workspace/features/agent/permissions/permission_dialog_handler.dart';
 
 const bool _enableFlutterDriverExtension = bool.fromEnvironment(
   'ENABLE_FLUTTER_DRIVER_EXTENSION',
@@ -141,12 +137,12 @@ void main() {
           // Keep legacy Android storage readable until a storageNamespace
           // migration can move both encrypted data and wrapped keys.
           // ignore: deprecated_member_use
-          sharedPreferencesName: 'conduit_secure_prefs',
-          preferencesKeyPrefix: 'conduit_',
+          sharedPreferencesName: 'nerdin_secure_prefs',
+          preferencesKeyPrefix: 'nerdin_',
           resetOnError: false,
         ),
         iOptions: IOSOptions(
-          accountName: 'conduit_secure_storage',
+          accountName: 'nerdin_secure_storage',
           synchronizable: false,
         ),
       );
@@ -192,22 +188,16 @@ void main() {
         overrides: [
           secureStorageProvider.overrideWithValue(secureStorage),
           hiveBoxesProvider.overrideWithValue(hiveBoxes),
-          // Inversion seam (E3): the core/sync drainer reads the no-op
-          // RequestCompletionRunner stub; bind it to the chat implementation so
-          // queued completions re-enter the streaming pipeline.
-          requestCompletionRunnerProvider.overrideWith(
-            (ref) => ref.watch(chatRequestCompletionRunnerProvider),
-          ),
         ],
       );
-      // CarPlay can cold-launch Conduit without a visible Flutter scene, so
+      // CarPlay can cold-launch Nerdin without a visible Flutter scene, so
       // install its method-channel handler before frame-scheduled startup work.
       providerContainer.read(carPlayCoordinatorProvider);
 
       runApp(
         UncontrolledProviderScope(
           container: providerContainer,
-          child: const ConduitApp(),
+          child: const NerdinApp(),
         ),
       );
       developer.Timeline.instantSync('runApp_called');
@@ -224,14 +214,14 @@ void main() {
   );
 }
 
-class ConduitApp extends ConsumerStatefulWidget {
-  const ConduitApp({super.key});
+class NerdinApp extends ConsumerStatefulWidget {
+  const NerdinApp({super.key});
 
   @override
-  ConsumerState<ConduitApp> createState() => _ConduitAppState();
+  ConsumerState<NerdinApp> createState() => _NerdinAppState();
 }
 
-class _ConduitAppState extends ConsumerState<ConduitApp> {
+class _NerdinAppState extends ConsumerState<NerdinApp> {
   Brightness? _lastAppliedOverlayBrightness;
   StreamSubscription<NativeSheetEvent>? _nativeSheetSubscription;
   final Map<String, String> _nativeSheetDraftValues = {};
@@ -367,14 +357,10 @@ class _ConduitAppState extends ConsumerState<ConduitApp> {
       if (event.id.startsWith('quick-pill:')) {
         final pillId = event.id.substring('quick-pill:'.length);
         if (value is! bool) return;
-        final tools = ref
-            .read(toolsListProvider)
-            .maybeWhen(data: (v) => v, orElse: () => const <Tool>[]);
         final selectedModel = ref.read(selectedModelProvider);
         final allowed = <String>{
           'web',
           'image',
-          ...tools.map((t) => t.id),
           ...(selectedModel?.filters ?? const []).map((f) => 'filter:${f.id}'),
         };
         if (!allowed.contains(pillId)) return;
@@ -548,12 +534,6 @@ class _ConduitAppState extends ConsumerState<ConduitApp> {
                 .read(appSettingsProvider.notifier)
                 .setNotificationsEnabled(value);
             _syncNotificationPrefsToServer(enabled: value);
-            if (value) {
-              // Best-effort OS permission on opt-in; OS governs delivery.
-              await ref
-                  .read(localNotificationServiceProvider)
-                  .requestPermissions();
-            }
           }
         case 'notification-in-app-banner':
           if (value is bool) {
@@ -731,6 +711,8 @@ class _ConduitAppState extends ConsumerState<ConduitApp> {
   void _initializeAppState() {
     DebugLogger.auth('init', scope: 'app');
     ref.read(appStartupFlowProvider.notifier).start();
+    // Load persisted permission rules from Drift into the permission manager.
+    ref.read(permissionInitProvider);
   }
 
   @override
@@ -752,22 +734,17 @@ class _ConduitAppState extends ConsumerState<ConduitApp> {
     return ErrorBoundary(
       child: AdaptiveApp.router(
         routerConfig: router,
-        onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
+        onGenerateTitle: (context) => 'Nerdin',
         materialLightTheme: lightTheme,
         materialDarkTheme: darkTheme,
         cupertinoLightTheme: cupertinoLight,
         cupertinoDarkTheme: cupertinoDark,
         themeMode: themeMode,
         locale: locale,
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
+        supportedLocales: const [Locale('en')],
         localeListResolutionCallback: (deviceLocales, supported) {
           if (locale != null) return locale;
-          if (deviceLocales == null || deviceLocales.isEmpty) {
-            return supported.first;
-          }
-          final resolved = _resolveSupportedLocale(deviceLocales, supported);
-          return resolved ?? supported.first;
+          return supported.first;
         },
         material: (_, _) =>
             const MaterialAppData(debugShowCheckedModeBanner: false),
@@ -798,7 +775,7 @@ class _ConduitAppState extends ConsumerState<ConduitApp> {
           // On iOS, AdaptiveApp creates CupertinoApp which
           // doesn't propagate Material ThemeExtensions.
           // Wrap with Theme to ensure all custom extensions
-          // (ConduitThemeExtension, AppColorTokens, etc.)
+          // (NerdinThemeExtension, AppColorTokens, etc.)
           // are available via Theme.of(context) on every
           // platform.
           final materialTheme = brightness == Brightness.dark
@@ -807,79 +784,15 @@ class _ConduitAppState extends ConsumerState<ConduitApp> {
 
           return Theme(
             data: materialTheme,
-            child: _KeyboardDismissOnScroll(child: safeChild),
+            child: PermissionDialogHandler(
+              child: _KeyboardDismissOnScroll(child: safeChild),
+            ),
           );
         },
       ),
     );
   }
 
-  bool _prefersTraditionalChinese(Locale deviceLocale) {
-    final script = deviceLocale.scriptCode?.toLowerCase();
-    if (script == 'hant') return true;
-
-    final country = deviceLocale.countryCode?.toUpperCase();
-    return country == 'TW' || country == 'HK' || country == 'MO';
-  }
-
-  Locale? _resolveSupportedLocale(
-    List<Locale>? deviceLocales,
-    Iterable<Locale> supported,
-  ) {
-    if (deviceLocales == null || deviceLocales.isEmpty) return null;
-
-    for (final device in deviceLocales) {
-      final prefersTraditional = _prefersTraditionalChinese(device);
-      final deviceLanguage = device.languageCode.toLowerCase();
-      final deviceScript = device.scriptCode?.toLowerCase();
-      final deviceCountry = device.countryCode?.toUpperCase();
-
-      // Pass 1: match language with script (or preferred Traditional)
-      for (final loc in supported) {
-        final languageMatches =
-            loc.languageCode.toLowerCase() == deviceLanguage;
-        if (!languageMatches) continue;
-
-        final locScript = loc.scriptCode?.toLowerCase();
-        final scriptMatches =
-            locScript != null &&
-            locScript.isNotEmpty &&
-            (locScript == deviceScript ||
-                (loc.languageCode == 'zh' &&
-                    locScript == 'hant' &&
-                    prefersTraditional));
-        if (!scriptMatches) continue;
-
-        final locCountry = loc.countryCode?.toUpperCase();
-        final countryMatches =
-            locCountry == null ||
-            locCountry.isEmpty ||
-            locCountry == deviceCountry;
-
-        if (countryMatches) {
-          return loc;
-        }
-      }
-
-      // Pass 2: prefer Traditional Chinese when applicable
-      if (prefersTraditional) {
-        for (final loc in supported) {
-          if (loc.languageCode == 'zh' && loc.scriptCode == 'Hant') {
-            return loc;
-          }
-        }
-      }
-
-      // Pass 3: language-only match
-      for (final loc in supported) {
-        if (loc.languageCode.toLowerCase() == deviceLanguage) {
-          return loc;
-        }
-      }
-    }
-
-    return null;
-  }
 }
 
 /// Dismisses the soft keyboard whenever the user scrolls.

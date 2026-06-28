@@ -1,5 +1,5 @@
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -93,7 +93,7 @@ class InlineRenderer {
   ]);
 
   /// The style configuration for rendering.
-  final ConduitMarkdownStyle style;
+  final NerdinMarkdownStyle style;
 
   /// Preprocessor for restoring LaTeX placeholders.
   final LatexPreprocessor latexPreprocessor;
@@ -633,7 +633,7 @@ class InlineRenderer {
   static InlineSpan applyFadeOpacity(
     RenderedInlineSpans base,
     InlineTextFadeSpec? fade, {
-    required ConduitMarkdownStyle style,
+    required NerdinMarkdownStyle style,
   }) {
     if (fade == null || fade.opacity >= 1) {
       return base.span;
@@ -645,7 +645,7 @@ class InlineRenderer {
     InlineSpan span,
     Map<InlineSpan, FadableSpanRange> ranges,
     InlineTextFadeSpec fade,
-    ConduitMarkdownStyle style,
+    NerdinMarkdownStyle style,
   ) {
     if (span is TextSpan) {
       final children = span.children;
@@ -679,7 +679,7 @@ class InlineRenderer {
     TextSpan span,
     FadableSpanRange? range,
     InlineTextFadeSpec fade,
-    ConduitMarkdownStyle style,
+    NerdinMarkdownStyle style,
   ) {
     final text = span.text;
     if (range == null || text == null || range.end <= fade.startOffset) {
@@ -765,7 +765,7 @@ class InlineRenderer {
   static TextStyle _styleWithFadeOpacityStatic(
     TextStyle? currentStyle,
     double opacity,
-    ConduitMarkdownStyle style,
+    NerdinMarkdownStyle style,
   ) {
     final base = currentStyle ?? style.body;
     final baseColor = base.color ?? style.body.color;
@@ -809,7 +809,7 @@ class FadableRichText extends StatelessWidget {
   final RenderedInlineSpans rendered;
 
   /// Style used to resolve fade base colors.
-  final ConduitMarkdownStyle style;
+  final NerdinMarkdownStyle style;
 
   /// Optional streaming fade source. When `null`, no fade is applied.
   final MarkdownStreamingFade? fade;
@@ -843,7 +843,7 @@ class _InlineCodeWidget extends StatelessWidget {
   const _InlineCodeWidget({required this.code, required this.style});
 
   final String code;
-  final ConduitMarkdownStyle style;
+  final NerdinMarkdownStyle style;
 
   @override
   Widget build(BuildContext context) {

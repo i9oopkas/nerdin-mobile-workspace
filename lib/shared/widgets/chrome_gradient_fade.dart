@@ -2,44 +2,44 @@ import 'package:flutter/widgets.dart';
 
 import '../theme/theme_extensions.dart';
 
-const double kConduitChromeFadeHeight = 30.0;
+const double kNerdinChromeFadeHeight = 30.0;
 
-enum ConduitChromeFadeEdge { top, bottom }
+enum NerdinChromeFadeEdge { top, bottom }
 
 /// Gradient-only chrome edge used when custom Flutter bars replace native bars.
 ///
 /// This intentionally does not blur. It gives transparent custom chrome the
 /// same soft scroll-edge separation as the adaptive bars while keeping the
 /// underlying content readable.
-class ConduitChromeGradientFade extends StatelessWidget {
-  const ConduitChromeGradientFade({
+class NerdinChromeGradientFade extends StatelessWidget {
+  const NerdinChromeGradientFade({
     super.key,
     required this.edge,
     required this.contentHeight,
-    this.fadeHeight = kConduitChromeFadeHeight,
+    this.fadeHeight = kNerdinChromeFadeHeight,
   });
 
-  const ConduitChromeGradientFade.top({
+  const NerdinChromeGradientFade.top({
     super.key,
     required this.contentHeight,
-    this.fadeHeight = kConduitChromeFadeHeight,
-  }) : edge = ConduitChromeFadeEdge.top;
+    this.fadeHeight = kNerdinChromeFadeHeight,
+  }) : edge = NerdinChromeFadeEdge.top;
 
-  const ConduitChromeGradientFade.bottom({
+  const NerdinChromeGradientFade.bottom({
     super.key,
     required this.contentHeight,
-    this.fadeHeight = kConduitChromeFadeHeight,
-  }) : edge = ConduitChromeFadeEdge.bottom;
+    this.fadeHeight = kNerdinChromeFadeHeight,
+  }) : edge = NerdinChromeFadeEdge.bottom;
 
-  final ConduitChromeFadeEdge edge;
+  final NerdinChromeFadeEdge edge;
   final double contentHeight;
   final double fadeHeight;
 
   @override
   Widget build(BuildContext context) {
-    final baseColor = context.conduitTheme.surfaceBackground;
+    final baseColor = context.nerdinTheme.surfaceBackground;
     final height = contentHeight + fadeHeight;
-    final colors = edge == ConduitChromeFadeEdge.top
+    final colors = edge == NerdinChromeFadeEdge.top
         ? [
             baseColor.withValues(alpha: 0.92),
             baseColor.withValues(alpha: 0.72),

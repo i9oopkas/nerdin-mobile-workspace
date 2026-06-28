@@ -10,7 +10,6 @@ import '../mappers/chat_blob_mapper.dart';
 import '../mappers/conversation_assembler.dart';
 import '../tables/chats.dart';
 import '../tables/messages.dart';
-import 'outbox_dao.dart';
 
 part 'chats_dao.g.dart';
 

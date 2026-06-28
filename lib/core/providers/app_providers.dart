@@ -37,16 +37,11 @@ import '../utils/debug_logger.dart';
 import '../services/worker_manager.dart';
 import '../../shared/theme/tweakcn_themes.dart';
 import '../../shared/theme/app_theme.dart';
-import '../../features/tools/providers/tools_providers.dart';
 import '../models/socket_transport_availability.dart';
 import 'storage_providers.dart';
 import 'package:drift/drift.dart' show Value;
 import '../database/database_provider.dart';
-import '../database/local_conversation_loader.dart';
 import '../database/mappers/conversation_assembler.dart';
-import '../sync/chat_locks.dart';
-import '../sync/pull_sync.dart';
-import '../sync/sync_engine.dart';
 
 export 'storage_providers.dart';
 
@@ -1168,21 +1163,7 @@ void refreshConversationsCache(dynamic ref, {bool includeFolders = false}) {
   final folderConversationRefresh = ref.read(
     _folderConversationRefreshTickProvider.notifier,
   );
-  unawaited(
-    Future<void>(() async {
-      await ref
-          .read(syncEngineProvider.notifier)
-          .requestPull(reason: 'cache-refresh');
-      folderConversationRefresh.bumpIfMounted();
-    }).catchError((Object error, StackTrace stackTrace) {
-      DebugLogger.error(
-        'refresh-cache-failed',
-        scope: 'conversations',
-        error: error,
-        stackTrace: stackTrace,
-      );
-    }),
-  );
+  folderConversationRefresh.bumpIfMounted();
 }
 
 typedef _UpdatedItem<T> = ({List<T> items, T item});
@@ -1243,44 +1224,6 @@ _RemovedItems<T> _removeItemById<T>(
 /// timestamps (which round-trip epoch seconds themselves).
 int _epochSecondsOf(DateTime dateTime) =>
     dateTime.millisecondsSinceEpoch ~/ 1000;
-
-void _submitReconcilePull(
-  Ref ref, {
-  required String reason,
-  required String scope,
-  required String action,
-}) {
-  DebugLogger.log(
-    'reconcile-after-remote-mutation',
-    scope: scope,
-    data: {'action': action},
-  );
-  Future<PullResult?> pull;
-  try {
-    pull = ref.read(syncEngineProvider.notifier).requestPull(reason: reason);
-  } catch (error, stackTrace) {
-    DebugLogger.error(
-      'reconcile-pull-failed',
-      scope: scope,
-      error: error,
-      stackTrace: stackTrace,
-      data: {'action': action},
-    );
-    return;
-  }
-  unawaited(
-    pull.catchError((Object error, StackTrace stackTrace) {
-      DebugLogger.error(
-        'reconcile-pull-failed',
-        scope: scope,
-        error: error,
-        stackTrace: stackTrace,
-        data: {'action': action},
-      );
-      return null;
-    }),
-  );
-}
 
 // Conversation list provider — Drift-backed read path (CDT-RFC-001 Phase 1).
 //
@@ -1352,9 +1295,6 @@ class Conversations extends _$Conversations {
     return completer.future;
   }
 
-  /// Refreshing is a pull request; the database stream delivers the result.
-  /// Folders are part of every pull cycle, so [includeFolders] needs no extra
-  /// work.
   Future<void> refresh({
     bool includeFolders = false,
     bool forceFresh = false,
@@ -1362,7 +1302,6 @@ class Conversations extends _$Conversations {
     final folderConversationRefresh = ref.read(
       _folderConversationRefreshTickProvider.notifier,
     );
-    await ref.read(syncEngineProvider.notifier).requestPull(reason: 'refresh');
     folderConversationRefresh.bumpIfMounted();
   }
 
@@ -1384,13 +1323,12 @@ class Conversations extends _$Conversations {
     // Caller already deleted the chat server-side; drop the local row.
     final db = ref.read(appDatabaseProvider);
     if (db == null || isTemporaryChat(id)) return;
-    final locks = ref.read(chatLocksProvider);
     final folderConversationRefresh = ref.read(
       _folderConversationRefreshTickProvider.notifier,
     );
     unawaited(
-      locks
-          .runExclusive(id, () => db.chatsDao.hardDelete(id))
+      db.chatsDao
+          .hardDelete(id)
           .then((_) => folderConversationRefresh.bumpIfMounted())
           .catchError((Object error, StackTrace stackTrace) {
             DebugLogger.error(
@@ -1451,25 +1389,10 @@ class Conversations extends _$Conversations {
             idOf: (conversation) => conversation.id,
           );
     if (update == null) {
-      // The chat list stream has not loaded yet, or this id is absent from the
-      // loaded projection. Request a reconcile pull so the server-confirmed
-      // envelope mutation is not lost (mirrors Folders.updateFolder).
-      _requestConversationReconcilePull(
-        action: current == null ? 'update-cold' : 'update-missing',
-      );
       return;
     }
     _replaceState(update.items);
     _writeEnvelopeUpdate(update.item);
-  }
-
-  void _requestConversationReconcilePull({required String action}) {
-    _submitReconcilePull(
-      ref,
-      reason: 'conversations-reconcile',
-      scope: 'conversations',
-      action: action,
-    );
   }
 
   void markConversationRead(String id, DateTime readAt) {
@@ -1528,29 +1451,23 @@ class Conversations extends _$Conversations {
     final db = ref.read(appDatabaseProvider);
     if (db == null || isTemporaryChat(conversation.id)) return;
     final lastReadAt = conversation.lastReadAt;
-    // ChatLocks discipline: every write touching one chat's rows serializes
-    // through the per-chat mutex so a stale optimistic stub can never be
-    // ordered after (and overwrite) a concurrent locked pull merge.
-    final locks = ref.read(chatLocksProvider);
     final folderConversationRefresh = ref.read(
       _folderConversationRefreshTickProvider.notifier,
     );
     unawaited(
-      locks
-          .runExclusive(conversation.id, () {
-            return db.chatsDao.upsertEnvelopeStub(
-              id: conversation.id,
-              title: conversation.title,
-              createdAt: _epochSecondsOf(conversation.createdAt),
-              updatedAt: _epochSecondsOf(conversation.updatedAt),
-              pinned: conversation.pinned,
-              archived: conversation.archived,
-              folderId: Value(conversation.folderId),
-              lastReadAt: lastReadAt == null
-                  ? null
-                  : _epochSecondsOf(lastReadAt),
-            );
-          })
+      db.chatsDao
+          .upsertEnvelopeStub(
+            id: conversation.id,
+            title: conversation.title,
+            createdAt: _epochSecondsOf(conversation.createdAt),
+            updatedAt: _epochSecondsOf(conversation.updatedAt),
+            pinned: conversation.pinned,
+            archived: conversation.archived,
+            folderId: Value(conversation.folderId),
+            lastReadAt: lastReadAt == null
+                ? null
+                : _epochSecondsOf(lastReadAt),
+          )
           .then((_) => folderConversationRefresh.bumpIfMounted())
           .catchError((Object error, StackTrace stackTrace) {
             DebugLogger.error(
@@ -1567,22 +1484,19 @@ class Conversations extends _$Conversations {
   void _writeEnvelopeUpdate(Conversation conversation) {
     final db = ref.read(appDatabaseProvider);
     if (db == null || isTemporaryChat(conversation.id)) return;
-    final locks = ref.read(chatLocksProvider);
     final folderConversationRefresh = ref.read(
       _folderConversationRefreshTickProvider.notifier,
     );
     unawaited(
-      locks
-          .runExclusive(conversation.id, () {
-            return db.chatsDao.updateEnvelope(
-              conversation.id,
-              title: Value(conversation.title),
-              folderId: Value(conversation.folderId),
-              pinned: Value(conversation.pinned),
-              archived: Value(conversation.archived),
-              updatedAt: Value(_epochSecondsOf(conversation.updatedAt)),
-            );
-          })
+      db.chatsDao
+          .updateEnvelope(
+            conversation.id,
+            title: Value(conversation.title),
+            folderId: Value(conversation.folderId),
+            pinned: Value(conversation.pinned),
+            archived: Value(conversation.archived),
+            updatedAt: Value(_epochSecondsOf(conversation.updatedAt)),
+          )
           .then((_) => folderConversationRefresh.bumpIfMounted())
           .catchError((Object error, StackTrace stackTrace) {
             DebugLogger.error(
@@ -1605,7 +1519,7 @@ class Conversations extends _$Conversations {
   List<Conversation> _demoConversations() => [
     Conversation(
       id: 'demo-conv-1',
-      title: 'Welcome to Conduit (Demo)',
+      title: 'Welcome to Nerdin (Demo)',
       createdAt: DateTime.now().subtract(const Duration(minutes: 15)),
       updatedAt: DateTime.now().subtract(const Duration(minutes: 10)),
       messages: [
@@ -1613,7 +1527,7 @@ class Conversations extends _$Conversations {
           id: 'demo-msg-1',
           role: 'assistant',
           content:
-              '**Welcome to Conduit Demo Mode**\n\nThis is a demo for app review - responses are pre-written, not from real AI.\n\nTry these features:\n• Send messages\n• Attach images\n• Use voice input\n• Switch models (tap header)\n• Create new chats (menu)\n\nAll features work offline. No server needed.',
+              '**Welcome to Nerdin Demo Mode**\n\nThis is a demo for app review - responses are pre-written, not from real AI.\n\nTry these features:\n• Send messages\n• Attach images\n• Use voice input\n• Switch models (tap header)\n• Create new chats (menu)\n\nAll features work offline. No server needed.',
           timestamp: DateTime.now().subtract(const Duration(minutes: 10)),
           model: 'Gemma 2 Mini (Demo)',
           isStreaming: false,
@@ -1791,19 +1705,6 @@ class ActiveConversationNotifier extends Notifier<Conversation?> {
 // Provider to load full conversation with messages
 @riverpod
 Future<Conversation> loadConversation(Ref ref, String conversationId) async {
-  // DB-first open (CDT-RFC-001 Phase 1): synced rows render without the
-  // network; a background pull freshens them.
-  final local = await loadLocalConversation(ref, conversationId);
-  if (local != null) {
-    DebugLogger.log(
-      'load-local-ok',
-      scope: 'conversation',
-      data: {'id': conversationId, 'messages': local.messages.length},
-    );
-    schedulePullChatNow(ref, conversationId);
-    return local;
-  }
-
   final api = ref.watch(apiServiceProvider);
   if (api == null) {
     throw Exception('No API service available');
@@ -1820,8 +1721,6 @@ Future<Conversation> loadConversation(Ref ref, String conversationId) async {
     scope: 'conversation',
     data: {'messages': fullConversation.messages.length},
   );
-  // Materialize the local row so the next open is DB-first.
-  schedulePullChatNow(ref, conversationId);
 
   return fullConversation;
 }
@@ -3023,77 +2922,6 @@ class FoldersFeatureEnabledNotifier extends Notifier<bool> {
   }
 }
 
-/// Tracks whether the notes feature is enabled on the server.
-/// Set to false when the server returns 401 or 403 for the notes endpoint.
-final notesFeatureEnabledProvider =
-    NotifierProvider<NotesFeatureEnabledNotifier, bool>(
-      NotesFeatureEnabledNotifier.new,
-    );
-
-class NotesFeatureEnabledNotifier extends Notifier<bool> {
-  _FeatureAvailabilityScope? _scope;
-
-  @override
-  bool build() {
-    _scope = _featureAvailabilityScope(ref);
-    return _FeatureAvailabilityCache.read('notes', scope: _scope) ?? true;
-  }
-
-  void setEnabled(bool enabled) {
-    state = enabled;
-    _FeatureAvailabilityCache.write('notes', enabled, scope: _scope);
-  }
-}
-
-/// Tracks whether the Channels feature is enabled on the server.
-/// Set to false when the server returns 401 or 403 for the channels endpoint.
-final channelsFeatureEnabledProvider =
-    NotifierProvider<ChannelsFeatureEnabledNotifier, bool>(
-      ChannelsFeatureEnabledNotifier.new,
-    );
-
-class ChannelsFeatureEnabledNotifier extends Notifier<bool> {
-  _FeatureAvailabilityScope? _scope;
-
-  @override
-  bool build() {
-    _scope = _featureAvailabilityScope(ref);
-    return _FeatureAvailabilityCache.read('channels', scope: _scope) ?? true;
-  }
-
-  void setEnabled(bool enabled) {
-    state = enabled;
-    _FeatureAvailabilityCache.write('channels', enabled, scope: _scope);
-  }
-}
-
-/// Tracks whether the Terminal feature has any available servers on the active
-/// server, cached per server/user. The terminal tab's visibility is otherwise
-/// derived live from [terminalAvailableServersProvider]; this cache lets the tab
-/// reflect the last-known state when offline (loading/error) instead of
-/// optimistically defaulting to visible — matching notes/channels behavior so a
-/// server with terminal disabled doesn't surface the tab offline. The live
-/// derivation lives in `terminalTabVisibleProvider` (terminal feature), which
-/// writes back here via [setEnabled] whenever the server list resolves.
-final terminalFeatureEnabledProvider =
-    NotifierProvider<TerminalFeatureEnabledNotifier, bool>(
-      TerminalFeatureEnabledNotifier.new,
-    );
-
-class TerminalFeatureEnabledNotifier extends Notifier<bool> {
-  _FeatureAvailabilityScope? _scope;
-
-  @override
-  bool build() {
-    _scope = _featureAvailabilityScope(ref);
-    return _FeatureAvailabilityCache.read('terminal', scope: _scope) ?? true;
-  }
-
-  void setEnabled(bool enabled) {
-    state = enabled;
-    _FeatureAvailabilityCache.write('terminal', enabled, scope: _scope);
-  }
-}
 
 _FeatureAvailabilityScope? _featureAvailabilityScope(Ref ref) {
   final activeServerId = ref.watch(
@@ -3286,8 +3114,6 @@ final class _FeatureAvailabilityCache {
 // Folders provider — Drift-backed read path (CDT-RFC-001 Phase 1). Renders
 // from `FoldersDao.watchFolders()`; server-confirmed mutations land in memory
 // and in the database in the same call so the next emission agrees.
-// `foldersFeatureEnabledProvider` is now set by the SyncEngine from
-// PullResult.
 @Riverpod(keepAlive: true)
 class Folders extends _$Folders {
   @override
@@ -3330,17 +3156,9 @@ class Folders extends _$Folders {
     return completer.future;
   }
 
-  Future<void> refresh({bool forceFresh = false}) async {
-    await ref
-        .read(syncEngineProvider.notifier)
-        .requestPull(reason: 'folders-refresh');
-  }
+  Future<void> refresh({bool forceFresh = false}) async {}
 
-  Future<void> warmIfNeeded() async {
-    await ref
-        .read(syncEngineProvider.notifier)
-        .requestPull(reason: 'folders-warm');
-  }
+  Future<void> warmIfNeeded() async {}
 
   void upsertFolder(Folder folder) {
     _replaceState(
@@ -3363,9 +3181,6 @@ class Folders extends _$Folders {
         : _transformItemById(current, id, transform, idOf: (f) => f.id);
     if (update == null) {
       _persistFolderTransform(id, transform);
-      _requestReconcilePull(
-        action: current == null ? 'update-cold' : 'update-missing',
-      );
       return;
     }
     _replaceState(update.items);
@@ -3450,15 +3265,6 @@ class Folders extends _$Folders {
           data: {'id': id},
         );
       }),
-    );
-  }
-
-  void _requestReconcilePull({required String action}) {
-    _submitReconcilePull(
-      ref,
-      reason: 'folders-reconcile',
-      scope: 'folders',
-      action: action,
     );
   }
 

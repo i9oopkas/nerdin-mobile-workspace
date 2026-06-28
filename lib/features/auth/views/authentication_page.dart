@@ -15,10 +15,10 @@ import '../../../core/widgets/error_boundary.dart';
 import '../../../shared/services/brand_service.dart';
 import '../../../shared/theme/theme_extensions.dart';
 import '../../../shared/widgets/adaptive_route_shell.dart';
-import '../../../shared/widgets/conduit_components.dart';
+import '../../../shared/widgets/nerdin_components.dart';
 import '../../../core/auth/auth_state_manager.dart';
 import '../../../core/utils/debug_logger.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import '../providers/unified_auth_providers.dart';
 import '../../../core/auth/webview_cookie_helper.dart' show isWebViewSupported;
 
@@ -293,7 +293,7 @@ class _AuthenticationPageState extends ConsumerState<AuthenticationPage> {
 
     return ErrorBoundary(
       child: AdaptiveRouteShell(
-        backgroundColor: context.conduitTheme.surfaceBackground,
+        backgroundColor: context.nerdinTheme.surfaceBackground,
         body: Column(
           children: [
             // Main scrollable content
@@ -371,16 +371,16 @@ class _AuthenticationPageState extends ConsumerState<AuthenticationPage> {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: context.conduitTheme.surfaceContainer,
+          color: context.nerdinTheme.surfaceContainer,
           borderRadius: BorderRadius.circular(AppBorderRadius.button),
           border: Border.all(
-            color: context.conduitTheme.cardBorder,
+            color: context.nerdinTheme.cardBorder,
             width: BorderWidth.thin,
           ),
         ),
         child: Icon(
           Icons.arrow_back,
-          color: context.conduitTheme.textPrimary,
+          color: context.nerdinTheme.textPrimary,
           size: IconSize.medium,
         ),
       ),
@@ -388,7 +388,7 @@ class _AuthenticationPageState extends ConsumerState<AuthenticationPage> {
   }
 
   Widget _buildHeader() {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     return Column(
       children: [
@@ -441,7 +441,7 @@ class _AuthenticationPageState extends ConsumerState<AuthenticationPage> {
   Widget _buildAuthModeSelector() {
     final modes = _availableAuthModes;
     final selectedIndex = modes.indexOf(_authMode);
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     if (!Platform.isAndroid) {
       return AdaptiveSegmentedControl(
@@ -519,8 +519,8 @@ class _AuthenticationPageState extends ConsumerState<AuthenticationPage> {
       displayUrl,
       textAlign: TextAlign.center,
       overflow: TextOverflow.ellipsis,
-      style: context.conduitTheme.bodySmall?.copyWith(
-        color: context.conduitTheme.textSecondary,
+      style: context.nerdinTheme.bodySmall?.copyWith(
+        color: context.nerdinTheme.textSecondary,
         fontFamily: AppTypography.monospaceFontFamily,
       ),
     );
@@ -568,21 +568,21 @@ class _AuthenticationPageState extends ConsumerState<AuthenticationPage> {
       children: [
         Expanded(
           child: Divider(
-            color: context.conduitTheme.dividerColor.withValues(alpha: 0.5),
+            color: context.nerdinTheme.dividerColor.withValues(alpha: 0.5),
           ),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: Spacing.md),
           child: Text(
             text,
-            style: context.conduitTheme.bodySmall?.copyWith(
-              color: context.conduitTheme.textSecondary,
+            style: context.nerdinTheme.bodySmall?.copyWith(
+              color: context.nerdinTheme.textSecondary,
             ),
           ),
         ),
         Expanded(
           child: Divider(
-            color: context.conduitTheme.dividerColor.withValues(alpha: 0.5),
+            color: context.nerdinTheme.dividerColor.withValues(alpha: 0.5),
           ),
         ),
       ],
@@ -623,7 +623,7 @@ class _AuthenticationPageState extends ConsumerState<AuthenticationPage> {
         icon = Icons.login;
     }
 
-    return ConduitButton(
+    return NerdinButton(
       text: l10n.continueWithProvider(displayName),
       icon: icon,
       onPressed: _navigateToSso,
@@ -672,15 +672,15 @@ class _AuthenticationPageState extends ConsumerState<AuthenticationPage> {
             Platform.isIOS
                 ? CupertinoIcons.lock_shield
                 : Icons.vpn_key_outlined,
-            color: context.conduitTheme.iconSecondary,
+            color: context.nerdinTheme.iconSecondary,
           ),
-          suffixIcon: ConduitIconButton(
+          suffixIcon: NerdinIconButton(
             icon: _obscurePassword
                 ? (Platform.isIOS
                       ? CupertinoIcons.eye_slash
                       : Icons.visibility_off)
                 : (Platform.isIOS ? CupertinoIcons.eye : Icons.visibility),
-            iconColor: context.conduitTheme.iconSecondary,
+            iconColor: context.nerdinTheme.iconSecondary,
             onPressed: () =>
                 setState(() => _obscurePassword = !_obscurePassword),
             tooltip: _obscurePassword ? 'Show password' : 'Hide password',
@@ -690,15 +690,15 @@ class _AuthenticationPageState extends ConsumerState<AuthenticationPage> {
           autofillHints: const [AutofillHints.password],
           cupertinoDecoration: BoxDecoration(
             color: CupertinoColors.tertiarySystemBackground,
-            border: Border.all(color: context.conduitTheme.inputBorder),
+            border: Border.all(color: context.nerdinTheme.inputBorder),
             borderRadius: BorderRadius.circular(8),
           ),
         ),
         const SizedBox(height: Spacing.sm),
         Text(
           AppLocalizations.of(context)!.tokenHint,
-          style: context.conduitTheme.bodySmall?.copyWith(
-            color: context.conduitTheme.textSecondary,
+          style: context.nerdinTheme.bodySmall?.copyWith(
+            color: context.nerdinTheme.textSecondary,
           ),
         ),
       ],
@@ -723,12 +723,12 @@ class _AuthenticationPageState extends ConsumerState<AuthenticationPage> {
             keyboardType: TextInputType.emailAddress,
             prefixIcon: Icon(
               Platform.isIOS ? CupertinoIcons.person : Icons.person_outline,
-              color: context.conduitTheme.iconSecondary,
+              color: context.nerdinTheme.iconSecondary,
             ),
             autofillHints: const [AutofillHints.username, AutofillHints.email],
             cupertinoDecoration: BoxDecoration(
               color: CupertinoColors.tertiarySystemBackground,
-              border: Border.all(color: context.conduitTheme.inputBorder),
+              border: Border.all(color: context.nerdinTheme.inputBorder),
               borderRadius: BorderRadius.circular(8),
             ),
           ),
@@ -750,15 +750,15 @@ class _AuthenticationPageState extends ConsumerState<AuthenticationPage> {
             obscureText: _obscurePassword,
             prefixIcon: Icon(
               Platform.isIOS ? CupertinoIcons.lock : Icons.lock_outline,
-              color: context.conduitTheme.iconSecondary,
+              color: context.nerdinTheme.iconSecondary,
             ),
-            suffixIcon: ConduitIconButton(
+            suffixIcon: NerdinIconButton(
               icon: _obscurePassword
                   ? (Platform.isIOS
                         ? CupertinoIcons.eye_slash
                         : Icons.visibility_off)
                   : (Platform.isIOS ? CupertinoIcons.eye : Icons.visibility),
-              iconColor: context.conduitTheme.iconSecondary,
+              iconColor: context.nerdinTheme.iconSecondary,
               onPressed: () =>
                   setState(() => _obscurePassword = !_obscurePassword),
               tooltip: _obscurePassword ? 'Show password' : 'Hide password',
@@ -768,7 +768,7 @@ class _AuthenticationPageState extends ConsumerState<AuthenticationPage> {
             autofillHints: const [AutofillHints.password],
             cupertinoDecoration: BoxDecoration(
               color: CupertinoColors.tertiarySystemBackground,
-              border: Border.all(color: context.conduitTheme.inputBorder),
+              border: Border.all(color: context.nerdinTheme.inputBorder),
               borderRadius: BorderRadius.circular(8),
             ),
           ),
@@ -793,12 +793,12 @@ class _AuthenticationPageState extends ConsumerState<AuthenticationPage> {
             keyboardType: TextInputType.text,
             prefixIcon: Icon(
               Platform.isIOS ? CupertinoIcons.person : Icons.person_outline,
-              color: context.conduitTheme.iconSecondary,
+              color: context.nerdinTheme.iconSecondary,
             ),
             autofillHints: const [AutofillHints.username],
             cupertinoDecoration: BoxDecoration(
               color: CupertinoColors.tertiarySystemBackground,
-              border: Border.all(color: context.conduitTheme.inputBorder),
+              border: Border.all(color: context.nerdinTheme.inputBorder),
               borderRadius: BorderRadius.circular(8),
             ),
           ),
@@ -820,15 +820,15 @@ class _AuthenticationPageState extends ConsumerState<AuthenticationPage> {
             obscureText: _obscurePassword,
             prefixIcon: Icon(
               Platform.isIOS ? CupertinoIcons.lock : Icons.lock_outline,
-              color: context.conduitTheme.iconSecondary,
+              color: context.nerdinTheme.iconSecondary,
             ),
-            suffixIcon: ConduitIconButton(
+            suffixIcon: NerdinIconButton(
               icon: _obscurePassword
                   ? (Platform.isIOS
                         ? CupertinoIcons.eye_slash
                         : Icons.visibility_off)
                   : (Platform.isIOS ? CupertinoIcons.eye : Icons.visibility),
-              iconColor: context.conduitTheme.iconSecondary,
+              iconColor: context.nerdinTheme.iconSecondary,
               onPressed: () =>
                   setState(() => _obscurePassword = !_obscurePassword),
               tooltip: _obscurePassword ? 'Show password' : 'Hide password',
@@ -838,15 +838,15 @@ class _AuthenticationPageState extends ConsumerState<AuthenticationPage> {
             autofillHints: const [AutofillHints.password],
             cupertinoDecoration: BoxDecoration(
               color: CupertinoColors.tertiarySystemBackground,
-              border: Border.all(color: context.conduitTheme.inputBorder),
+              border: Border.all(color: context.nerdinTheme.inputBorder),
               borderRadius: BorderRadius.circular(8),
             ),
           ),
           const SizedBox(height: Spacing.sm),
           Text(
             l10n.ldapDescription,
-            style: context.conduitTheme.bodySmall?.copyWith(
-              color: context.conduitTheme.textSecondary,
+            style: context.nerdinTheme.bodySmall?.copyWith(
+              color: context.nerdinTheme.textSecondary,
             ),
           ),
         ],
@@ -863,10 +863,10 @@ class _AuthenticationPageState extends ConsumerState<AuthenticationPage> {
         Container(
           padding: const EdgeInsets.all(Spacing.lg),
           decoration: BoxDecoration(
-            color: context.conduitTheme.surfaceContainer.withValues(alpha: 0.3),
+            color: context.nerdinTheme.surfaceContainer.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(AppBorderRadius.medium),
             border: Border.all(
-              color: context.conduitTheme.dividerColor.withValues(alpha: 0.5),
+              color: context.nerdinTheme.dividerColor.withValues(alpha: 0.5),
               width: BorderWidth.standard,
             ),
           ),
@@ -875,20 +875,20 @@ class _AuthenticationPageState extends ConsumerState<AuthenticationPage> {
               Icon(
                 Platform.isIOS ? CupertinoIcons.lock_shield : Icons.security,
                 size: IconSize.xxl,
-                color: context.conduitTheme.buttonPrimary,
+                color: context.nerdinTheme.buttonPrimary,
               ),
               const SizedBox(height: Spacing.md),
-              Text(l10n.sso, style: context.conduitTheme.headingMedium),
+              Text(l10n.sso, style: context.nerdinTheme.headingMedium),
               const SizedBox(height: Spacing.sm),
               Text(
                 l10n.ssoDescription,
-                style: context.conduitTheme.bodyMedium?.copyWith(
-                  color: context.conduitTheme.textSecondary,
+                style: context.nerdinTheme.bodyMedium?.copyWith(
+                  color: context.nerdinTheme.textSecondary,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: Spacing.lg),
-              ConduitButton(
+              NerdinButton(
                 text: l10n.signInWithSso,
                 icon: Platform.isIOS
                     ? CupertinoIcons.arrow_right
@@ -940,7 +940,7 @@ class _AuthenticationPageState extends ConsumerState<AuthenticationPage> {
       }
     }
 
-    return ConduitButton(
+    return NerdinButton(
       text: buttonText,
       icon: _isSigningIn
           ? null
@@ -958,10 +958,10 @@ class _AuthenticationPageState extends ConsumerState<AuthenticationPage> {
       child: Container(
         padding: const EdgeInsets.all(Spacing.md),
         decoration: BoxDecoration(
-          color: context.conduitTheme.error.withValues(alpha: 0.08),
+          color: context.nerdinTheme.error.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(AppBorderRadius.small),
           border: Border.all(
-            color: context.conduitTheme.error.withValues(alpha: 0.2),
+            color: context.nerdinTheme.error.withValues(alpha: 0.2),
             width: BorderWidth.standard,
           ),
         ),
@@ -971,15 +971,15 @@ class _AuthenticationPageState extends ConsumerState<AuthenticationPage> {
               Platform.isIOS
                   ? CupertinoIcons.exclamationmark_circle
                   : Icons.error_outline,
-              color: context.conduitTheme.error,
+              color: context.nerdinTheme.error,
               size: IconSize.small,
             ),
             const SizedBox(width: Spacing.sm),
             Expanded(
               child: Text(
                 message,
-                style: context.conduitTheme.bodySmall?.copyWith(
-                  color: context.conduitTheme.error,
+                style: context.nerdinTheme.bodySmall?.copyWith(
+                  color: context.nerdinTheme.error,
                 ),
               ),
             ),

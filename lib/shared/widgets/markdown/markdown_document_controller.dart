@@ -42,7 +42,7 @@ final RegExp _streamingReferenceDefinitionPattern = RegExp(
 
 /// Shared controller that resolves prepared markdown into compiled documents.
 ///
-/// Both `ConduitMarkdownWidget` and `StreamingMarkdownWidget` use the same
+/// Both `NerdinMarkdownWidget` and `StreamingMarkdownWidget` use the same
 /// compile state machine, while preserving their different UI policies around
 /// whether stale content should remain visible during async recompiles.
 class MarkdownDocumentController {

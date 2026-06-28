@@ -24,7 +24,7 @@ const int _maxSharedImageAttachmentSizeMB = 20;
 const int _nativeShareImportMaxPollAttempts = 240;
 const String _nativeShareImportTimedOutMessage =
     'Could not finish importing shared attachments. Please try sharing again.';
-const _androidShareTextChannel = MethodChannel('conduit/share_receiver_text');
+const _androidShareTextChannel = MethodChannel('nerdin/share_receiver_text');
 const _sharingIntentChannel = MethodChannel('flutter_sharing_intent');
 
 enum SharedPayloadProcessResult { processed, consumed, retry }

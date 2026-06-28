@@ -14,7 +14,7 @@ class ConversationDragFeedback extends StatelessWidget {
   final bool pinned;
 
   /// The theme extension for styling.
-  final ConduitThemeExtension theme;
+  final NerdinThemeExtension theme;
 
   /// Creates a drag feedback widget for a conversation.
   const ConversationDragFeedback({
@@ -96,7 +96,7 @@ class ConversationTileContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     // Enhanced typography with better visual hierarchy
     final textStyle = AppTypography.sidebarTitleStyle.copyWith(
@@ -215,7 +215,7 @@ class ConversationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final borderRadius = BorderRadius.circular(AppBorderRadius.card);
 
     // Match the chats drawer scroll surface (surfaceBackground), not

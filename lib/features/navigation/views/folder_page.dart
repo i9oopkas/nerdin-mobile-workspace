@@ -9,7 +9,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/database/local_conversation_loader.dart';
 import '../../../core/models/conversation.dart';
 import '../../../core/models/folder.dart';
 import '../../../core/models/model.dart';
@@ -20,8 +19,8 @@ import '../../../core/services/native_sheet_hydration_service.dart';
 import '../../../core/services/navigation_service.dart';
 import '../../../core/services/settings_service.dart';
 import '../../../core/widgets/error_boundary.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/theme/conduit_input_styles.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
+import '../../../shared/theme/nerdin_input_styles.dart';
 import '../../../shared/theme/theme_extensions.dart';
 import '../../../shared/utils/platform_scroll_physics.dart';
 import '../../../shared/utils/conversation_context_menu.dart';
@@ -31,7 +30,7 @@ import '../../../core/utils/debug_logger.dart';
 import '../../../shared/widgets/adaptive_route_shell.dart';
 import '../../../shared/widgets/adaptive_toolbar_components.dart';
 import '../../../shared/widgets/chrome_gradient_fade.dart';
-import '../../../shared/widgets/conduit_loading.dart';
+import '../../../shared/widgets/nerdin_loading.dart';
 import '../../../shared/widgets/measure_size.dart';
 import '../../../shared/widgets/middle_ellipsis_text.dart';
 import '../../../shared/widgets/responsive_drawer_layout.dart';
@@ -120,13 +119,13 @@ class _FolderPageState extends ConsumerState<FolderPage> {
     AppLocalizations l10n,
     Folder? folder,
   ) {
-    final tintColor = context.conduitTheme.textPrimary;
+    final tintColor = context.nerdinTheme.textPrimary;
     final hasOverflowMenu = folder != null;
-    const leadingGap = kConduitAdaptiveToolbarLeadingGap;
-    final maxModelWidth = resolveConduitAdaptiveLeadingPillWidth(
+    const leadingGap = kNerdinAdaptiveToolbarLeadingGap;
+    final maxModelWidth = resolveNerdinAdaptiveLeadingPillWidth(
       context,
       trailingActionCount: hasOverflowMenu ? 3 : 2,
-      maxWidth: kConduitAdaptiveToolbarMaxPillWidth,
+      maxWidth: kNerdinAdaptiveToolbarMaxPillWidth,
     );
     final leading = _buildFolderToolbarLeading(
       context: context,
@@ -136,7 +135,7 @@ class _FolderPageState extends ConsumerState<FolderPage> {
       maxModelWidth: maxModelWidth,
     );
     final actions = _buildFolderToolbarActionWidgets(context, folder);
-    final leadingWidth = resolveConduitAdaptiveToolbarLeadingWidth(
+    final leadingWidth = resolveNerdinAdaptiveToolbarLeadingWidth(
       pillWidth: maxModelWidth,
       leadingGap: leadingGap,
     );
@@ -184,16 +183,16 @@ class _FolderPageState extends ConsumerState<FolderPage> {
       ref.watch(selectedModelProvider)?.name ?? l10n.chooseModel,
     );
 
-    return buildConduitAdaptiveToolbarLeadingRow(
+    return buildNerdinAdaptiveToolbarLeadingRow(
       children: [
-        ConduitAdaptiveAppBarIconButton(
+        NerdinAdaptiveAppBarIconButton(
           key: const ValueKey<String>('folder-page-drawer-button'),
           icon: Platform.isIOS ? CupertinoIcons.line_horizontal_3 : Icons.menu,
           onPressed: _toggleDrawer,
           iconColor: tintColor,
         ),
         SizedBox(width: leadingGap),
-        ConduitAdaptiveAppBarModelSelector(
+        NerdinAdaptiveAppBarModelSelector(
           key: const ValueKey<String>('folder-page-model-selector'),
           label: label,
           maxWidth: maxModelWidth,
@@ -208,28 +207,28 @@ class _FolderPageState extends ConsumerState<FolderPage> {
     Folder? folder,
   ) {
     final isTemporary = ref.watch(temporaryChatEnabledProvider);
-    final actions = buildConduitAdaptiveToolbarActionWidgets([
-      ConduitAdaptiveAppBarIconButton(
+    final actions = buildNerdinAdaptiveToolbarActionWidgets([
+      NerdinAdaptiveAppBarIconButton(
         key: const ValueKey<String>('folder-page-temp-button'),
         icon: isTemporary
             ? (Platform.isIOS ? CupertinoIcons.eye_slash : Icons.visibility_off)
             : (Platform.isIOS ? CupertinoIcons.eye : Icons.visibility_outlined),
-        iconColor: isTemporary ? Colors.blue : context.conduitTheme.textPrimary,
+        iconColor: isTemporary ? Colors.blue : context.nerdinTheme.textPrimary,
         onPressed: () {
-          ConduitHaptics.selectionClick();
+          NerdinHaptics.selectionClick();
           final current = ref.read(temporaryChatEnabledProvider);
           ref.read(temporaryChatEnabledProvider.notifier).set(!current);
         },
       ),
-      ConduitAdaptiveAppBarIconButton(
+      NerdinAdaptiveAppBarIconButton(
         key: const ValueKey<String>('folder-page-new-chat-button'),
         icon: Platform.isIOS ? CupertinoIcons.create : Icons.add_comment,
-        iconColor: context.conduitTheme.textPrimary,
+        iconColor: context.nerdinTheme.textPrimary,
         onPressed: _handleNewChat,
       ),
       if (folder != null)
         _FolderToolbarPopupButton(
-          tintColor: context.conduitTheme.textPrimary,
+          tintColor: context.nerdinTheme.textPrimary,
           onSelected: (action) => _handleFolderToolbarSelection(folder, action),
         ),
     ]);
@@ -238,7 +237,7 @@ class _FolderPageState extends ConsumerState<FolderPage> {
   }
 
   void _handleFolderToolbarSelection(Folder folder, String action) {
-    ConduitHaptics.selectionClick();
+    NerdinHaptics.selectionClick();
     _dismissComposerFocus();
 
     switch (action) {
@@ -325,7 +324,7 @@ class _FolderPageState extends ConsumerState<FolderPage> {
   }
 
   void _handleNewChat() {
-    ConduitHaptics.selectionClick();
+    NerdinHaptics.selectionClick();
     _dismissComposerFocus();
     ref.read(attachedFilesProvider.notifier).clearAll();
     try {
@@ -444,7 +443,7 @@ class _FolderPageState extends ConsumerState<FolderPage> {
           .toList(growable: false);
       final toolIds = container.read(selectedToolIdsProvider);
 
-      ConduitHaptics.selectionClick();
+      NerdinHaptics.selectionClick();
       final settings = container.read(appSettingsProvider);
       container
           .read(temporaryChatEnabledProvider.notifier)
@@ -748,7 +747,7 @@ class _FolderPageState extends ConsumerState<FolderPage> {
                     const SizedBox(height: 12),
                     AdaptiveTextField(
                       placeholder: 'https://example.com/article',
-                      decoration: innerContext.conduitInputStyles
+                      decoration: innerContext.nerdinInputStyles
                           .standard(
                             hint: 'https://example.com/article',
                             error: errorText,
@@ -1091,7 +1090,7 @@ class _FolderPageState extends ConsumerState<FolderPage> {
       return;
     }
 
-    ConduitHaptics.selectionClick();
+    NerdinHaptics.selectionClick();
     ref.read(pendingFolderIdProvider.notifier).clear();
     context.goNamed(RouteNames.folder, pathParameters: {'id': folderId});
   }
@@ -1116,53 +1115,43 @@ class _FolderPageState extends ConsumerState<FolderPage> {
 
       NavigationService.router.go(Routes.chat);
 
-      // DB-first open (CDT-RFC-001 Phase 1): a synced local row renders
-      // instantly — offline included — and a background pull freshens it.
-      final local = await loadLocalConversation(container, conversationId);
-      if (local != null) {
-        container.read(activeConversationProvider.notifier).set(local);
-        schedulePullChatNow(container, conversationId);
-      } else {
-        Future<void> useCachedConversation() async {
-          final conversations = await container.read(
-            conversationsProvider.future,
-          );
-          Conversation? conversation;
-          for (final item in conversations) {
-            if (item.id == conversationId) {
-              conversation = item;
-              break;
-            }
-          }
-          if (conversation != null) {
-            container
-                .read(activeConversationProvider.notifier)
-                .set(conversation);
+      Future<void> useCachedConversation() async {
+        final conversations = await container.read(
+          conversationsProvider.future,
+        );
+        Conversation? conversation;
+        for (final item in conversations) {
+          if (item.id == conversationId) {
+            conversation = item;
+            break;
           }
         }
+        if (conversation != null) {
+          container
+              .read(activeConversationProvider.notifier)
+              .set(conversation);
+        }
+      }
 
-        final api = container.read(apiServiceProvider);
-        if (api != null) {
-          try {
-            final fullConversation = await api.getConversation(conversationId);
-            container
-                .read(activeConversationProvider.notifier)
-                .set(fullConversation);
-            // Materialize the local row so the next open is DB-first.
-            schedulePullChatNow(container, conversationId);
-          } catch (error, stackTrace) {
-            DebugLogger.error(
-              'folder-conversation-fetch-failed',
-              scope: 'navigation/folder',
-              error: error,
-              stackTrace: stackTrace,
-              data: {'conversationId': conversationId},
-            );
-            await useCachedConversation();
-          }
-        } else {
+      final api = container.read(apiServiceProvider);
+      if (api != null) {
+        try {
+          final fullConversation = await api.getConversation(conversationId);
+          container
+              .read(activeConversationProvider.notifier)
+              .set(fullConversation);
+        } catch (error, stackTrace) {
+          DebugLogger.error(
+            'folder-conversation-fetch-failed',
+            scope: 'navigation/folder',
+            error: error,
+            stackTrace: stackTrace,
+            data: {'conversationId': conversationId},
+          );
           await useCachedConversation();
         }
+      } else {
+        await useCachedConversation();
       }
 
       container.read(chat.isLoadingConversationProvider.notifier).set(false);
@@ -1188,7 +1177,7 @@ class _FolderPageState extends ConsumerState<FolderPage> {
 
     return ErrorBoundary(
       child: AdaptiveRouteShell(
-        backgroundColor: context.conduitTheme.surfaceBackground,
+        backgroundColor: context.nerdinTheme.surfaceBackground,
         extendBodyBehindAppBar: true,
         appBar: _buildAdaptiveAppBar(context, l10n, folder),
         body: _buildBody(context, foldersAsync),
@@ -1203,7 +1192,7 @@ class _FolderPageState extends ConsumerState<FolderPage> {
     return foldersAsync.when(
       data: (folders) => _buildFolderContents(context, folders),
       loading: () => Center(
-        child: ConduitLoading.primary(
+        child: NerdinLoading.primary(
           message: AppLocalizations.of(context)!.folders,
         ),
       ),
@@ -1340,7 +1329,7 @@ class _FolderPageState extends ConsumerState<FolderPage> {
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: Spacing.xl),
-            child: Center(child: ConduitLoading.inline(context: context)),
+            child: Center(child: NerdinLoading.inline(context: context)),
           ),
         )
       else if (sortedConversations.isNotEmpty) ...[
@@ -1363,7 +1352,7 @@ class _FolderPageState extends ConsumerState<FolderPage> {
                   (_pendingConversationId == conversation.id) &&
                   ref.watch(chat.isLoadingConversationProvider);
 
-              return ConduitContextMenu(
+              return NerdinContextMenu(
                 actions: buildConversationActionsWithFolders(
                   context: context,
                   ref: ref,
@@ -1399,7 +1388,7 @@ class _FolderPageState extends ConsumerState<FolderPage> {
                 l10n.noConversationsYet,
                 textAlign: TextAlign.center,
                 style: AppTypography.bodyMediumStyle.copyWith(
-                  color: context.conduitTheme.textSecondary,
+                  color: context.nerdinTheme.textSecondary,
                 ),
               ),
             ),
@@ -1412,7 +1401,7 @@ class _FolderPageState extends ConsumerState<FolderPage> {
       ),
     ];
 
-    final scrollView = ConduitRefreshIndicator(
+    final scrollView = NerdinRefreshIndicator(
       edgeOffset: MediaQuery.of(context).padding.top + kTextTabBarHeight,
       onRefresh: _refreshFolderContents,
       child: CustomScrollView(
@@ -1438,7 +1427,7 @@ class _FolderPageState extends ConsumerState<FolderPage> {
             left: 0,
             right: 0,
             top: 0,
-            child: ConduitChromeGradientFade.top(
+            child: NerdinChromeGradientFade.top(
               contentHeight:
                   MediaQuery.viewPaddingOf(context).top + kTextTabBarHeight,
             ),
@@ -1447,7 +1436,7 @@ class _FolderPageState extends ConsumerState<FolderPage> {
             left: 0,
             right: 0,
             bottom: 0,
-            child: ConduitChromeGradientFade.bottom(
+            child: NerdinChromeGradientFade.bottom(
               contentHeight: math.max(
                 0,
                 math.max(
@@ -1477,7 +1466,7 @@ class _FolderPageState extends ConsumerState<FolderPage> {
           message,
           textAlign: TextAlign.center,
           style: AppTypography.bodyMediumStyle.copyWith(
-            color: context.conduitTheme.textSecondary,
+            color: context.nerdinTheme.textSecondary,
           ),
         ),
       ),
@@ -1492,7 +1481,7 @@ class _FolderPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     return Container(
       key: const ValueKey<String>('folder-page-header'),
@@ -1548,7 +1537,7 @@ InputDecoration _buildFolderFieldDecoration({
   required String label,
   String? hint,
 }) {
-  final theme = context.conduitTheme;
+  final theme = context.nerdinTheme;
   return InputDecoration(
     labelText: label,
     hintText: hint,
@@ -1584,7 +1573,7 @@ class _FolderSheetFrame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
     final titleStyle = AppTypography.headlineSmallStyle.copyWith(
       color: theme.sidebarForeground,
@@ -1604,7 +1593,7 @@ class _FolderSheetFrame extends StatelessWidget {
           borderRadius: const BorderRadius.vertical(
             top: Radius.circular(AppBorderRadius.modal),
           ),
-          boxShadow: ConduitShadows.modal(context),
+          boxShadow: NerdinShadows.modal(context),
         ),
         child: SafeArea(
           top: false,
@@ -1772,7 +1761,7 @@ class _FolderEditSheetState extends ConsumerState<_FolderEditSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final titleStyle = AppTypography.headlineSmallStyle.copyWith(
       color: theme.sidebarForeground,
       fontWeight: FontWeight.w700,
@@ -1826,7 +1815,7 @@ class _FolderEditSheetState extends ConsumerState<_FolderEditSheet> {
             const SizedBox(height: Spacing.sm),
             Align(
               alignment: Alignment.centerLeft,
-              child: ConduitLoading.inline(context: context),
+              child: NerdinLoading.inline(context: context),
             ),
           ],
           const SizedBox(height: Spacing.lg),
@@ -2034,7 +2023,7 @@ class _FolderSystemPromptSheetState
           if (_isLoadingDetails) ...[
             Align(
               alignment: Alignment.centerLeft,
-              child: ConduitLoading.inline(context: context),
+              child: NerdinLoading.inline(context: context),
             ),
             const SizedBox(height: Spacing.md),
           ],
@@ -2086,7 +2075,7 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     return Row(
       children: [
@@ -2134,13 +2123,13 @@ class _FolderToolbarPopupButton extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return KeyedSubtree(
       key: const ValueKey<String>('folder-page-overflow-button'),
-      child: ConduitAdaptiveToolbarOverflowButton<String>(
+      child: NerdinAdaptiveToolbarOverflowButton<String>(
         tintColor: tintColor,
         items: [
           AdaptivePopupMenuItem<String>(
             value: 'edit-folder',
             label: l10n.editFolder,
-            icon: conduitAdaptivePopupMenuIcon(
+            icon: nerdinAdaptivePopupMenuIcon(
               iosSymbol: 'pencil',
               materialIcon: Icons.edit_outlined,
             ),
@@ -2148,7 +2137,7 @@ class _FolderToolbarPopupButton extends StatelessWidget {
           AdaptivePopupMenuItem<String>(
             value: 'system-prompt',
             label: l10n.systemPrompt,
-            icon: conduitAdaptivePopupMenuIcon(
+            icon: nerdinAdaptivePopupMenuIcon(
               iosSymbol: 'text.bubble',
               materialIcon: Icons.notes_outlined,
             ),
@@ -2174,7 +2163,7 @@ class _FolderListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final borderRadius = BorderRadius.circular(AppBorderRadius.card);
 
     return Container(

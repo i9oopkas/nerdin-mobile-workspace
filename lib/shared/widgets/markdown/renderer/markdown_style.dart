@@ -7,20 +7,20 @@ import '../../../theme/theme_extensions.dart';
 ///
 /// All colors, text styles, spacing values, and border radii
 /// needed to render markdown elements are derived from the
-/// app's [ConduitThemeExtension] so that the renderer
+/// app's [NerdinThemeExtension] so that the renderer
 /// automatically adapts to light/dark mode and the active
 /// theme palette.
 ///
-/// Create an instance via [ConduitMarkdownStyle.fromTheme]:
+/// Create an instance via [NerdinMarkdownStyle.fromTheme]:
 ///
 /// ```dart
-/// final style = ConduitMarkdownStyle.fromTheme(context);
+/// final style = NerdinMarkdownStyle.fromTheme(context);
 /// ```
 @immutable
-class ConduitMarkdownStyle {
-  /// Constructs a [ConduitMarkdownStyle] with all required
+class NerdinMarkdownStyle {
+  /// Constructs a [NerdinMarkdownStyle] with all required
   /// properties. Prefer using [fromTheme] instead.
-  const ConduitMarkdownStyle({
+  const NerdinMarkdownStyle({
     required this.isDark,
     // Text styles
     required this.body,
@@ -61,13 +61,13 @@ class ConduitMarkdownStyle {
     required this.tableRadius,
   });
 
-  /// Builds a [ConduitMarkdownStyle] from the current
-  /// [ConduitThemeExtension] and [Theme] accessible via
+  /// Builds a [NerdinMarkdownStyle] from the current
+  /// [NerdinThemeExtension] and [Theme] accessible via
   /// [context].
   ///
   /// This is the recommended way to create an instance.
-  factory ConduitMarkdownStyle.fromTheme(BuildContext context) {
-    final theme = context.conduitTheme;
+  factory NerdinMarkdownStyle.fromTheme(BuildContext context) {
+    final theme = context.nerdinTheme;
     final textTheme = Theme.of(context).textTheme;
     final textScaler = MediaQuery.textScalerOf(context);
     final tokens = theme.tokens;
@@ -104,7 +104,7 @@ class ConduitMarkdownStyle {
         ? const Color(0xFFE06C75)
         : const Color(0xFFEB5757);
 
-    return ConduitMarkdownStyle(
+    return NerdinMarkdownStyle(
       isDark: dark,
 
       // -- Text styles --

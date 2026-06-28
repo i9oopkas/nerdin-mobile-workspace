@@ -1,7 +1,7 @@
 import 'dart:io' show Platform;
 
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/models/chat_message.dart';
@@ -66,7 +66,7 @@ class CodeExecutionListView extends StatelessWidget {
     ChatCodeExecution execution,
   ) async {
     final l10n = AppLocalizations.of(context)!;
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     if (Platform.isIOS) {
       try {
         final result = execution.result;

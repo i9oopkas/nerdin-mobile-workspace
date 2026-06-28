@@ -4,7 +4,7 @@ import 'tweakcn_themes.dart';
 
 /// Immutable set of semantic color tokens exposed through [ThemeExtension].
 ///
-/// The tokens are derived from the Conduit color specification and provide
+/// The tokens are derived from the Nerdin color specification and provide
 /// consistent mappings for light and dark modes. Widgets should prefer using
 /// these tokens instead of hard-coded color values to ensure theme parity and
 /// accessible contrast levels.

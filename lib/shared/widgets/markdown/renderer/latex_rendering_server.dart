@@ -41,7 +41,7 @@ class LatexRenderingServer {
       ensureStarted().catchError((Object error, StackTrace stackTrace) {
         developer.log(
           'Failed to prewarm LaTeX renderer',
-          name: 'conduit.markdown.latex',
+          name: 'nerdin.markdown.latex',
           error: error,
           stackTrace: stackTrace,
         );
@@ -62,7 +62,7 @@ class LatexRenderingServer {
       _startFuture = null;
       developer.log(
         'Failed to start LaTeX renderer',
-        name: 'conduit.markdown.latex',
+        name: 'nerdin.markdown.latex',
         error: error,
         stackTrace: stackTrace,
       );

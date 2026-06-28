@@ -9,7 +9,7 @@ import '../../../core/models/model.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../shared/theme/theme_extensions.dart';
 import '../../../shared/widgets/model_avatar.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 
 /// Autocomplete overlay that appears when the user types `@` to
 /// switch the active AI model, similar to OpenWebUI.
@@ -33,8 +33,8 @@ class ModelSuggestionOverlay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final Brightness brightness = Theme.of(context).brightness;
-    final overlayColor = context.conduitTheme.cardBackground;
-    final borderColor = context.conduitTheme.cardBorder.withValues(
+    final overlayColor = context.nerdinTheme.cardBackground;
+    final borderColor = context.nerdinTheme.cardBorder.withValues(
       alpha: brightness == Brightness.dark ? 0.6 : 0.4,
     );
 
@@ -48,7 +48,7 @@ class ModelSuggestionOverlay extends ConsumerWidget {
         border: Border.all(color: borderColor, width: BorderWidth.thin),
         boxShadow: [
           BoxShadow(
-            color: context.conduitTheme.cardShadow.withValues(
+            color: context.nerdinTheme.cardShadow.withValues(
               alpha: brightness == Brightness.dark ? 0.28 : 0.16,
             ),
             blurRadius: 22,
@@ -65,7 +65,7 @@ class ModelSuggestionOverlay extends ConsumerWidget {
               leading: Icon(
                 Icons.inbox_outlined,
                 size: IconSize.medium,
-                color: context.conduitTheme.textSecondary.withValues(
+                color: context.nerdinTheme.textSecondary.withValues(
                   alpha: Alpha.medium,
                 ),
               ),
@@ -94,7 +94,7 @@ class ModelSuggestionOverlay extends ConsumerWidget {
                 final bool isSelected = index == activeIndex;
                 final bool isCurrent = currentModel?.id == model.id;
                 final Color highlight = isSelected
-                    ? context.conduitTheme.navigationSelectedBackground
+                    ? context.nerdinTheme.navigationSelectedBackground
                           .withValues(alpha: 0.4)
                     : Colors.transparent;
 
@@ -134,7 +134,7 @@ class ModelSuggestionOverlay extends ConsumerWidget {
                                   style: Theme.of(context).textTheme.bodyMedium
                                       ?.copyWith(
                                         fontWeight: FontWeight.w600,
-                                        color: context.conduitTheme.textPrimary,
+                                        color: context.nerdinTheme.textPrimary,
                                       ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -152,7 +152,7 @@ class ModelSuggestionOverlay extends ConsumerWidget {
                                           .bodySmall
                                           ?.copyWith(
                                             color: context
-                                                .conduitTheme
+                                                .nerdinTheme
                                                 .textSecondary,
                                           ),
                                       maxLines: 1,
@@ -170,7 +170,7 @@ class ModelSuggestionOverlay extends ConsumerWidget {
                                     ? CupertinoIcons.checkmark_alt
                                     : Icons.check,
                                 size: IconSize.medium,
-                                color: context.conduitTheme.buttonPrimary,
+                                color: context.nerdinTheme.buttonPrimary,
                               ),
                             ),
                         ],
@@ -189,7 +189,7 @@ class ModelSuggestionOverlay extends ConsumerWidget {
             child: CircularProgressIndicator(
               strokeWidth: BorderWidth.regular,
               valueColor: AlwaysStoppedAnimation<Color>(
-                context.conduitTheme.loadingIndicator,
+                context.nerdinTheme.loadingIndicator,
               ),
             ),
           ),
@@ -198,7 +198,7 @@ class ModelSuggestionOverlay extends ConsumerWidget {
           leading: Icon(
             Icons.error_outline,
             size: IconSize.medium,
-            color: context.conduitTheme.error,
+            color: context.nerdinTheme.error,
           ),
         ),
       ),
@@ -230,7 +230,7 @@ class _ModelAvatar extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: context.conduitTheme.buttonPrimary.withValues(alpha: 0.12),
+        color: context.nerdinTheme.buttonPrimary.withValues(alpha: 0.12),
       ),
       child: Center(
         child: Icon(
@@ -238,7 +238,7 @@ class _ModelAvatar extends StatelessWidget {
               ? CupertinoIcons.sparkles
               : Icons.auto_awesome,
           size: IconSize.small,
-          color: context.conduitTheme.buttonPrimary,
+          color: context.nerdinTheme.buttonPrimary,
         ),
       ),
     );
@@ -270,7 +270,7 @@ class _OverlayPlaceholder extends StatelessWidget {
               child: Text(
                 message!,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: context.conduitTheme.textSecondary,
+                  color: context.nerdinTheme.textSecondary,
                 ),
               ),
             ),

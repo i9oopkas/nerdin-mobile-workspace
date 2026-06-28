@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:io';
 
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:quick_actions/quick_actions.dart';
@@ -16,8 +16,8 @@ import '../../features/auth/providers/unified_auth_providers.dart';
 
 part 'quick_actions_service.g.dart';
 
-const _quickActionNewChat = 'conduit_new_chat';
-const _quickActionVoiceCall = 'conduit_voice_call';
+const _quickActionNewChat = 'nerdin_new_chat';
+const _quickActionVoiceCall = 'nerdin_voice_call';
 
 /// Registers the platform quick-actions callback as early as possible.
 ///

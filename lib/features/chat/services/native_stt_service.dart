@@ -119,10 +119,10 @@ class NativeSttException implements Exception {
 
 class NativeSttService {
   static const MethodChannel _methodChannel = MethodChannel(
-    'app.cogwheel.conduit/native_stt',
+    'com.nerdin.mobile/native_stt',
   );
   static const EventChannel _eventChannel = EventChannel(
-    'app.cogwheel.conduit/native_stt/events',
+    'com.nerdin.mobile/native_stt/events',
   );
 
   StreamSubscription<dynamic>? _eventSub;

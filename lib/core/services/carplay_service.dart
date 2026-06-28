@@ -10,7 +10,7 @@ import '../../features/chat/voice_mode/chat_voice_mode_controller.dart';
 import '../providers/app_providers.dart';
 import '../utils/debug_logger.dart';
 
-const _carPlayChannel = MethodChannel('conduit/carplay');
+const _carPlayChannel = MethodChannel('nerdin/carplay');
 
 final carPlayCoordinatorProvider = Provider<void>((ref) {
   if (kIsWeb || !Platform.isIOS) {
@@ -91,7 +91,7 @@ final class CarPlayCoordinator {
       return _failure('CarPlay disconnected.');
     }
     if (authState != AuthNavigationState.authenticated) {
-      return _failure('Please sign in to Conduit on iPhone first.');
+      return _failure('Please sign in to Nerdin on iPhone first.');
     }
 
     await _ensureModelSelected();
@@ -99,7 +99,7 @@ final class CarPlayCoordinator {
       return _failure('CarPlay disconnected.');
     }
     if (_ref.read(selectedModelProvider) == null) {
-      return _failure('Please select a model in Conduit on iPhone first.');
+      return _failure('Please select a model in Nerdin on iPhone first.');
     }
 
     _startedByCarPlay = true;
@@ -119,12 +119,12 @@ final class CarPlayCoordinator {
     if (next.phase == ChatVoiceModePhase.error) {
       _startedByCarPlay = false;
       return _failure(
-        next.errorMessage ?? 'Unable to start Conduit voice conversation.',
+        next.errorMessage ?? 'Unable to start Nerdin voice conversation.',
       );
     }
     if (!next.isActive) {
       _startedByCarPlay = false;
-      return _failure('Conduit voice conversation ended before it started.');
+      return _failure('Nerdin voice conversation ended before it started.');
     }
 
     return _success(next);
@@ -147,7 +147,7 @@ final class CarPlayCoordinator {
   Future<Map<String, Object?>> _pauseVoiceConversation() async {
     final snapshot = _ref.read(chatVoiceModeControllerProvider);
     if (!snapshot.canPause) {
-      return _failure('Conduit is not currently listening.');
+      return _failure('Nerdin is not currently listening.');
     }
 
     await _ref.read(chatVoiceModeControllerProvider.notifier).pause();
@@ -157,7 +157,7 @@ final class CarPlayCoordinator {
   Future<Map<String, Object?>> _resumeVoiceConversation() async {
     final snapshot = _ref.read(chatVoiceModeControllerProvider);
     if (!snapshot.canResume) {
-      return _failure('No paused Conduit voice conversation.');
+      return _failure('No paused Nerdin voice conversation.');
     }
 
     await _ref.read(chatVoiceModeControllerProvider.notifier).resume();

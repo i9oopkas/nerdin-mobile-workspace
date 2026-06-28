@@ -1,4 +1,4 @@
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -120,14 +120,14 @@ bool _readTerminalTabVisible(WidgetRef ref) {
 }
 
 Future<void> _startNewChat(BuildContext context, WidgetRef ref) async {
-  ConduitHaptics.selectionClick();
+  NerdinHaptics.selectionClick();
   chat.startNewChat(ref);
   NavigationService.router.go(Routes.chat);
   _closeSidebarIfNeeded(context);
 }
 
 Future<void> _createNote(BuildContext context, WidgetRef ref) async {
-  ConduitHaptics.lightImpact();
+  NerdinHaptics.lightImpact();
   final defaultTitle = DateFormat('yyyy-MM-dd').format(DateTime.now());
   final note = await ref
       .read(noteCreatorProvider.notifier)
@@ -142,7 +142,7 @@ Future<void> _createNote(BuildContext context, WidgetRef ref) async {
 }
 
 Future<void> _createChannel(BuildContext context, WidgetRef ref) async {
-  ConduitHaptics.lightImpact();
+  NerdinHaptics.lightImpact();
   final result = await showCreateChannelFormDialog(context);
   if (result == null || !context.mounted) {
     return;

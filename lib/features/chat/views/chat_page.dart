@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import '../../../core/widgets/error_boundary.dart';
-import '../../../shared/theme/conduit_input_styles.dart';
+import '../../../shared/theme/nerdin_input_styles.dart';
 import '../../../shared/theme/theme_extensions.dart';
 import '../../../shared/utils/platform_scroll_physics.dart';
 import 'package:flutter/services.dart';
-import 'package:conduit/core/services/haptic_service.dart';
+import 'package:nerdin_mobile_workspace/core/services/haptic_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart' show ScrollCacheExtent, ScrollDirection;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -54,7 +54,7 @@ import '../../../core/models/folder.dart';
 import '../../../core/models/model.dart';
 import '../providers/context_attachments_provider.dart';
 import '../../../shared/utils/adaptive_glass.dart';
-import '../../../shared/widgets/conduit_loading.dart';
+import '../../../shared/widgets/nerdin_loading.dart';
 import '../../../shared/widgets/themed_dialogs.dart';
 import '../../../shared/widgets/themed_sheets.dart';
 import '../../../shared/widgets/measure_size.dart';
@@ -888,7 +888,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                     const SizedBox(height: 12),
                     AdaptiveTextField(
                       placeholder: 'https://example.com/article',
-                      decoration: innerContext.conduitInputStyles
+                      decoration: innerContext.nerdinInputStyles
                           .standard(
                             hint: 'https://example.com/article',
                             error: errorText,
@@ -1698,8 +1698,8 @@ class _ChatPageState extends ConsumerState<ChatPage> {
         : Icons.keyboard_arrow_down;
     const buttonSize = 40.0;
     const iconSize = IconSize.medium;
-    final theme = context.conduitTheme;
-    final usesOpaqueFallback = conduitUsesOpaqueGlassFallback();
+    final theme = context.nerdinTheme;
+    final usesOpaqueFallback = nerdinUsesOpaqueGlassFallback();
     final style = usesOpaqueFallback
         ? AdaptiveButtonStyle.filled
         : AdaptiveButtonStyle.glass;
@@ -1794,14 +1794,14 @@ class _ChatPageState extends ConsumerState<ChatPage> {
         padding: const EdgeInsets.all(Spacing.md),
         decoration: BoxDecoration(
           color: isUser
-              ? context.conduitTheme.buttonPrimary.withValues(alpha: 0.15)
-              : context.conduitTheme.cardBackground,
+              ? context.nerdinTheme.buttonPrimary.withValues(alpha: 0.15)
+              : context.nerdinTheme.cardBackground,
           borderRadius: BorderRadius.circular(AppBorderRadius.messageBubble),
           border: Border.all(
-            color: context.conduitTheme.cardBorder,
+            color: context.nerdinTheme.cardBorder,
             width: BorderWidth.regular,
           ),
-          boxShadow: ConduitShadows.messageBubble(context),
+          boxShadow: NerdinShadows.messageBubble(context),
         ),
         child: MarkdownLoadingSkeleton(
           contentLength: visualWeight,
@@ -2166,7 +2166,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
 
   void _copyMessage(String content) {
     // Strip reasoning blocks and annotations from copied content
-    final cleanedContent = ConduitMarkdownPreprocessor.sanitize(content);
+    final cleanedContent = NerdinMarkdownPreprocessor.sanitize(content);
     Clipboard.setData(ClipboardData(text: cleanedContent));
   }
 
@@ -2299,7 +2299,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
         : theme.textTheme.headlineSmall ?? AppTypography.headlineSmallStyle;
     final greetingStyle = baseGreetingStyle.copyWith(
       fontWeight: FontWeight.w600,
-      color: context.conduitTheme.textPrimary,
+      color: context.nerdinTheme.textPrimary,
     );
     final textScaler = MediaQuery.textScalerOf(context);
     final greetingHeight =
@@ -2335,7 +2335,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
               l10n.temporaryChat,
               style: AppTypography.labelStyle.copyWith(
                 fontWeight: FontWeight.w600,
-                color: context.conduitTheme.textPrimary,
+                color: context.nerdinTheme.textPrimary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -2343,7 +2343,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
             Text(
               l10n.temporaryChatTooltip,
               style: AppTypography.bodyMediumStyle.copyWith(
-                color: context.conduitTheme.textSecondary,
+                color: context.nerdinTheme.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -2390,13 +2390,13 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                                   ? CupertinoIcons.folder_fill
                                   : Icons.folder_rounded,
                               size: 14,
-                              color: context.conduitTheme.textSecondary,
+                              color: context.nerdinTheme.textSecondary,
                             ),
                             const SizedBox(width: Spacing.xs),
                             Text(
                               pendingFolder.name,
                               style: AppTypography.small.copyWith(
-                                color: context.conduitTheme.textSecondary,
+                                color: context.nerdinTheme.textSecondary,
                               ),
                               textAlign: TextAlign.center,
                               maxLines: 1,
@@ -2591,7 +2591,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
           child: Stack(
             children: [
               Positioned.fill(
-                child: ConduitRefreshIndicator(
+                child: NerdinRefreshIndicator(
                   edgeOffset:
                       MediaQuery.of(context).padding.top + kTextTabBarHeight,
                   onRefresh: _refreshActiveConversation,
@@ -2612,7 +2612,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                 left: 0,
                 right: 0,
                 top: 0,
-                child: ConduitChromeGradientFade.top(
+                child: NerdinChromeGradientFade.top(
                   contentHeight:
                       MediaQuery.viewPaddingOf(context).top + kTextTabBarHeight,
                 ),
@@ -2667,7 +2667,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                child: ConduitChromeGradientFade.bottom(
+                child: NerdinChromeGradientFade.bottom(
                   contentHeight: math.max(
                     0,
                     math.max(
@@ -2737,13 +2737,13 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     final isTemporary = ref.watch(temporaryChatEnabledProvider);
     final hasMessages = ref.watch(hasChatMessagesProvider);
     final showNewChatAction = activeConversation != null || hasMessages;
-    final tintColor = context.conduitTheme.textPrimary;
-    const leadingGap = kConduitAdaptiveToolbarLeadingGap;
+    final tintColor = context.nerdinTheme.textPrimary;
+    const leadingGap = kNerdinAdaptiveToolbarLeadingGap;
     final trailingActionCount = (showNewChatAction ? 1 : 0) + 1;
-    final maxModelWidth = resolveConduitAdaptiveLeadingPillWidth(
+    final maxModelWidth = resolveNerdinAdaptiveLeadingPillWidth(
       context,
       trailingActionCount: trailingActionCount,
-      maxWidth: kConduitAdaptiveToolbarMaxPillWidth,
+      maxWidth: kNerdinAdaptiveToolbarMaxPillWidth,
     );
     final leading = _buildNativeToolbarLeading(
       context: context,
@@ -2759,7 +2759,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
       hasMessages: hasMessages,
       showNewChatAction: showNewChatAction,
     );
-    final leadingWidth = resolveConduitAdaptiveToolbarLeadingWidth(
+    final leadingWidth = resolveNerdinAdaptiveToolbarLeadingWidth(
       pillWidth: maxModelWidth,
       leadingGap: leadingGap,
     );
@@ -2803,16 +2803,16 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     required double leadingGap,
     required double maxModelWidth,
   }) {
-    return buildConduitAdaptiveToolbarLeadingRow(
+    return buildNerdinAdaptiveToolbarLeadingRow(
       children: [
-        ConduitAdaptiveAppBarIconButton(
+        NerdinAdaptiveAppBarIconButton(
           key: const ValueKey('chat-sidebar-toggle'),
           icon: Platform.isIOS ? CupertinoIcons.line_horizontal_3 : Icons.menu,
           onPressed: () => _toggleResponsiveDrawer(context),
-          iconColor: context.conduitTheme.textPrimary,
+          iconColor: context.nerdinTheme.textPrimary,
         ),
         SizedBox(width: leadingGap),
-        ConduitAdaptiveAppBarModelSelector(
+        NerdinAdaptiveAppBarModelSelector(
           label: modelLabel,
           maxWidth: maxModelWidth,
           isLoading: isLoadingConversation,
@@ -2830,7 +2830,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     required bool showNewChatAction,
   }) {
     final actions = <Widget>[];
-    final defaultTint = context.conduitTheme.textPrimary;
+    final defaultTint = context.nerdinTheme.textPrimary;
 
     final temporaryAction = _buildTemporaryChatToolbarAction(
       activeConversation: activeConversation,
@@ -2844,7 +2844,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
 
     if (showNewChatAction) {
       actions.add(
-        ConduitAdaptiveAppBarIconButton(
+        NerdinAdaptiveAppBarIconButton(
           icon: Platform.isIOS ? CupertinoIcons.create : Icons.add_comment,
           iconColor: defaultTint,
           onPressed: _handleNewChat,
@@ -2861,7 +2861,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
       actions.add(overflowButton);
     }
 
-    return buildConduitAdaptiveToolbarActionWidgets(actions);
+    return buildNerdinAdaptiveToolbarActionWidgets(actions);
   }
 
   Widget? _buildTemporaryChatToolbarAction({
@@ -2877,20 +2877,20 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     }
 
     if (isTemporary && hasMessages && activeConversation != null) {
-      return ConduitAdaptiveAppBarIconButton(
+      return NerdinAdaptiveAppBarIconButton(
         icon: Platform.isIOS ? CupertinoIcons.arrow_down_doc : Icons.save_alt,
         iconColor: tintColor,
         onPressed: _saveTemporaryChat,
       );
     }
 
-    return ConduitAdaptiveAppBarIconButton(
+    return NerdinAdaptiveAppBarIconButton(
       icon: isTemporary
           ? (Platform.isIOS ? CupertinoIcons.eye_slash : Icons.visibility_off)
           : (Platform.isIOS ? CupertinoIcons.eye : Icons.visibility_outlined),
       iconColor: isTemporary ? Colors.blue : tintColor,
       onPressed: () {
-        ConduitHaptics.selectionClick();
+        NerdinHaptics.selectionClick();
         final current = ref.read(temporaryChatEnabledProvider);
         ref.read(temporaryChatEnabledProvider.notifier).set(!current);
       },
@@ -2924,7 +2924,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
             ref: ref,
             conversation: activeConversation,
           )
-        : const <ConduitContextMenuAction>[];
+        : const <NerdinContextMenuAction>[];
     for (final action in conversationActions) {
       addItem(
         label: action.label,
@@ -2940,7 +2940,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
       return null;
     }
 
-    return ConduitAdaptiveToolbarOverflowButton<int>(
+    return NerdinAdaptiveToolbarOverflowButton<int>(
       tintColor: tintColor,
       materialIcon: Icons.more_vert,
       items: items,
@@ -2953,10 +2953,10 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     );
   }
 
-  Object _chatToolbarConversationActionIcon(ConduitContextMenuAction action) {
+  Object _chatToolbarConversationActionIcon(NerdinContextMenuAction action) {
     final sfSymbol = action.sfSymbol;
     if (sfSymbol != null) {
-      return conduitAdaptivePopupMenuIcon(
+      return nerdinAdaptivePopupMenuIcon(
         iosSymbol: sfSymbol,
         materialIcon: action.materialIcon,
       );

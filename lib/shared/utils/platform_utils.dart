@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:conduit/core/services/haptic_service.dart';
+import 'package:nerdin_mobile_workspace/core/services/haptic_service.dart';
 
 /// Platform-specific utilities for enhanced user experience.
 ///
@@ -10,33 +10,33 @@ class PlatformUtils {
   PlatformUtils._();
 
   /// Whether the current device supports haptic feedback.
-  static bool get supportsHaptics => ConduitHaptics.supportsHaptics;
+  static bool get supportsHaptics => NerdinHaptics.supportsHaptics;
 
   /// Trigger light haptic feedback.
   static void lightHaptic() {
     if (supportsHaptics) {
-      unawaited(ConduitHaptics.lightImpact());
+      unawaited(NerdinHaptics.lightImpact());
     }
   }
 
   /// Trigger medium haptic feedback.
   static void mediumHaptic() {
     if (supportsHaptics) {
-      unawaited(ConduitHaptics.mediumImpact());
+      unawaited(NerdinHaptics.mediumImpact());
     }
   }
 
   /// Trigger heavy haptic feedback.
   static void heavyHaptic() {
     if (supportsHaptics) {
-      unawaited(ConduitHaptics.heavyImpact());
+      unawaited(NerdinHaptics.heavyImpact());
     }
   }
 
   /// Trigger selection haptic feedback.
   static void selectionHaptic() {
     if (supportsHaptics) {
-      unawaited(ConduitHaptics.selectionClick());
+      unawaited(NerdinHaptics.selectionClick());
     }
   }
 }

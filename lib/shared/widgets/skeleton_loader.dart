@@ -89,9 +89,9 @@ class _SkeletonLoaderState extends State<SkeletonLoader>
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
               colors: [
-                widget.baseColor ?? context.conduitTheme.shimmerBase,
-                widget.highlightColor ?? context.conduitTheme.shimmerHighlight,
-                widget.baseColor ?? context.conduitTheme.shimmerBase,
+                widget.baseColor ?? context.nerdinTheme.shimmerBase,
+                widget.highlightColor ?? context.nerdinTheme.shimmerHighlight,
+                widget.baseColor ?? context.nerdinTheme.shimmerBase,
               ],
               stops: [
                 _animation.value - 0.3,
@@ -257,10 +257,10 @@ class SkeletonCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(isCompact ? Spacing.sm : Spacing.cardPadding),
       decoration: BoxDecoration(
-        color: context.conduitTheme.cardBackground,
+        color: context.nerdinTheme.cardBackground,
         borderRadius: BorderRadius.circular(AppBorderRadius.card),
         border: Border.all(
-          color: context.conduitTheme.cardBorder,
+          color: context.nerdinTheme.cardBorder,
           width: BorderWidth.standard,
         ),
       ),

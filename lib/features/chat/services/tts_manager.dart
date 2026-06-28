@@ -603,7 +603,7 @@ class TtsManager {
             return idx < codeBlocks.length ? codeBlocks[idx] : '';
           });
         })
-        .map(ConduitMarkdownPreprocessor.cleanText)
+        .map(NerdinMarkdownPreprocessor.cleanText)
         .where((s) => s.isNotEmpty)
         .toList();
   }
@@ -630,7 +630,7 @@ class TtsManager {
             return idx < codeBlocks.length ? codeBlocks[idx] : '';
           });
         })
-        .map(ConduitMarkdownPreprocessor.cleanText)
+        .map(NerdinMarkdownPreprocessor.cleanText)
         .where((s) => s.isNotEmpty)
         .toList();
 
@@ -676,7 +676,7 @@ class TtsManager {
       case splitOnParagraphs:
         return extractParagraphsForAudio(sanitizedContent);
       case splitOnNone:
-        final cleaned = ConduitMarkdownPreprocessor.cleanText(sanitizedContent);
+        final cleaned = NerdinMarkdownPreprocessor.cleanText(sanitizedContent);
         return cleaned.isEmpty ? const [] : [cleaned];
       case splitOnPunctuation:
       default:
@@ -1308,7 +1308,7 @@ class TtsManager {
     _AudioChunk chunk,
   ) async {
     final tempDir = await getTemporaryDirectory();
-    final dir = Directory(p.join(tempDir.path, 'conduit_tts', '$sessionId'));
+    final dir = Directory(p.join(tempDir.path, 'nerdin_tts', '$sessionId'));
     await dir.create(recursive: true);
 
     final extension = _audioExtensionForMimeType(chunk.mimeType);

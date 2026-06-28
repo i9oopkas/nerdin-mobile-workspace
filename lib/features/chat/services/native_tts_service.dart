@@ -28,16 +28,16 @@ class NativeTtsEvent {
 
 class NativeTtsService {
   static const MethodChannel _iosMethodChannel = MethodChannel(
-    'app.cogwheel.conduit/native_ios_tts',
+    'com.nerdin.mobile/native_ios_tts',
   );
   static const EventChannel _iosEventChannel = EventChannel(
-    'app.cogwheel.conduit/native_ios_tts/events',
+    'com.nerdin.mobile/native_ios_tts/events',
   );
   static const MethodChannel _androidMethodChannel = MethodChannel(
-    'app.cogwheel.conduit/native_android_tts',
+    'com.nerdin.mobile/native_android_tts',
   );
   static const EventChannel _androidEventChannel = EventChannel(
-    'app.cogwheel.conduit/native_android_tts/events',
+    'com.nerdin.mobile/native_android_tts/events',
   );
 
   bool get isSupportedPlatform => Platform.isIOS || Platform.isAndroid;

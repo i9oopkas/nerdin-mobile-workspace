@@ -14,7 +14,7 @@ import '../../../shared/theme/theme_extensions.dart';
 import '../../../shared/utils/platform_page_route.dart';
 import '../../../shared/widgets/jovial_svg_image.dart';
 import '../../../shared/widgets/skeleton_loader.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../shared/widgets/adaptive_route_shell.dart';
 import '../../../core/utils/debug_logger.dart';
@@ -826,7 +826,7 @@ class _EnhancedImageAttachmentState
     bool showProgressIndicator = false,
     bool includeMarkdownMargin = false,
   }) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final borderRadius = BorderRadius.circular(AppBorderRadius.md);
 
     return Container(
@@ -916,10 +916,10 @@ class _EnhancedImageAttachmentState
           ),
       margin: const EdgeInsets.only(bottom: Spacing.xs),
       decoration: BoxDecoration(
-        color: context.conduitTheme.surfaceBackground.withValues(alpha: 0.3),
+        color: context.nerdinTheme.surfaceBackground.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(AppBorderRadius.md),
         border: Border.all(
-          color: context.conduitTheme.error.withValues(alpha: 0.3),
+          color: context.nerdinTheme.error.withValues(alpha: 0.3),
           width: BorderWidth.thin,
         ),
       ),
@@ -928,7 +928,7 @@ class _EnhancedImageAttachmentState
         children: [
           Icon(
             Icons.broken_image_outlined,
-            color: context.conduitTheme.error,
+            color: context.nerdinTheme.error,
             size: 32,
           ),
           const SizedBox(height: Spacing.xs),
@@ -937,7 +937,7 @@ class _EnhancedImageAttachmentState
             child: Text(
               _errorMessage!,
               style: AppTypography.bodySmallStyle.copyWith(
-                color: context.conduitTheme.error,
+                color: context.nerdinTheme.error,
               ),
               textAlign: TextAlign.center,
               maxLines: 2,
@@ -1064,7 +1064,7 @@ class _EnhancedImageAttachmentState
         // Add subtle shadow for depth
         boxShadow: [
           BoxShadow(
-            color: context.conduitTheme.cardShadow.withValues(alpha: 0.1),
+            color: context.nerdinTheme.cardShadow.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -1165,7 +1165,7 @@ class FullScreenImageViewer extends ConsumerWidget {
           errorBuilder: (context, error, stackTrace) => Center(
             child: Icon(
               Icons.error_outline,
-              color: context.conduitTheme.error,
+              color: context.nerdinTheme.error,
               size: 48,
             ),
           ),
@@ -1187,13 +1187,13 @@ class FullScreenImageViewer extends ConsumerWidget {
           headers: headers,
           placeholderBuilder: (context) => Center(
             child: CircularProgressIndicator(
-              color: context.conduitTheme.buttonPrimary,
+              color: context.nerdinTheme.buttonPrimary,
             ),
           ),
           errorBuilder: (context, error, stackTrace) => Center(
             child: Icon(
               Icons.error_outline,
-              color: context.conduitTheme.error,
+              color: context.nerdinTheme.error,
               size: 48,
             ),
           ),
@@ -1207,13 +1207,13 @@ class FullScreenImageViewer extends ConsumerWidget {
           httpHeaders: headers,
           placeholder: (context, url) => Center(
             child: CircularProgressIndicator(
-              color: context.conduitTheme.buttonPrimary,
+              color: context.nerdinTheme.buttonPrimary,
             ),
           ),
           errorBuilder: (context, error, stackTrace) => Center(
             child: Icon(
               Icons.error_outline,
-              color: context.conduitTheme.error,
+              color: context.nerdinTheme.error,
               size: 48,
             ),
           ),
@@ -1241,7 +1241,7 @@ class FullScreenImageViewer extends ConsumerWidget {
             errorBuilder: (context, error, stackTrace) => Center(
               child: Icon(
                 Icons.error_outline,
-                color: context.conduitTheme.error,
+                color: context.nerdinTheme.error,
                 size: 48,
               ),
             ),
@@ -1253,7 +1253,7 @@ class FullScreenImageViewer extends ConsumerWidget {
         imageWidget = Center(
           child: Icon(
             Icons.error_outline,
-            color: context.conduitTheme.error,
+            color: context.nerdinTheme.error,
             size: 48,
           ),
         );
@@ -1263,7 +1263,7 @@ class FullScreenImageViewer extends ConsumerWidget {
       imageWidget = Center(
         child: Icon(
           Icons.error_outline,
-          color: context.conduitTheme.error,
+          color: context.nerdinTheme.error,
           size: 48,
         ),
       );
@@ -1385,7 +1385,7 @@ class FullScreenImageViewer extends ConsumerWidget {
       fileExtension ??= 'png';
       final tempDir = await getTemporaryDirectory();
       final filePath =
-          '${tempDir.path}/conduit_shared_${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
+          '${tempDir.path}/nerdin_shared_${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
       final file = File(filePath);
       await file.writeAsBytes(bytes);
 

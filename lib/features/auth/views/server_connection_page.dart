@@ -10,9 +10,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:conduit/core/services/haptic_service.dart';
+import 'package:nerdin_mobile_workspace/core/services/haptic_service.dart';
 import 'package:uuid/uuid.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 
 import '../../../core/auth/webview_cookie_helper.dart';
 import '../../../core/models/server_config.dart';
@@ -27,7 +27,7 @@ import '../providers/unified_auth_providers.dart';
 import '../../../shared/services/brand_service.dart';
 import '../../../shared/theme/theme_extensions.dart';
 import '../../../shared/widgets/adaptive_route_shell.dart';
-import '../../../shared/widgets/conduit_components.dart';
+import '../../../shared/widgets/nerdin_components.dart';
 import 'proxy_auth_page.dart';
 
 class ServerConnectionPage extends ConsumerStatefulWidget {
@@ -685,7 +685,7 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
         }
         _connectionError = null;
       });
-      ConduitHaptics.lightImpact();
+      NerdinHaptics.lightImpact();
     } catch (error) {
       _showHeaderError(error.toString().replaceFirst('Exception: ', ''));
     }
@@ -754,7 +754,7 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
       _mtlsPrivateKeyPasswordController.clear();
       _connectionError = null;
     });
-    ConduitHaptics.lightImpact();
+    NerdinHaptics.lightImpact();
   }
 
   String _formatConnectionError(Object error) {
@@ -892,7 +892,7 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
 
     return ErrorBoundary(
       child: AdaptiveRouteShell(
-        backgroundColor: context.conduitTheme.surfaceBackground,
+        backgroundColor: context.nerdinTheme.surfaceBackground,
         body: Column(
           children: [
             // Main content
@@ -956,14 +956,14 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
   }
 
   Widget _buildHeader(bool reviewerMode) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     return Column(
       children: [
         // Brand icon with gradient container
         GestureDetector(
           onLongPress: () async {
-            ConduitHaptics.mediumImpact();
+            NerdinHaptics.mediumImpact();
             await ref.read(reviewerModeProvider.notifier).toggle();
             if (!mounted) return;
             final enabled = ref.read(reviewerModeProvider);
@@ -1009,7 +1009,7 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
               if (reviewerMode)
                 Positioned(
                   bottom: -8,
-                  child: ConduitBadge(
+                  child: NerdinBadge(
                     text: AppLocalizations.of(context)!.demoBadge,
                     backgroundColor: theme.warning.withValues(alpha: 0.15),
                     textColor: theme.warning,
@@ -1046,7 +1046,7 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
   }
 
   Widget _buildReviewerModeSection() {
-    return ConduitCard(
+    return NerdinCard(
       isElevated: false,
       padding: const EdgeInsets.all(Spacing.lg),
       child: Column(
@@ -1055,7 +1055,7 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
             children: [
               Icon(
                 Platform.isIOS ? CupertinoIcons.wand_stars : Icons.auto_awesome,
-                color: context.conduitTheme.warning,
+                color: context.nerdinTheme.warning,
                 size: IconSize.medium,
               ),
               const SizedBox(width: Spacing.md),
@@ -1065,16 +1065,16 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
                   children: [
                     Text(
                       AppLocalizations.of(context)!.demoModeActive,
-                      style: context.conduitTheme.bodyMedium?.copyWith(
+                      style: context.nerdinTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: context.conduitTheme.warning,
+                        color: context.nerdinTheme.warning,
                       ),
                     ),
                     const SizedBox(height: Spacing.xs),
                     Text(
                       AppLocalizations.of(context)!.skipServerSetupTryDemo,
-                      style: context.conduitTheme.bodySmall?.copyWith(
-                        color: context.conduitTheme.textSecondary,
+                      style: context.nerdinTheme.bodySmall?.copyWith(
+                        color: context.nerdinTheme.textSecondary,
                       ),
                     ),
                   ],
@@ -1083,7 +1083,7 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
             ],
           ),
           const SizedBox(height: Spacing.lg),
-          ConduitButton(
+          NerdinButton(
             text: AppLocalizations.of(context)!.enterDemo,
             icon: Platform.isIOS ? CupertinoIcons.play_fill : Icons.play_arrow,
             onPressed: () {
@@ -1115,12 +1115,12 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
           onSubmitted: (_) => _connectToServer(),
           prefixIcon: Icon(
             Platform.isIOS ? CupertinoIcons.globe : Icons.public,
-            color: context.conduitTheme.iconSecondary,
+            color: context.nerdinTheme.iconSecondary,
           ),
           autofillHints: const [AutofillHints.url],
           cupertinoDecoration: BoxDecoration(
             color: CupertinoColors.tertiarySystemBackground,
-            border: Border.all(color: context.conduitTheme.inputBorder),
+            border: Border.all(color: context.nerdinTheme.inputBorder),
             borderRadius: BorderRadius.circular(8),
           ),
         ),
@@ -1139,7 +1139,7 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
   }
 
   Widget _buildAdvancedSettings() {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     return Container(
       decoration: BoxDecoration(
@@ -1182,7 +1182,7 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
                   if (_customHeaders.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(right: Spacing.sm),
-                      child: ConduitBadge(
+                      child: NerdinBadge(
                         text: '${_customHeaders.length}',
                         backgroundColor: theme.buttonPrimary.withValues(
                           alpha: 0.1,
@@ -1224,7 +1224,7 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
 
   Widget _buildAdvancedSettingsContent() {
     final l10n = AppLocalizations.of(context)!;
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1307,7 +1307,7 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
                 Row(
                   children: [
                     Expanded(
-                      child: ConduitButton(
+                      child: NerdinButton(
                         text: l10n.mutualTlsSelectCertificate,
                         onPressed: _pickMtlsCertificateChain,
                         isSecondary: true,
@@ -1317,7 +1317,7 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
                     ),
                     const SizedBox(width: Spacing.sm),
                     Expanded(
-                      child: ConduitButton(
+                      child: NerdinButton(
                         text: l10n.mutualTlsSelectPrivateKey,
                         onPressed: _pickMtlsPrivateKey,
                         isSecondary: true,
@@ -1365,7 +1365,7 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
                     ),
                   ),
                   const SizedBox(height: Spacing.sm),
-                  ConduitButton(
+                  NerdinButton(
                     text: l10n.mutualTlsClearCredentials,
                     onPressed: _clearMutualTlsCredentials,
                     isSecondary: true,
@@ -1508,9 +1508,9 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
   }
 
   Widget _buildMutualTlsBadge({required String label}) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
-    return ConduitBadge(
+    return NerdinBadge(
       text: label,
       isCompact: true,
       maxLines: 1,
@@ -1521,7 +1521,7 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
   }
 
   Widget _buildCustomHeadersList() {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     return Column(
       children: _customHeaders.entries.map((entry) {
@@ -1562,7 +1562,7 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                ConduitIconButton(
+                NerdinIconButton(
                   icon: Platform.isIOS
                       ? CupertinoIcons.xmark
                       : Icons.close_rounded,
@@ -1581,7 +1581,7 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
   }
 
   Widget _buildConnectButton() {
-    return ConduitButton(
+    return NerdinButton(
       text: _isConnecting
           ? AppLocalizations.of(context)!.connecting
           : AppLocalizations.of(context)!.connectToServerButton,
@@ -1601,10 +1601,10 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
       child: Container(
         padding: const EdgeInsets.all(Spacing.md),
         decoration: BoxDecoration(
-          color: context.conduitTheme.error.withValues(alpha: 0.08),
+          color: context.nerdinTheme.error.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(AppBorderRadius.small),
           border: Border.all(
-            color: context.conduitTheme.error.withValues(alpha: 0.2),
+            color: context.nerdinTheme.error.withValues(alpha: 0.2),
             width: BorderWidth.standard,
           ),
         ),
@@ -1614,15 +1614,15 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
               Platform.isIOS
                   ? CupertinoIcons.exclamationmark_circle
                   : Icons.error_outline,
-              color: context.conduitTheme.error,
+              color: context.nerdinTheme.error,
               size: IconSize.small,
             ),
             const SizedBox(width: Spacing.sm),
             Expanded(
               child: Text(
                 message,
-                style: context.conduitTheme.bodySmall?.copyWith(
-                  color: context.conduitTheme.error,
+                style: context.nerdinTheme.bodySmall?.copyWith(
+                  color: context.nerdinTheme.error,
                 ),
               ),
             ),
@@ -1669,7 +1669,7 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
       _headerKeyController.clear();
       _headerValueController.clear();
     });
-    ConduitHaptics.lightImpact();
+    NerdinHaptics.lightImpact();
   }
 
   String? _validateHeaderKey(String key) {
@@ -1745,6 +1745,6 @@ class _ServerConnectionPageState extends ConsumerState<ServerConnectionPage> {
     setState(() {
       _customHeaders.remove(key);
     });
-    ConduitHaptics.lightImpact();
+    NerdinHaptics.lightImpact();
   }
 }

@@ -8,9 +8,7 @@ import 'daos/chats_dao.dart';
 import 'daos/folders_dao.dart';
 import 'daos/messages_dao.dart';
 import 'daos/notes_dao.dart';
-import 'daos/outbox_dao.dart';
 import 'daos/search_dao.dart';
-import 'daos/sync_meta_dao.dart';
 import 'fts/fts_ddl.dart';
 import 'tables/app_cache.dart';
 import 'tables/attachment_queue.dart';
@@ -19,15 +17,16 @@ import 'tables/folders.dart';
 import 'tables/messages.dart';
 import 'tables/notes.dart';
 import 'tables/outbox.dart';
+import 'tables/permission_rules.dart';
 import 'tables/sync_meta.dart';
 
 part 'app_database.g.dart';
 
-/// Conduit's per-server local database (CDT-RFC-001).
+/// Nerdin's per-server local database (CDT-RFC-001).
 ///
-/// Current schema version 6 includes sync metadata, chats, messages, folders,
-/// outbox operations, notes, the shared chat/note FTS substrate, and (v6) the
-/// per-server app cache + attachment upload queue.
+/// Current schema version 7 includes sync metadata, chats, messages, folders,
+/// outbox operations, notes, the shared chat/note FTS substrate, (v6) the
+/// per-server app cache + attachment upload queue, and (v7) permission rules.
 ///
 /// One database file exists per [ServerConfig]; lifecycle (open/close/delete
 /// on server switch or removal) is owned by [DatabaseManager].
@@ -41,13 +40,12 @@ part 'app_database.g.dart';
     Notes,
     AppCache,
     AttachmentQueue,
+    PermissionRules,
   ],
   daos: [
     ChatsDao,
     MessagesDao,
     FoldersDao,
-    SyncMetaDao,
-    OutboxDao,
     SearchDao,
     NotesDao,
     AppCacheDao,
@@ -73,7 +71,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -127,6 +125,10 @@ class AppDatabase extends _$AppDatabase {
         // Hive removal PR-2: per-server app cache + attachment queue tables.
         await m.createTable(appCache);
         await m.createTable(attachmentQueue);
+      }
+      if (from < 7) {
+        // Phase 7 permission rules table.
+        await m.createTable(permissionRules);
       }
     },
     beforeOpen: (details) async {

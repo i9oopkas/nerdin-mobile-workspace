@@ -15,16 +15,16 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "app.cogwheel.conduit"
+    namespace = "app.nerdin.mobile"
     compileSdk = 36
     ndkVersion = "29.0.14206865"
 
     defaultConfig {
-    applicationId = "app.cogwheel.conduit"
+    applicationId = "app.nerdin.mobile"
     minSdk = flutter.minSdkVersion
     targetSdk = 36
-    versionCode = flutter.versionCode
-    versionName = flutter.versionName
+    versionCode = 1
+    versionName = "alpha-test-0.1"
     }
 
     compileOptions {

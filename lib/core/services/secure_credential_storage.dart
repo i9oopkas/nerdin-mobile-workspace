@@ -28,8 +28,8 @@ class SecureCredentialStorage {
       // Keep legacy Android storage readable until a storageNamespace migration
       // can move both stored data and wrapped keys.
       // ignore: deprecated_member_use
-      sharedPreferencesName: 'conduit_secure_prefs',
-      preferencesKeyPrefix: 'conduit_',
+      sharedPreferencesName: 'nerdin_secure_prefs',
+      preferencesKeyPrefix: 'nerdin_',
       // Avoid auto-wipe on transient errors; handle gracefully in code
       resetOnError: false,
     );
@@ -38,7 +38,7 @@ class SecureCredentialStorage {
   /// Get iOS-specific secure storage options
   IOSOptions _getIOSOptions() {
     return const IOSOptions(
-      accountName: 'conduit_secure_storage',
+      accountName: 'nerdin_secure_storage',
       synchronizable: false,
     );
   }

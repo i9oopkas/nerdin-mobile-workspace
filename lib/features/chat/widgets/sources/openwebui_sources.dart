@@ -30,8 +30,8 @@ class OpenWebUISourcesWidget extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final theme = context.conduitTheme;
-    final usesOpaqueFallback = conduitUsesOpaqueGlassFallback();
+    final theme = context.nerdinTheme;
+    final usesOpaqueFallback = nerdinUsesOpaqueGlassFallback();
     final urlSources = sources
         .where((source) {
           return SourceReferenceHelper.getSourceUrl(source) != null;
@@ -91,7 +91,7 @@ class OpenWebUISourcesWidget extends StatelessWidget {
     BuildContext context,
     List<ChatSourceReference> urlSources,
   ) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -162,7 +162,7 @@ class OpenWebUISourcesWidget extends StatelessWidget {
       showHandle: false,
       padding: EdgeInsets.zero,
       builder: (sheetContext) {
-        final liveTheme = sheetContext.conduitTheme;
+        final liveTheme = sheetContext.nerdinTheme;
 
         return DraggableScrollableSheet(
           initialChildSize: 0.6,
@@ -245,7 +245,7 @@ class OpenWebUISourcesWidget extends StatelessWidget {
     ChatSourceReference source,
     int index,
   ) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final url = SourceReferenceHelper.getSourceUrl(source);
     final displayText = SourceReferenceHelper.getSourceLabel(source, index);
     final snippet = _sourceSnippet(source);
@@ -463,7 +463,7 @@ class _SourceIndexBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
 
     return Container(
       width: 22,
@@ -492,7 +492,7 @@ class _SourceFavicon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final domain = SourceReferenceHelper.extractDomain(url);
 
     return Container(
@@ -515,7 +515,7 @@ class _SourceFavicon extends StatelessWidget {
     );
   }
 
-  Widget _fallback(ConduitThemeExtension theme) {
+  Widget _fallback(NerdinThemeExtension theme) {
     return Container(
       width: size - 2,
       height: size - 2,

@@ -47,7 +47,7 @@ final markdownCompileServiceProvider = Provider<MarkdownCompileService>((ref) {
 });
 
 String prepareMarkdownContent(String content, {required bool streaming}) {
-  final normalized = ConduitMarkdownPreprocessor.normalize(content);
+  final normalized = NerdinMarkdownPreprocessor.normalize(content);
   final prepared = streaming
       ? stripTrailingIncompleteToolCallDetails(normalized)
       : normalized;

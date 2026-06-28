@@ -541,7 +541,7 @@ class ResponsiveDrawerLayoutState extends State<ResponsiveDrawerLayout>
     _resetDragState();
   }
 
-  Widget _buildTabletDrawerSlot(ConduitThemeExtension theme, DrawerSlot slot) {
+  Widget _buildTabletDrawerSlot(NerdinThemeExtension theme, DrawerSlot slot) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -556,12 +556,12 @@ class ResponsiveDrawerLayoutState extends State<ResponsiveDrawerLayout>
     );
   }
 
-  BoxDecoration _drawerPanelDecoration(ConduitThemeExtension theme) {
+  BoxDecoration _drawerPanelDecoration(NerdinThemeExtension theme) {
     return BoxDecoration(color: theme.surfaceBackground);
   }
 
   Widget _buildMobileDrawerSlotPanel(
-    ConduitThemeExtension theme,
+    NerdinThemeExtension theme,
     DrawerSlot slot,
   ) {
     return Container(
@@ -588,7 +588,7 @@ class ResponsiveDrawerLayoutState extends State<ResponsiveDrawerLayout>
     );
   }
 
-  Widget _buildMobileDrawerPanel(ConduitThemeExtension theme) {
+  Widget _buildMobileDrawerPanel(NerdinThemeExtension theme) {
     final drawerPanel = RepaintBoundary(
       child: Container(
         decoration: _drawerPanelDecoration(theme),
@@ -621,7 +621,7 @@ class ResponsiveDrawerLayoutState extends State<ResponsiveDrawerLayout>
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final scrim = widget.scrimColor ?? context.colorTokens.overlayStrong;
     final isTablet = _isTablet(context);
 
@@ -634,7 +634,7 @@ class ResponsiveDrawerLayoutState extends State<ResponsiveDrawerLayout>
     }
   }
 
-  Widget _buildTabletLayout(ConduitThemeExtension theme) {
+  Widget _buildTabletLayout(NerdinThemeExtension theme) {
     final targetWidth = widget.tabletDismissible && !_isTabletDocked
         ? 0.0
         : widget.tabletDrawerWidth;
@@ -664,7 +664,7 @@ class ResponsiveDrawerLayoutState extends State<ResponsiveDrawerLayout>
     );
   }
 
-  Widget _buildMobileLayout(ConduitThemeExtension theme, Color scrim) {
+  Widget _buildMobileLayout(NerdinThemeExtension theme, Color scrim) {
     return Stack(
       children: [
         // Content (optionally pushed by the drawer)

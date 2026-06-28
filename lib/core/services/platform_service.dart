@@ -34,13 +34,13 @@ class PlatformService {
   }
 
   static Future<void> _feedbackFor(HapticType type) => switch (type) {
-    HapticType.light => ConduitHaptics.lightImpact(),
-    HapticType.medium => ConduitHaptics.mediumImpact(),
-    HapticType.heavy => ConduitHaptics.heavyImpact(),
-    HapticType.selection => ConduitHaptics.selectionClick(),
-    HapticType.success => ConduitHaptics.success(),
-    HapticType.warning => ConduitHaptics.warning(),
-    HapticType.error => ConduitHaptics.error(),
+    HapticType.light => NerdinHaptics.lightImpact(),
+    HapticType.medium => NerdinHaptics.mediumImpact(),
+    HapticType.heavy => NerdinHaptics.heavyImpact(),
+    HapticType.selection => NerdinHaptics.selectionClick(),
+    HapticType.success => NerdinHaptics.success(),
+    HapticType.warning => NerdinHaptics.warning(),
+    HapticType.error => NerdinHaptics.error(),
   };
 
   /// Get platform-appropriate card elevation

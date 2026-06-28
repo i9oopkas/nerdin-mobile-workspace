@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:conduit/core/services/haptic_service.dart';
+import 'package:nerdin_mobile_workspace/core/services/haptic_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'dart:io' show Platform;
 
 import '../../../shared/theme/theme_extensions.dart';
 import '../../../shared/widgets/sheet_handle.dart';
-import '../../../shared/widgets/conduit_components.dart';
+import '../../../shared/widgets/nerdin_components.dart';
 import '../../../shared/widgets/modal_safe_area.dart';
 import '../../../shared/widgets/model_avatar.dart';
 import '../../../core/models/toggle_filter.dart';
@@ -16,7 +16,7 @@ import '../../tools/providers/tools_providers.dart';
 import '../../terminal/providers/terminal_providers.dart';
 import '../providers/chat_providers.dart';
 import 'composer_overflow_items.dart';
-import 'package:conduit/l10n/app_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 
 /// A reusable toggle tile widget used in the composer overflow sheet.
 class ToggleTile extends StatelessWidget {
@@ -35,7 +35,7 @@ class ToggleTile extends StatelessWidget {
   final String? subtitle;
   final bool selected;
   final VoidCallback onToggle;
-  final ConduitThemeExtension theme;
+  final NerdinThemeExtension theme;
 
   @override
   Widget build(BuildContext context) {
@@ -44,10 +44,10 @@ class ToggleTile extends StatelessWidget {
       toggled: selected,
       label: title,
       hint: (subtitle?.isEmpty ?? true) ? null : subtitle,
-      child: ConduitCard(
+      child: NerdinCard(
         padding: const EdgeInsets.all(Spacing.md),
         onTap: () {
-          ConduitHaptics.selectionClick();
+          NerdinHaptics.selectionClick();
           onToggle();
         },
         child: Row(
@@ -172,7 +172,7 @@ class _ComposerOverflowSheetState extends ConsumerState<ComposerOverflowSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final attachmentItems = buildComposerOverflowAttachmentItems(
       l10n: l10n,
       attachmentAvailability: ComposerOverflowAttachmentAvailability(
@@ -420,7 +420,7 @@ class _ComposerOverflowSheetState extends ConsumerState<ComposerOverflowSheet> {
                 color: theme.dividerColor,
                 width: BorderWidth.thin,
               ),
-              boxShadow: ConduitShadows.modal(context),
+              boxShadow: NerdinShadows.modal(context),
             ),
             child: ModalSheetSafeArea(
               padding: const EdgeInsets.fromLTRB(
@@ -447,7 +447,7 @@ class _ComposerOverflowSheetState extends ConsumerState<ComposerOverflowSheet> {
       child: Text(
         text,
         style: AppTypography.labelStyle.copyWith(
-          color: context.conduitTheme.textSecondary.withValues(
+          color: context.nerdinTheme.textSecondary.withValues(
             alpha: Alpha.strong,
           ),
           fontWeight: FontWeight.w600,
@@ -457,8 +457,8 @@ class _ComposerOverflowSheetState extends ConsumerState<ComposerOverflowSheet> {
   }
 
   Widget _buildInfoCard(String message) {
-    final theme = context.conduitTheme;
-    return ConduitCard(
+    final theme = context.nerdinTheme;
+    return NerdinCard(
       padding: const EdgeInsets.all(Spacing.md),
       child: Text(
         message,
@@ -574,7 +574,7 @@ class _ComposerOverflowSheetState extends ConsumerState<ComposerOverflowSheet> {
     required ComposerOverflowItem item,
     VoidCallback? onTap,
   }) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final bool enabled = onTap != null;
     final Color iconColor = enabled ? theme.buttonPrimary : theme.iconDisabled;
     final Color textColor = enabled
@@ -583,7 +583,7 @@ class _ComposerOverflowSheetState extends ConsumerState<ComposerOverflowSheet> {
 
     return Opacity(
       opacity: enabled ? 1.0 : Alpha.disabled,
-      child: ConduitCard(
+      child: NerdinCard(
         padding: const EdgeInsets.symmetric(
           horizontal: Spacing.xs,
           vertical: Spacing.sm,
@@ -591,7 +591,7 @@ class _ComposerOverflowSheetState extends ConsumerState<ComposerOverflowSheet> {
         onTap: onTap == null
             ? null
             : () {
-                ConduitHaptics.lightImpact();
+                NerdinHaptics.lightImpact();
                 Navigator.of(context).pop();
                 Future.microtask(onTap);
               },
@@ -640,7 +640,7 @@ class _ComposerOverflowSheetState extends ConsumerState<ComposerOverflowSheet> {
     required ValueChanged<bool> onChanged,
     String? iconUrl,
   }) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     final glyph = iconUrl != null && iconUrl.isNotEmpty
         ? _buildFilterGlyph(iconUrl: iconUrl, selected: value, theme: theme)
         : _buildIconGlyph(icon: icon, selected: value, theme: theme);
@@ -672,7 +672,7 @@ class _ComposerOverflowSheetState extends ConsumerState<ComposerOverflowSheet> {
     required bool selected,
     required VoidCallback onToggle,
   }) {
-    final theme = context.conduitTheme;
+    final theme = context.nerdinTheme;
     return ToggleTile(
       glyph: _buildFilterGlyph(
         iconUrl: filter.icon,
@@ -690,7 +690,7 @@ class _ComposerOverflowSheetState extends ConsumerState<ComposerOverflowSheet> {
   Widget _buildIconGlyph({
     required IconData icon,
     required bool selected,
-    required ConduitThemeExtension theme,
+    required NerdinThemeExtension theme,
   }) {
     final color = selected ? theme.buttonPrimary : theme.iconPrimary;
     return Container(
@@ -712,7 +712,7 @@ class _ComposerOverflowSheetState extends ConsumerState<ComposerOverflowSheet> {
   Widget _buildFilterGlyph({
     String? iconUrl,
     required bool selected,
-    required ConduitThemeExtension theme,
+    required NerdinThemeExtension theme,
   }) {
     final color = selected ? theme.buttonPrimary : theme.iconPrimary;
     final fallback = Icon(
