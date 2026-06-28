@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nerdin_mobile_workspace/features/workspace/layout/workspace_layout.dart';
-import 'package:nerdin_mobile_workspace/core/services/navigation_service.dart';
 
 /// Single-route GoRouter — no auth, no server, no ShellRoute.
 ///
@@ -25,6 +24,5 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     },
   );
 
-  NavigationService.attachRouter(router);
   return router;
 });
