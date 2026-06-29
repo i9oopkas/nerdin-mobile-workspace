@@ -112,7 +112,7 @@ void main() {
           // Try to extract stack from exception itself
           try {
             throw details.exception;
-          } catch (_, StackTrace s) {
+          }           catch (_, s) {
             debugPrint('Stack:    $s');
           }
         }
