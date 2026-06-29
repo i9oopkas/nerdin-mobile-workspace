@@ -10,8 +10,8 @@ import 'package:nerdin_mobile_workspace/features/agent/permissions/permission_pr
 /// Place this widget near the root of the widget tree (inside
 /// [Navigator] context) so it can show dialogs.
 ///
-/// Requests are shown one at a time — the next request is shown only
-/// after the previous dialog is dismissed.
+/// Uses [ref.listen] to avoid calling setState during build phase,
+/// which would trigger the '!_dirty' assertion in Flutter.
 class PermissionDialogHandler extends ConsumerStatefulWidget {
   final Widget child;
 
@@ -24,38 +24,27 @@ class PermissionDialogHandler extends ConsumerStatefulWidget {
 
 class _PermissionDialogHandlerState
     extends ConsumerState<PermissionDialogHandler> {
-  /// Track which request ID was last shown to avoid re-showing.
-  String? _lastShownRequestId;
-
-  /// Whether a dialog is currently being displayed.
   bool _isShowingDialog = false;
 
   @override
   Widget build(BuildContext context) {
-    final pendingRequests = ref.watch(pendingPermissionRequestsProvider);
-
-    // If there are pending requests and we're not currently showing a dialog
-    // and we haven't shown this request yet
-    if (pendingRequests.isNotEmpty && !_isShowingDialog) {
-      final request = pendingRequests.first;
-      if (request.id != _lastShownRequestId) {
-        _lastShownRequestId = request.id;
-        _showDialog(request.id);
+    // Listen for new pending requests — fires AFTER build completes
+    ref.listen(pendingPermissionRequestsProvider, (_, pendingRequests) {
+      if (pendingRequests.isNotEmpty && !_isShowingDialog) {
+        _showDialog(pendingRequests.first.id);
       }
-    }
+    });
 
     return widget.child;
   }
 
   void _showDialog(String requestId) {
-    // Get the request from the current state (it should still be there)
     final requests = ref.read(pendingPermissionRequestsProvider);
     final request = requests.where((r) => r.id == requestId).firstOrNull;
     if (request == null) return;
 
     _isShowingDialog = true;
 
-    // Use WidgetsBinding to ensure we're in a proper context for showDialog
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
 
@@ -63,8 +52,6 @@ class _PermissionDialogHandlerState
 
       if (!mounted) return;
       _isShowingDialog = false;
-
-      // Trigger a rebuild so the next pending request (if any) gets shown
       setState(() {});
     });
   }
