@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 45
 
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +33,6 @@ jobs:
 
       - name: Widget tests
         run: flutter test test/activity_bar_test.dart test/smoke_test.dart
-        continue-on-error: false
         timeout-minutes: 5
 
       - name: Static analysis
@@ -43,11 +42,26 @@ jobs:
           flutter analyze 2>&1 | tee analyze_output.txt
           echo "EXIT_CODE=$?" >> $GITHUB_OUTPUT
 
-      - name: Build debug APK
-        id: build
+      - name: Enable KVM
         run: |
-          flutter build apk --debug 2>&1 | tee build_output.txt
-          echo "EXIT_CODE=$?" >> $GITHUB_OUTPUT
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Integration test (Android emulator)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -cache-size 512
+          disable-animations: true
+          script: |
+            flutter test integration_test
+
+      - name: Build debug APK
+        if: success()
+        run: flutter build apk --debug
 
       - name: Check logs for errors
         if: always()
@@ -68,26 +82,16 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
           fi
 
-          if [ -f build_output.txt ]; then
-            echo "### flutter build" >> $GITHUB_STEP_SUMMARY
-            if grep -q "BUILD FAILED" build_output.txt; then
-              echo "- ❌ **Build FAILED**" >> $GITHUB_STEP_SUMMARY
-              echo '```' >> $GITHUB_STEP_SUMMARY
-              grep -E "Error:|error:|FAILED|Exception|exit code" build_output.txt | head -30 >> $GITHUB_STEP_SUMMARY
-              echo '```' >> $GITHUB_STEP_SUMMARY
-            else
-              echo "- ✅ Build SUCCESS" >> $GITHUB_STEP_SUMMARY
-              grep "Built" build_output.txt >> $GITHUB_STEP_SUMMARY
-              echo "" >> $GITHUB_STEP_SUMMARY
-              echo "**APK uploaded as artifact:** \`nerdin-alpha-test-0.1\`" >> $GITHUB_STEP_SUMMARY
-            fi
-            echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Integration test" >> $GITHUB_STEP_SUMMARY
+          if [ -f build/app/outputs/flutter-apk/app-debug.apk ]; then
+            echo "- ✅ APK built" >> $GITHUB_STEP_SUMMARY
+            ls -lh build/app/outputs/flutter-apk/app-debug.apk >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Upload APK
-        if: success()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: nerdin-alpha-test-0.1
           path: build/app/outputs/flutter-apk/*.apk
-          if-no-files-found: error
+          if-no-files-found: ignore

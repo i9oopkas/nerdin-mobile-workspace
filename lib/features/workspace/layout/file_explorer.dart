@@ -219,47 +219,50 @@ class _FileTreeTileState extends State<_FileTreeTile> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        InkWell(
-          onTap: _toggleExpand,
-          child: Padding(
-            padding: EdgeInsets.only(
-              left: indent,
-              right: 8,
-              top: 2,
-              bottom: 2,
-            ),
-            child: SizedBox(
-              height: 28,
-              child: Row(
-                children: [
-                  Icon(
-                    icon,
-                    size: 16,
-                    color: isDir
-                        ? Colors.amber.shade400
-                        : colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      widget.entry.name,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: colorScheme.onSurface,
+        Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            onTap: _toggleExpand,
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: indent,
+                right: 8,
+                top: 2,
+                bottom: 2,
+              ),
+              child: SizedBox(
+                height: 28,
+                child: Row(
+                  children: [
+                    Icon(
+                      icon,
+                      size: 16,
+                      color: isDir
+                          ? Colors.amber.shade400
+                          : colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        widget.entry.name,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: colorScheme.onSurface,
+                        ),
                       ),
                     ),
-                  ),
-                  if (_loadingChildren)
-                    SizedBox(
-                      width: 12,
-                      height: 12,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 1.5,
-                        color: colorScheme.onSurfaceVariant,
+                    if (_loadingChildren)
+                      SizedBox(
+                        width: 12,
+                        height: 12,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 1.5,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
