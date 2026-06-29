@@ -7,17 +7,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 ///
 /// In debug mode, captures the stack trace at the point of update and
 /// logs a compact one-line summary per change. In release mode, no-ops.
-class NerdinProviderObserver extends ProviderObserver {
+base class NerdinProviderObserver extends ProviderObserver {
   const NerdinProviderObserver();
 
   @override
   void didUpdateProvider(
-    ProviderBase<Object?> provider,
+    ProviderObserverContext context,
     Object? previousValue,
     Object? newValue,
-    ProviderContainer container,
   ) {
     if (!kDebugMode) return;
+
+    final provider = context.provider;
 
     // Build a compact description
     final providerName = provider.name ?? provider.runtimeType.toString();
