@@ -37,14 +37,10 @@ class _AgentTabState extends ConsumerState<AgentTab> {
   @override
   void dispose() {
     _scrollController.dispose();
-    try {
-      final current = ref.read(sendMessageHandlerProvider);
-      if (current == _handleSend) {
-        ref.read(sendMessageHandlerProvider.notifier).state = null;
-      }
-    } catch (_) {
-      // Widget is being torn down, provider mutation is non-critical
-    }
+    // NOTE: Don't null sendMessageHandlerProvider here — Riverpod 3.x forbids
+    // modifying providers in dispose(). The handler will be overridden when
+    // a new AgentTab registers. The mounted guard in _handleSend prevents
+    // stale handler execution.
     super.dispose();
   }
 
@@ -62,6 +58,7 @@ class _AgentTabState extends ConsumerState<AgentTab> {
   }
 
   Future<void> _handleSend(String text) async {
+    if (!mounted) return;
     ref.read(agentSessionProvider.notifier).startTask(text);
     _scrollToBottom();
   }

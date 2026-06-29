@@ -14,6 +14,7 @@ import 'core/providers/chat_seed_provider.dart';
 import 'features/agent/permissions/permission_providers.dart';
 import 'features/agent/permissions/permission_dialog_handler.dart';
 import 'shared/widgets/error_screen.dart';
+import 'core/utils/provider_observer.dart';
 
 /// Provides a shared [FlutterSecureStorage] instance.
 final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
@@ -107,7 +108,10 @@ void main() {
       );
 
       // Create the app's ProviderContainer
-      _appContainer = ProviderContainer(overrides: []);
+      _appContainer = ProviderContainer(
+        overrides: [],
+        observers: [const NerdinProviderObserver()],
+      );
 
       // ── Flutter error handler ──
       // Catches all Flutter errors (assertions, build errors, etc.),

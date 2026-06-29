@@ -67,6 +67,49 @@ class ErrorScreen extends StatelessWidget {
     return file;
   }
 
+  Widget _buildHeader(ThemeData theme) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.red.shade900.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.red.shade800,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(Icons.bug_report, size: 28, color: Colors.white),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Something went wrong',
+                  style: theme.textTheme.titleMedium?.copyWith(color: Colors.white),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Nerdin encountered an unexpected error. '
+                  'Please share the crash log to help fix it.',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: Colors.white70,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -81,56 +124,16 @@ class ErrorScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // Scrollable content area (header + message + stack trace)
+          // Content area — takes remaining space, scrollable
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Error header
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.red.shade900.withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.red.shade800,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Icon(Icons.bug_report, size: 28, color: Colors.white),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Something went wrong',
-                                style: theme.textTheme.titleMedium?.copyWith(color: Colors.white),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                'Nerdin encountered an unexpected error. '
-                                'Please share the crash log to help fix it.',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: Colors.white70,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  _buildHeader(theme),
                   const SizedBox(height: 12),
-
                   // Error message
                   Container(
                     width: double.infinity,
@@ -138,7 +141,6 @@ class ErrorScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.red.shade900.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.red.shade800.withOpacity(0.5)),
                     ),
                     child: SelectableText(
                       '${errorDetails.exception}',
@@ -150,90 +152,84 @@ class ErrorScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-
-                  // Stack trace — constrained height with its own scroll
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(maxHeight: 400),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF0D0D1A),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.white10),
-                      ),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Primary error
+                  // Stack trace — capped at 300px, scrollable internally
+                  Container(
+                    width: double.infinity,
+                    height: 300,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0D0D1A),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '❌ ${errorDetails.exception.runtimeType}: ${errorDetails.exception}',
+                            style: const TextStyle(
+                              fontFamily: 'monospace',
+                              fontSize: 13,
+                              color: Colors.redAccent,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          SelectableText(
+                            errorDetails.stack?.toString() ?? '(No stack trace)',
+                            style: const TextStyle(
+                              fontFamily: 'monospace',
+                              fontSize: 11,
+                              color: Color(0xFF00FF88),
+                              height: 1.4,
+                            ),
+                          ),
+                          if (additionalErrors.isNotEmpty) ...[
+                            const SizedBox(height: 16),
+                            const Divider(color: Colors.white12),
+                            const SizedBox(height: 8),
                             Text(
-                              '❌ ${errorDetails.exception.runtimeType}: ${errorDetails.exception}',
+                              '📋 ${additionalErrors.length} cascading error(s):',
                               style: const TextStyle(
                                 fontFamily: 'monospace',
                                 fontSize: 13,
-                                color: Colors.redAccent,
+                                color: Colors.orangeAccent,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             const SizedBox(height: 8),
-                            SelectableText(
-                              errorDetails.stack?.toString() ?? '(No stack trace)',
-                              style: const TextStyle(
-                                fontFamily: 'monospace',
-                                fontSize: 11,
-                                color: Color(0xFF00FF88),
-                                height: 1.4,
-                              ),
-                            ),
-                            // Additional cascading errors
-                            if (additionalErrors.isNotEmpty) ...[
-                              const SizedBox(height: 16),
-                              const Divider(color: Colors.white12),
-                              const SizedBox(height: 8),
-                              Text(
-                                '📋 ${additionalErrors.length} cascading error(s):',
-                                style: const TextStyle(
-                                  fontFamily: 'monospace',
-                                  fontSize: 13,
-                                  color: Colors.orangeAccent,
-                                  fontWeight: FontWeight.bold,
+                            ...additionalErrors.asMap().entries.map((entry) {
+                              final idx = entry.key + 1;
+                              final err = entry.value;
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '📎 #$idx ${err.exception.runtimeType}: ${err.exception}',
+                                      style: const TextStyle(
+                                        fontFamily: 'monospace',
+                                        fontSize: 12,
+                                        color: Colors.orange,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    SelectableText(
+                                      err.stack?.toString() ?? '(No stack trace)',
+                                      style: const TextStyle(
+                                        fontFamily: 'monospace',
+                                        fontSize: 10,
+                                        color: Color(0xFFFFCC88),
+                                        height: 1.3,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              const SizedBox(height: 8),
-                              ...additionalErrors.asMap().entries.map((entry) {
-                                final idx = entry.key + 1;
-                                final err = entry.value;
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 12),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '📎 #$idx ${err.exception.runtimeType}: ${err.exception}',
-                                        style: const TextStyle(
-                                          fontFamily: 'monospace',
-                                          fontSize: 12,
-                                          color: Colors.orange,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      SelectableText(
-                                        err.stack?.toString() ?? '(No stack trace)',
-                                        style: const TextStyle(
-                                          fontFamily: 'monospace',
-                                          fontSize: 10,
-                                          color: Color(0xFFFFCC88),
-                                          height: 1.3,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }),
-                            ],
+                              );
+                            }),
                           ],
-                        ),
+                        ],
                       ),
                     ),
                   ),
@@ -242,11 +238,12 @@ class ErrorScreen extends StatelessWidget {
             ),
           ),
 
-          // Action buttons — sticky at bottom, no border/decoration
+          // Action buttons — always visible at bottom, NO decoration/border/divider
           Container(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
             color: const Color(0xFF1A1A2E),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
                   children: [

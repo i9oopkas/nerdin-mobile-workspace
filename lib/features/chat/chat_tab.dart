@@ -37,20 +37,16 @@ class _ChatTabState extends ConsumerState<ChatTab> {
   void dispose() {
     _streamSub?.cancel();
     _scrollController.dispose();
-    // Best-effort cleanup: unregister handler if it's still us
-    try {
-      final current = ref.read(sendMessageHandlerProvider);
-      if (current == _handleSend) {
-        ref.read(sendMessageHandlerProvider.notifier).state = null;
-      }
-    } catch (_) {
-      // Widget is being torn down, provider mutation is non-critical
-    }
+    // NOTE: Don't null sendMessageHandlerProvider here — Riverpod 3.x forbids
+    // modifying providers in dispose(). The handler will be overridden when
+    // a new ChatTab registers. The mounted guard in _handleSend prevents
+    // stale handler execution.
     super.dispose();
   }
 
   /// The main send function: sends user message, streams assistant reply.
   Future<void> _handleSend(String text) async {
+    if (!mounted) return;
     final notifier = ref.read(chatMessagesProvider.notifier);
     final client = ref.read(llmClientProvider);
     final model = ref.read(selectedModelProvider);
