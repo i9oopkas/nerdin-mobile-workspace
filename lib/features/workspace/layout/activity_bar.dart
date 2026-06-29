@@ -77,7 +77,7 @@ class ActivityBar extends ConsumerWidget {
   }
 
   /// Resolve which navigation index is currently selected.
-  int _resolveIndex(
+  int? _resolveIndex(
       String activeTabId, SidePanelTab activePanel, bool sidePanelOpen) {
     if (sidePanelOpen) {
       switch (activePanel) {
@@ -94,7 +94,7 @@ class ActivityBar extends ConsumerWidget {
     }
     if (activeTabId == 'chat') return 0;
     if (activeTabId == 'agent') return 1;
-    return -1;
+    return null;
   }
 
   void _onDestinationSelected(int index, WidgetRef ref, BuildContext context) {
