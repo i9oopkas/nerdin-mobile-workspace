@@ -125,7 +125,7 @@ class _NerdinAppState extends ConsumerState<NerdinApp> {
         cupertino: (_, _) =>
             const CupertinoAppData(debugShowCheckedModeBanner: false),
         builder: (context, child) {
-          final Brightness brightness;
+          late final Brightness brightness;
           switch (themeMode) {
             case ThemeMode.dark:
               brightness = Brightness.dark;

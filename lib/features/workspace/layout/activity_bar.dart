@@ -44,7 +44,7 @@ class ActivityBar extends ConsumerWidget {
             onTap: () => _selectPanel(ref, SidePanelTab.search),
           ),
           _ActivityIcon(
-            icon: Icons.code_branch,
+            icon: Icons.source,
             isActive: activePanel == SidePanelTab.git,
             tooltip: 'Source Control',
             colorScheme: colorScheme,

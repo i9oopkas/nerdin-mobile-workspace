@@ -81,4 +81,12 @@ final openTabsProvider =
 );
 
 /// ID of the currently active tab.
-final activeTabIdProvider = StateProvider<String>((ref) => '');
+class ActiveTabIdNotifier extends Notifier<String> {
+  @override
+  String build() => '';
+}
+
+final activeTabIdProvider =
+    NotifierProvider<ActiveTabIdNotifier, String>(
+  ActiveTabIdNotifier.new,
+);

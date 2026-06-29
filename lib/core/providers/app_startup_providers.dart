@@ -1,21 +1,30 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logging/logging.dart';
 
-/// Minimal startup flow provider.
-/// The full OWUI startup (server connection, conversation warmup, socket, etc.)
-/// has been removed. This provider exists as a no-op placeholder so existing
-/// call sites in main.dart still compile.
-class AppStartupFlow {
+final _logger = Logger('AppStartup');
+
+/// No-op startup flow. Converted to Notifier so `ref.read(...).notifier.start()` works.
+class AppStartupFlow extends Notifier<int> {
+  @override
+  int build() {
+    _init();
+    return 0;
+  }
+
+  Future<void> _init() async {
+    _logger.info('AppStartupFlow: started');
+  }
+
+  /// Called from main.dart after the ProviderScope is ready.
   void start() {
-    // No-op: server-side startup logic removed.
+    _logger.info('AppStartupFlow: start() called — no-op');
   }
 }
 
-final appStartupFlowProvider = Provider<AppStartupFlow>((ref) {
-  return AppStartupFlow();
-});
+final appStartupFlowProvider =
+    NotifierProvider<AppStartupFlow, int>(AppStartupFlow.new);
 
-/// Cleanup provider stub. The original OWUI implementation invalidated
-/// user-scoped providers on sign-out. Since auth is removed, this is a no-op.
+/// Cleans up user-scoped providers (no-op after OWUI removal).
 final userScopedProviderCleanupProvider = Provider<void>((ref) {
-  // No-op: auth cleanup removed.
+  // no-op
 });

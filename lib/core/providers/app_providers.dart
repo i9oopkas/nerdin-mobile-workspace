@@ -6,12 +6,28 @@ import '../../shared/theme/tweakcn_themes.dart';
 
 // ── Theme Mode ─────────────────────────────────────────────────
 
-final appThemeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.system);
+class AppThemeModeNotifier extends Notifier<ThemeMode> {
+  @override
+  ThemeMode build() => ThemeMode.system;
+
+  void setTheme(ThemeMode mode) => state = mode;
+}
+
+final appThemeModeProvider =
+    NotifierProvider<AppThemeModeNotifier, ThemeMode>(
+  AppThemeModeNotifier.new,
+);
 
 // ── Theme Palette ──────────────────────────────────────────────
 
-final appThemePaletteProvider = StateProvider<TweakcnThemeDefinition>(
-  (ref) => TweakcnThemes.conduit,
+class AppThemePaletteNotifier extends Notifier<TweakcnThemeDefinition> {
+  @override
+  TweakcnThemeDefinition build() => TweakcnThemes.conduit;
+}
+
+final appThemePaletteProvider =
+    NotifierProvider<AppThemePaletteNotifier, TweakcnThemeDefinition>(
+  AppThemePaletteNotifier.new,
 );
 
 // ── Material Themes ────────────────────────────────────────────
@@ -40,4 +56,13 @@ final appCupertinoDarkThemeProvider = Provider<CupertinoThemeData>((ref) {
 
 // ── Locale ─────────────────────────────────────────────────────
 
-final appLocaleProvider = StateProvider<Locale?>((ref) => null);
+class AppLocaleNotifier extends Notifier<Locale?> {
+  @override
+  Locale? build() => null;
+
+  void setLocale(Locale? locale) => state = locale;
+}
+
+final appLocaleProvider = NotifierProvider<AppLocaleNotifier, Locale?>(
+  AppLocaleNotifier.new,
+);

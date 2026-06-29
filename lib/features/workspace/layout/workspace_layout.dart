@@ -43,7 +43,7 @@ class _WorkspaceLayoutState extends ConsumerState<WorkspaceLayout> {
         id: 'chat',
         title: 'Chat',
         icon: Icons.chat_bubble_outlined,
-        builder: ChatTab.new,
+        builder: (_) => const ChatTab(),
         closable: false,
       ),
     );
@@ -56,7 +56,7 @@ class _WorkspaceLayoutState extends ConsumerState<WorkspaceLayout> {
         id: 'agent',
         title: 'Agent',
         icon: Icons.smart_toy_outlined,
-        builder: AgentTab.new,
+        builder: (_) => const AgentTab(),
         closable: false,
       ),
     );

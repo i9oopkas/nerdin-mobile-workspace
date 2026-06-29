@@ -37,7 +37,7 @@ class MainArea extends ConsumerWidget {
             ),
           // Content area
           Expanded(
-            child: _resolveContent(openTabs, activeTabId),
+            child: _resolveContent(openTabs, activeTabId, context),
           ),
           // Bottom bar — visible for chat/agent tabs
           if (showBottomBar) const BottomBar(),
@@ -49,6 +49,7 @@ class MainArea extends ConsumerWidget {
   Widget _resolveContent(
     List<WorkspaceTab> openTabs,
     String activeTabId,
+    BuildContext context,
   ) {
     // No tabs → welcome state (shouldn't normally happen)
     if (openTabs.isEmpty) {

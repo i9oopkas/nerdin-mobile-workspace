@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nerdin_mobile_workspace/features/agent/services/llm_event.dart';
 import 'package:nerdin_mobile_workspace/features/agent/services/llm_providers.dart';
 import 'package:nerdin_mobile_workspace/features/workspace/layout/bottom_bar_providers.dart';
 
