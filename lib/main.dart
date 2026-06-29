@@ -6,7 +6,6 @@ import 'package:pdfrx/pdfrx.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import 'core/widgets/error_boundary.dart';
 import 'core/providers/app_providers.dart';
 import 'core/router/app_router.dart';
 import 'core/utils/system_ui_style.dart';
@@ -210,56 +209,54 @@ class _NerdinAppState extends ConsumerState<NerdinApp> {
     final cupertinoLight = ref.watch(appCupertinoLightThemeProvider);
     final cupertinoDark = ref.watch(appCupertinoDarkThemeProvider);
 
-    return ErrorBoundary(
-      child: AdaptiveApp.router(
-        routerConfig: router,
-        onGenerateTitle: (context) => 'Nerdin',
-        materialLightTheme: lightTheme,
-        materialDarkTheme: darkTheme,
-        cupertinoLightTheme: cupertinoLight,
-        cupertinoDarkTheme: cupertinoDark,
-        themeMode: themeMode,
-        locale: locale,
-        supportedLocales: const [Locale('en')],
-        localeListResolutionCallback: (deviceLocales, supported) {
-          if (locale != null) return locale;
-          return supported.first;
-        },
-        material: (_, _) =>
-            const MaterialAppData(debugShowCheckedModeBanner: false),
-        cupertino: (_, _) =>
-            const CupertinoAppData(debugShowCheckedModeBanner: false),
-        builder: (context, child) {
-          late final Brightness brightness;
-          switch (themeMode) {
-            case ThemeMode.dark:
-              brightness = Brightness.dark;
-            case ThemeMode.light:
-              brightness = Brightness.light;
-            case ThemeMode.system:
-              brightness = MediaQuery.platformBrightnessOf(context);
-          }
-          if (_lastAppliedOverlayBrightness != brightness) {
-            _lastAppliedOverlayBrightness = brightness;
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (!mounted) return;
-              applySystemUiOverlayStyleOnce(brightness: brightness);
-            });
-          }
-          final safeChild = child ?? const SizedBox.shrink();
+    return AdaptiveApp.router(
+      routerConfig: router,
+      onGenerateTitle: (context) => 'Nerdin',
+      materialLightTheme: lightTheme,
+      materialDarkTheme: darkTheme,
+      cupertinoLightTheme: cupertinoLight,
+      cupertinoDarkTheme: cupertinoDark,
+      themeMode: themeMode,
+      locale: locale,
+      supportedLocales: const [Locale('en')],
+      localeListResolutionCallback: (deviceLocales, supported) {
+        if (locale != null) return locale;
+        return supported.first;
+      },
+      material: (_, _) =>
+          const MaterialAppData(debugShowCheckedModeBanner: false),
+      cupertino: (_, _) =>
+          const CupertinoAppData(debugShowCheckedModeBanner: false),
+      builder: (context, child) {
+        late final Brightness brightness;
+        switch (themeMode) {
+          case ThemeMode.dark:
+            brightness = Brightness.dark;
+          case ThemeMode.light:
+            brightness = Brightness.light;
+          case ThemeMode.system:
+            brightness = MediaQuery.platformBrightnessOf(context);
+        }
+        if (_lastAppliedOverlayBrightness != brightness) {
+          _lastAppliedOverlayBrightness = brightness;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+            applySystemUiOverlayStyleOnce(brightness: brightness);
+          });
+        }
+        final safeChild = child ?? const SizedBox.shrink();
 
-          final materialTheme = brightness == Brightness.dark
-              ? darkTheme
-              : lightTheme;
+        final materialTheme = brightness == Brightness.dark
+            ? darkTheme
+            : lightTheme;
 
-          return Theme(
-            data: materialTheme,
-            child: PermissionDialogHandler(
-              child: _KeyboardDismissOnScroll(child: safeChild),
-            ),
-          );
-        },
-      ),
+        return Theme(
+          data: materialTheme,
+          child: PermissionDialogHandler(
+            child: _KeyboardDismissOnScroll(child: safeChild),
+          ),
+        );
+      },
     );
   }
 }
