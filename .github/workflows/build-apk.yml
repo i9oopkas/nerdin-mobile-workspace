@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
 
     steps:
       - uses: actions/checkout@v4
@@ -27,6 +27,11 @@ jobs:
 
       - name: Flutter pub get
         run: flutter pub get
+
+      - name: Widget tests
+        run: flutter test test/activity_bar_test.dart test/smoke_test.dart
+        continue-on-error: false
+        timeout-minutes: 5
 
       - name: Static analysis
         id: analyze
