@@ -28,6 +28,9 @@ jobs:
       - name: Flutter pub get
         run: flutter pub get
 
+      - name: Generate code
+        run: dart run build_runner build --delete-conflicting-outputs
+
       - name: Widget tests
         run: flutter test test/activity_bar_test.dart test/smoke_test.dart
         continue-on-error: false
@@ -39,9 +42,6 @@ jobs:
         run: |
           flutter analyze 2>&1 | tee analyze_output.txt
           echo "EXIT_CODE=$?" >> $GITHUB_OUTPUT
-
-      - name: Generate code
-        run: dart run build_runner build --delete-conflicting-outputs
 
       - name: Build debug APK
         id: build
