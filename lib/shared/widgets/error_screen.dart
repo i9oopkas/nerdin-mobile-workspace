@@ -268,7 +268,7 @@ class ErrorScreen extends StatelessWidget {
                           try {
                             // Open native "Save As" dialog — user picks location and filename
                             final bytes = Uint8List.fromList(_fullLog.codeUnits);
-                            final outputPath = await FilePicker.platform.saveFile(
+                            final outputPath = await FilePicker.saveFile(
                               dialogTitle: 'Save crash log',
                               fileName: 'nerdin_crash_${DateTime.now().millisecondsSinceEpoch}.log',
                               bytes: bytes,
