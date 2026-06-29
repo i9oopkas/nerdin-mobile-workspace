@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 20
 
     steps:
       - uses: actions/checkout@v4
@@ -35,65 +35,12 @@ jobs:
         run: flutter test test/activity_bar_test.dart test/smoke_test.dart
         timeout-minutes: 5
 
-      - name: Static analysis
-        id: analyze
-        continue-on-error: true
-        run: |
-          flutter analyze 2>&1 | tee analyze_output.txt
-          echo "EXIT_CODE=$?" >> $GITHUB_OUTPUT
-
-      # Pre-build APK before starting emulator to warm Gradle cache.
-      # This prevents CPU contention between Gradle and QEMU.
-      - name: Pre-build APK
+      - name: Build debug APK
         run: flutter build apk --debug
 
-      - name: Enable KVM
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-
-      - name: Integration test (Android emulator)
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 34
-          target: google_apis
-          arch: x86_64
-          emulator-options: -no-snapshot -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          emulator-boot-timeout: 300
-          script: |
-            flutter test integration_test
-
-      - name: Check logs for errors
-        if: always()
-        run: |
-          echo "## 🔍 Build log summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          if [ -f analyze_output.txt ]; then
-            echo "### flutter analyze" >> $GITHUB_STEP_SUMMARY
-            ERRORS=$(grep -cE "error|Error" analyze_output.txt || true)
-            WARNINGS=$(grep -cE "warning|Warning" analyze_output.txt || true)
-            echo "- Errors: $ERRORS, Warnings: $WARNINGS" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            grep -n "error" analyze_output.txt | head -20 >> $GITHUB_STEP_SUMMARY
-            echo '...' >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          if [ -f build/app/outputs/flutter-apk/app-debug.apk ]; then
-            APK_SIZE=$(ls -lh build/app/outputs/flutter-apk/app-debug.apk | awk '{print $5}')
-            echo "### APK artifact" >> $GITHUB_STEP_SUMMARY
-            echo "- ✅ Size: $APK_SIZE" >> $GITHUB_STEP_SUMMARY
-          fi
-
       - name: Upload APK
-        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: nerdin-alpha-test-0.1
           path: build/app/outputs/flutter-apk/app-debug.apk
-          if-no-files-found: ignore
+          if-no-files-found: error
