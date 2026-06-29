@@ -42,6 +42,11 @@ jobs:
           flutter analyze 2>&1 | tee analyze_output.txt
           echo "EXIT_CODE=$?" >> $GITHUB_OUTPUT
 
+      # Pre-build APK before starting emulator to warm Gradle cache.
+      # This prevents CPU contention between Gradle and QEMU.
+      - name: Pre-build APK
+        run: flutter build apk --debug
+
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -54,14 +59,11 @@ jobs:
           api-level: 34
           target: google_apis
           arch: x86_64
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -cache-size 512
+          emulator-options: -no-snapshot -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
+          emulator-boot-timeout: 300
           script: |
             flutter test integration_test
-
-      - name: Build debug APK
-        if: success()
-        run: flutter build apk --debug
 
       - name: Check logs for errors
         if: always()
@@ -82,10 +84,10 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
           fi
 
-          echo "### Integration test" >> $GITHUB_STEP_SUMMARY
           if [ -f build/app/outputs/flutter-apk/app-debug.apk ]; then
-            echo "- ✅ APK built" >> $GITHUB_STEP_SUMMARY
-            ls -lh build/app/outputs/flutter-apk/app-debug.apk >> $GITHUB_STEP_SUMMARY
+            APK_SIZE=$(ls -lh build/app/outputs/flutter-apk/app-debug.apk | awk '{print $5}')
+            echo "### APK artifact" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ Size: $APK_SIZE" >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Upload APK
@@ -93,5 +95,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: nerdin-alpha-test-0.1
-          path: build/app/outputs/flutter-apk/*.apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
           if-no-files-found: ignore
