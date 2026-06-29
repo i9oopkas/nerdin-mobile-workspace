@@ -29,16 +29,60 @@ jobs:
         run: flutter pub get
 
       - name: Static analysis
-        run: flutter analyze
+        id: analyze
         continue-on-error: true
+        run: |
+          flutter analyze 2>&1 | tee analyze_output.txt
+          echo "EXIT_CODE=$?" >> $GITHUB_OUTPUT
 
       - name: Generate code
         run: dart run build_runner build --delete-conflicting-outputs
 
       - name: Build debug APK
-        run: flutter build apk --debug
+        id: build
+        run: |
+          flutter build apk --debug 2>&1 | tee build_output.txt
+          echo "EXIT_CODE=$?" >> $GITHUB_OUTPUT
+
+      - name: Check logs for errors
+        if: always()
+        run: |
+          echo "## 🔍 Build log summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Check flutter analyze output
+          if [ -f analyze_output.txt ]; then
+            echo "### flutter analyze" >> $GITHUB_STEP_SUMMARY
+            ERRORS=$(grep -cE "error|Error" analyze_output.txt)
+            WARNINGS=$(grep -cE "warning|Warning" analyze_output.txt)
+            echo "- Errors: $ERRORS, Warnings: $WARNINGS" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            # Show actual errors
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            grep -E "error|Error" analyze_output.txt | head -30 >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Check build output
+          if [ -f build_output.txt ]; then
+            echo "### flutter build" >> $GITHUB_STEP_SUMMARY
+            if grep -q "BUILD FAILED" build_output.txt; then
+              echo "- ❌ **Build FAILED**" >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              grep -E "Error:|error:|FAILED|Exception|exit code" build_output.txt | head -30 >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- ✅ Build SUCCESS" >> $GITHUB_STEP_SUMMARY
+              # Find the APK path
+              grep "Built" build_output.txt >> $GITHUB_STEP_SUMMARY
+            fi
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: nerdin-alpha-test-0.1
