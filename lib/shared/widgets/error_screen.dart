@@ -6,9 +6,12 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:nerdin_mobile_workspace/shared/widgets/log_viewer.dart';
 
 /// Full-screen crash report widget.
-/// Shown when an unhandled Flutter error occurs (e.g. `_dirty` assertion).
+///
+/// Uses [LogViewer] for the stack trace display — auto-sizing,
+/// no overflow, internally scrollable, reusable pattern.
 class ErrorScreen extends StatelessWidget {
   final FlutterErrorDetails errorDetails;
   final List<FlutterErrorDetails> additionalErrors;
@@ -21,14 +24,12 @@ class ErrorScreen extends StatelessWidget {
     this.onRestart,
   });
 
-  /// Builds the full crash report text (includes all errors)
   String get _fullLog {
     final buf = StringBuffer();
     buf.writeln('===== Nerdin Mobile Workspace Crash Report =====');
     buf.writeln('Timestamp: ${DateTime.now().toIso8601String()}');
     buf.writeln('');
-    
-    // Primary error
+
     buf.writeln('--- Primary Error ---');
     buf.writeln('Error type: ${errorDetails.exception.runtimeType}');
     buf.writeln('Error message: ${errorDetails.exception}');
@@ -37,8 +38,7 @@ class ErrorScreen extends StatelessWidget {
       buf.writeln('--- Stack trace ---');
       buf.writeln(errorDetails.stack.toString());
     }
-    
-    // Additional errors
+
     for (var i = 0; i < additionalErrors.length; i++) {
       final err = additionalErrors[i];
       buf.writeln('');
@@ -51,14 +51,12 @@ class ErrorScreen extends StatelessWidget {
         buf.writeln(err.stack.toString());
       }
     }
-    
+
     buf.writeln('');
     buf.writeln('===== End of report =====');
     return buf.toString();
   }
 
-  /// Writes the full crash log to a file in Downloads
-  /// so the user can easily find and share it.
   Future<File> _saveLogFile() async {
     final dir = await getDownloadsDirectory() ?? await getApplicationDocumentsDirectory();
     final timestamp = DateTime.now().millisecondsSinceEpoch;
@@ -98,9 +96,7 @@ class ErrorScreen extends StatelessWidget {
                 Text(
                   'Nerdin encountered an unexpected error. '
                   'Please share the crash log to help fix it.',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.white70,
-                  ),
+                  style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70),
                 ),
               ],
             ),
@@ -110,9 +106,74 @@ class ErrorScreen extends StatelessWidget {
     );
   }
 
+  /// Builds the error message block using LogViewer.
+  Widget _buildErrorMessage() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.red.shade900.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: SelectableText(
+        '${errorDetails.exception}',
+        style: const TextStyle(
+          fontFamily: 'monospace',
+          fontSize: 13,
+          color: Colors.redAccent,
+        ),
+      ),
+    );
+  }
+
+  /// Builds a log viewer block for the error details.
+  Widget _buildStackTrace() {
+    return LogViewer(
+      title: '❌ ${errorDetails.exception.runtimeType}',
+      body: errorDetails.stack?.toString() ?? '(No stack trace)',
+      accentColor: const Color(0xFF00FF88),
+      backgroundColor: const Color(0xFF0D0D1A),
+    );
+  }
+
+  /// Builds log viewer blocks for all cascading errors.
+  List<Widget> _buildCascadingErrors() {
+    if (additionalErrors.isEmpty) return [];
+
+    return [
+      const SizedBox(height: 16),
+      const Divider(color: Colors.white12),
+      const SizedBox(height: 8),
+      Text(
+        '📋 ${additionalErrors.length} cascading error(s):',
+        style: const TextStyle(
+          fontFamily: 'monospace',
+          fontSize: 13,
+          color: Colors.orangeAccent,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      const SizedBox(height: 8),
+      ...additionalErrors.asMap().entries.map((entry) {
+        final idx = entry.key + 1;
+        final err = entry.value;
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: LogViewer(
+            title: '📎 #$idx ${err.exception.runtimeType}',
+            body: err.stack?.toString() ?? err.exception.toString(),
+            accentColor: Colors.orangeAccent,
+            backgroundColor: const Color(0xFF1A1A0D),
+          ),
+        );
+      }),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A2E),
@@ -124,124 +185,29 @@ class ErrorScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // Content area — takes remaining space, scrollable
+          // ── Scrollable content area ──
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Error header
                   _buildHeader(theme),
                   const SizedBox(height: 12),
-                  // Error message
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.red.shade900.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: SelectableText(
-                      '${errorDetails.exception}',
-                      style: const TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 13,
-                        color: Colors.redAccent,
-                      ),
-                    ),
-                  ),
+                  _buildErrorMessage(),
                   const SizedBox(height: 12),
-                  // Stack trace — capped at 300px, scrollable internally
-                  Container(
-                    width: double.infinity,
-                    height: 300,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0D0D1A),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '❌ ${errorDetails.exception.runtimeType}: ${errorDetails.exception}',
-                            style: const TextStyle(
-                              fontFamily: 'monospace',
-                              fontSize: 13,
-                              color: Colors.redAccent,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          SelectableText(
-                            errorDetails.stack?.toString() ?? '(No stack trace)',
-                            style: const TextStyle(
-                              fontFamily: 'monospace',
-                              fontSize: 11,
-                              color: Color(0xFF00FF88),
-                              height: 1.4,
-                            ),
-                          ),
-                          if (additionalErrors.isNotEmpty) ...[
-                            const SizedBox(height: 16),
-                            const Divider(color: Colors.white12),
-                            const SizedBox(height: 8),
-                            Text(
-                              '📋 ${additionalErrors.length} cascading error(s):',
-                              style: const TextStyle(
-                                fontFamily: 'monospace',
-                                fontSize: 13,
-                                color: Colors.orangeAccent,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            ...additionalErrors.asMap().entries.map((entry) {
-                              final idx = entry.key + 1;
-                              final err = entry.value;
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 12),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '📎 #$idx ${err.exception.runtimeType}: ${err.exception}',
-                                      style: const TextStyle(
-                                        fontFamily: 'monospace',
-                                        fontSize: 12,
-                                        color: Colors.orange,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    SelectableText(
-                                      err.stack?.toString() ?? '(No stack trace)',
-                                      style: const TextStyle(
-                                        fontFamily: 'monospace',
-                                        fontSize: 10,
-                                        color: Color(0xFFFFCC88),
-                                        height: 1.3,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ),
+                  _buildStackTrace(),
+                  ..._buildCascadingErrors(),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
           ),
 
-          // Action buttons — always visible at bottom, NO decoration/border/divider
+          // ── Action buttons — always visible at bottom ──
           Container(
             color: const Color(0xFF1A1A2E),
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+            padding: EdgeInsets.fromLTRB(16, 8, 16, bottomPadding > 0 ? bottomPadding : 16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
