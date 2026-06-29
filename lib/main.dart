@@ -14,6 +14,7 @@ import 'core/providers/app_startup_providers.dart';
 import 'core/providers/chat_seed_provider.dart';
 import 'features/agent/permissions/permission_providers.dart';
 import 'features/agent/permissions/permission_dialog_handler.dart';
+import 'shared/widgets/error_screen.dart';
 
 /// Provides a shared [FlutterSecureStorage] instance.
 final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
@@ -30,7 +31,53 @@ final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
   );
 });
 
+// ──────────────────────────────────────────────
+//  Crash screen logic — catches errors and shows
+//  a report with save/share/restart actions
+// ──────────────────────────────────────────────
+
+/// Global reference to the app's ProviderContainer (for restart).
+ProviderContainer? _appContainer;
+
+/// Shows the ErrorScreen overlay after the current frame completes.
+void _showErrorScreen(FlutterErrorDetails details) {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    // Dispose the old container (we'll create a fresh one on restart)
+    _appContainer?.dispose();
+    _appContainer = null;
+
+    runApp(
+      MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: ErrorScreen(
+          errorDetails: details,
+          onRestart: _restartApp,
+        ),
+      ),
+    );
+  });
+}
+
+/// Restarts the app with a fresh ProviderContainer.
+void _restartApp() {
+  _appContainer?.dispose();
+  _appContainer = ProviderContainer(overrides: []);
+  runApp(
+    UncontrolledProviderScope(
+      container: _appContainer!,
+      child: const NerdinApp(),
+    ),
+  );
+  // Re-seed chat tab after restart
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    _appContainer?.read(chatTabSeedProvider);
+  });
+}
+
 void main() {
+  // Debug: log every widget rebuild — helps identify the _dirty culprit
+  debugPrintRebuildDirtyWidgets = true;
+
   runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
@@ -42,33 +89,58 @@ void main() {
         }),
       );
 
-      // Global error handlers
+      // Create the app's ProviderContainer
+      _appContainer = ProviderContainer(overrides: []);
+
+      // ── Flutter error handler ──
+      // Catches all Flutter errors (assertions, build errors, etc.),
+      // prints full details to console, then shows ErrorScreen.
       FlutterError.onError = (FlutterErrorDetails details) {
-        debugPrint('Flutter error: ${details.exception}');
-        final stack = details.stack;
-        if (stack != null) {
-          debugPrintStack(stackTrace: stack);
+        // 1. Print standard error message
+        FlutterError.presentError(details);
+
+        // 2. Print full details to console
+        debugPrint('');
+        debugPrint('══════════ FLUTTER ERROR ══════════');
+        debugPrint('Type:     ${details.exception.runtimeType}');
+        debugPrint('Error:    ${details.exception}');
+        if (details.stack != null) {
+          debugPrint('Stack:');
+          debugPrint(details.stack.toString());
+        } else {
+          debugPrint('Stack:    null');
+          // Try to extract stack from exception itself
+          try {
+            throw details.exception;
+          } catch (_, StackTrace s) {
+            debugPrint('Stack:    $s');
+          }
         }
+        debugPrint('═══════════════════════════════════');
+        debugPrint('');
+
+        // 3. Show crash screen after frame completes
+        _showErrorScreen(details);
       };
+
+      // ── Platform error handler ──
+      // Catches low-level platform errors (rare in Flutter).
       WidgetsBinding.instance.platformDispatcher.onError = (error, stack) {
-        debugPrint('Platform error: $error');
+        debugPrint('❌ Platform error: $error');
         debugPrintStack(stackTrace: stack);
         return true;
       };
 
-      final providerContainer = ProviderContainer(
-        overrides: [],
-      );
-
+      // ── Launch the app ──
       runApp(
         UncontrolledProviderScope(
-          container: providerContainer,
+          container: _appContainer!,
           child: const NerdinApp(),
         ),
       );
     },
     (error, stack) {
-      debugPrint('Zone error: $error');
+      debugPrint('❌ Zone error: $error');
       debugPrintStack(stackTrace: stack);
     },
   );
