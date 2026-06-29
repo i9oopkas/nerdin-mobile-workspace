@@ -1,9 +1,11 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:file_picker/file_picker.dart';
 
 /// Full-screen crash report widget.
 /// Shown when an unhandled Flutter error occurs (e.g. `_dirty` assertion).
@@ -55,8 +57,10 @@ class ErrorScreen extends StatelessWidget {
     return buf.toString();
   }
 
+  /// Writes the full crash log to a file in Downloads
+  /// so the user can easily find and share it.
   Future<File> _saveLogFile() async {
-    final dir = await getApplicationDocumentsDirectory();
+    final dir = await getDownloadsDirectory() ?? await getApplicationDocumentsDirectory();
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final file = File('${dir.path}/nerdin_crash_$timestamp.log');
     await file.writeAsString(_fullLog);
@@ -258,16 +262,24 @@ class ErrorScreen extends StatelessWidget {
                     Expanded(
                       child: _ActionButton(
                         icon: Icons.save_alt,
-                        label: 'Save',
+                        label: 'Save As',
                         color: Colors.teal,
                         onTap: () async {
                           try {
-                            final file = await _saveLogFile();
-                            if (context.mounted) {
+                            // Open native "Save As" dialog — user picks location and filename
+                            final bytes = Uint8List.fromList(_fullLog.codeUnits);
+                            final outputPath = await FilePicker.platform.saveFile(
+                              dialogTitle: 'Save crash log',
+                              fileName: 'nerdin_crash_${DateTime.now().millisecondsSinceEpoch}.log',
+                              bytes: bytes,
+                              type: FileType.custom,
+                              allowedExtensions: ['log', 'txt'],
+                            );
+                            if (outputPath != null && context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text('Saved: ${file.path}'),
-                                  duration: const Duration(seconds: 4),
+                                  content: Text('Saved: ${outputPath.split('/').last}'),
+                                  duration: const Duration(seconds: 3),
                                 ),
                               );
                             }

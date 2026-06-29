@@ -118,10 +118,11 @@ void main() {
         FlutterError.presentError(details);
 
         // 2. Print full details to console
+        final errorMsg = details.exception.toString();
         debugPrint('');
         debugPrint('══════════ FLUTTER ERROR ══════════');
         debugPrint('Type:     ${details.exception.runtimeType}');
-        debugPrint('Error:    ${details.exception}');
+        debugPrint('Error:    $errorMsg');
         if (details.stack != null) {
           debugPrint('Stack:');
           debugPrint(details.stack.toString());
@@ -137,7 +138,19 @@ void main() {
         debugPrint('═══════════════════════════════════');
         debugPrint('');
 
-        // 3. Show crash screen after frame completes
+        // 3. Ignore non-fatal layout warnings (overflow, constraints, etc.)
+        //    These are just logged, not shown as crash screen.
+        if (errorMsg.contains('overflowed') || 
+            errorMsg.contains('overflow') ||
+            errorMsg.contains('RenderFlex') ||
+            errorMsg.contains('A Render') ||
+            errorMsg.contains('flex') ||
+            errorMsg.contains('does not support')) {
+          debugPrint('⚠️ Non-fatal layout warning — not showing crash screen');
+          return;
+        }
+
+        // 4. Show crash screen after frame completes for FATAL errors only
         _showErrorScreen(details);
       };
 
