@@ -19,7 +19,7 @@ final activeSidePanelProvider =
 
 class SidePanelOpenNotifier extends Notifier<bool> {
   @override
-  bool build() => true;
+  bool build() => false;
 }
 
 final sidePanelOpenProvider =

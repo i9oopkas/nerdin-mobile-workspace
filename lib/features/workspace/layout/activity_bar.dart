@@ -1,97 +1,159 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nerdin_mobile_workspace/features/agent/services/llm_providers.dart';
+import 'package:nerdin_mobile_workspace/features/agent/ui/agent_tab.dart';
+import 'package:nerdin_mobile_workspace/features/chat/chat_tab.dart';
+import 'package:nerdin_mobile_workspace/features/workspace/layout/code_editor_tab.dart';
+import 'package:nerdin_mobile_workspace/features/workspace/layout/main_area_providers.dart';
 import 'package:nerdin_mobile_workspace/features/workspace/layout/workspace_providers.dart';
 
-/// Left-side vertical icon column (Activity Bar) — VS Code style.
+/// MD3 NavigationRail — replaces the old VS Code-style ActivityBar.
 ///
-/// Controls which panel is shown in the [SidePanel]. The top section
-/// contains workspace navigation icons; the bottom contains settings.
-///
-/// [onAgentTap] opens the Agent workspace tab (not just the side panel).
+/// Shows destinations for Chat, Agent, Files, Search, Git, and Settings.
+/// Selecting Chat/Agent switches the active tab in MainArea.
+/// Selecting Files/Search/Git opens the SidePanel overlay with the
+/// corresponding panel content.
+/// Selecting Settings opens the Zen API key dialog.
 class ActivityBar extends ConsumerWidget {
-  final VoidCallback? onAgentTap;
-
-  const ActivityBar({super.key, this.onAgentTap});
+  const ActivityBar({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final activeTabId = ref.watch(activeTabIdProvider);
     final activePanel = ref.watch(activeSidePanelProvider);
+    final sidePanelOpen = ref.watch(sidePanelOpenProvider);
     final colorScheme = Theme.of(context).colorScheme;
-    const iconSize = 22.0;
 
-    return Container(
-      width: 48,
-      color: colorScheme.surfaceContainerLow,
-      child: Column(
-        children: [
-          const SizedBox(height: 8),
-          // Top section — workspace navigation
-          _ActivityIcon(
-            icon: Icons.folder_outlined,
-            isActive: activePanel == SidePanelTab.explorer,
-            tooltip: 'Explorer',
-            colorScheme: colorScheme,
-            size: iconSize,
-            onTap: () => _selectPanel(ref, SidePanelTab.explorer),
-          ),
-          _ActivityIcon(
-            icon: Icons.search,
-            isActive: activePanel == SidePanelTab.search,
-            tooltip: 'Search',
-            colorScheme: colorScheme,
-            size: iconSize,
-            onTap: () => _selectPanel(ref, SidePanelTab.search),
-          ),
-          _ActivityIcon(
-            icon: Icons.source,
-            isActive: activePanel == SidePanelTab.git,
-            tooltip: 'Source Control',
-            colorScheme: colorScheme,
-            size: iconSize,
-            onTap: () => _selectPanel(ref, SidePanelTab.git),
-          ),
-          _ActivityIcon(
-            icon: Icons.smart_toy_outlined,
-            isActive: activePanel == SidePanelTab.agent,
-            tooltip: 'Agent',
-            colorScheme: colorScheme,
-            size: iconSize,
-            onTap: () {
-              _selectPanel(ref, SidePanelTab.agent);
-              onAgentTap?.call();
-            },
-          ),
-          _ActivityIcon(
-            icon: Icons.extension_outlined,
-            isActive: activePanel == SidePanelTab.extensions,
-            tooltip: 'Extensions',
-            colorScheme: colorScheme,
-            size: iconSize,
-            onTap: () => _selectPanel(ref, SidePanelTab.extensions),
-          ),
-          const Spacer(),
-          // Bottom section — settings / Zen config
-          _ActivityIcon(
-            icon: Icons.settings_outlined,
-            isActive: false,
-            tooltip: 'Settings — LLM Provider',
-            colorScheme: colorScheme,
-            size: iconSize,
-            onTap: () => _showSettingsDialog(context, ref),
-          ),
-          const SizedBox(height: 8),
-        ],
+    final selectedIndex = _resolveIndex(activeTabId, activePanel, sidePanelOpen);
+
+    return NavigationRail(
+      selectedIndex: selectedIndex,
+      onDestinationSelected: (index) =>
+          _onDestinationSelected(index, ref, context),
+      labelType: NavigationRailLabelType.all,
+      minWidth: 56,
+      groupAlignment: -0.3,
+      backgroundColor: colorScheme.surfaceContainerLow,
+      indicatorColor: colorScheme.secondaryContainer,
+      leading: Padding(
+        padding: const EdgeInsets.only(top: 8, bottom: 8),
+        child: Icon(
+          Icons.code_rounded,
+          size: 28,
+          color: colorScheme.primary,
+        ),
+      ),
+      destinations: const [
+        NavigationRailDestination(
+          icon: Icon(Icons.chat_bubble_outline),
+          selectedIcon: Icon(Icons.chat_bubble),
+          label: Text('Chat'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.smart_toy_outlined),
+          selectedIcon: Icon(Icons.smart_toy),
+          label: Text('Agent'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.folder_outlined),
+          selectedIcon: Icon(Icons.folder),
+          label: Text('Files'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.search),
+          label: Text('Search'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.source),
+          label: Text('Git'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.settings_outlined),
+          selectedIcon: Icon(Icons.settings),
+          label: Text('Settings'),
+        ),
+      ],
+    );
+  }
+
+  /// Resolve which navigation index is currently selected.
+  int _resolveIndex(
+      String activeTabId, SidePanelTab activePanel, bool sidePanelOpen) {
+    if (sidePanelOpen) {
+      switch (activePanel) {
+        case SidePanelTab.explorer:
+          return 2;
+        case SidePanelTab.search:
+          return 3;
+        case SidePanelTab.git:
+          return 4;
+        case SidePanelTab.agent:
+        case SidePanelTab.extensions:
+          break;
+      }
+    }
+    if (activeTabId == 'chat') return 0;
+    if (activeTabId == 'agent') return 1;
+    return -1;
+  }
+
+  void _onDestinationSelected(int index, WidgetRef ref, BuildContext context) {
+    switch (index) {
+      case 0:
+        _openChatTab(ref);
+        ref.read(sidePanelOpenProvider.notifier).state = false;
+      case 1:
+        _openAgentTab(ref);
+        ref.read(sidePanelOpenProvider.notifier).state = false;
+      case 2:
+        ref.read(activeSidePanelProvider.notifier).state = SidePanelTab.explorer;
+        ref.read(sidePanelOpenProvider.notifier).state = true;
+      case 3:
+        ref.read(activeSidePanelProvider.notifier).state = SidePanelTab.search;
+        ref.read(sidePanelOpenProvider.notifier).state = true;
+      case 4:
+        ref.read(activeSidePanelProvider.notifier).state = SidePanelTab.git;
+        ref.read(sidePanelOpenProvider.notifier).state = true;
+      case 5:
+        _showZenSettings(context, ref);
+    }
+  }
+
+  void _openChatTab(WidgetRef ref) {
+    final tabs = ref.read(openTabsProvider);
+    if (tabs.any((t) => t.id == 'chat')) {
+      ref.read(activeTabIdProvider.notifier).state = 'chat';
+      return;
+    }
+    ref.read(openTabsProvider.notifier).resetTo(
+      WorkspaceTab(
+        id: 'chat',
+        title: 'Chat',
+        icon: Icons.chat_bubble_outlined,
+        builder: (_) => const ChatTab(),
+        closable: false,
       ),
     );
   }
 
-  void _selectPanel(WidgetRef ref, SidePanelTab tab) {
-    ref.read(activeSidePanelProvider.notifier).state = tab;
-    ref.read(sidePanelOpenProvider.notifier).state = true;
+  void _openAgentTab(WidgetRef ref) {
+    final tabs = ref.read(openTabsProvider);
+    if (tabs.any((t) => t.id == 'agent')) {
+      ref.read(activeTabIdProvider.notifier).state = 'agent';
+      return;
+    }
+    ref.read(openTabsProvider.notifier).open(
+      WorkspaceTab(
+        id: 'agent',
+        title: 'Agent',
+        icon: Icons.smart_toy_outlined,
+        builder: (_) => const AgentTab(),
+        closable: false,
+      ),
+    );
   }
 
-  void _showSettingsDialog(BuildContext context, WidgetRef ref) {
+  void _showZenSettings(BuildContext context, WidgetRef ref) {
     final zen = ref.read(zenConfigProvider);
     final controller = TextEditingController(text: zen.apiKey);
 
@@ -144,58 +206,6 @@ class ActivityBar extends ConsumerWidget {
             child: const Text('Save'),
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// A single icon button in the activity bar.
-class _ActivityIcon extends StatelessWidget {
-  final IconData icon;
-  final bool isActive;
-  final String tooltip;
-  final ColorScheme colorScheme;
-  final double size;
-  final VoidCallback onTap;
-
-  const _ActivityIcon({
-    required this.icon,
-    required this.isActive,
-    required this.tooltip,
-    required this.colorScheme,
-    required this.size,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Tooltip(
-        message: tooltip,
-        child: GestureDetector(
-          onTap: onTap,
-          child: Container(
-            width: 48,
-            height: 32,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              border: Border(
-                left: BorderSide(
-                  color: isActive ? colorScheme.primary : Colors.transparent,
-                  width: 2,
-                ),
-              ),
-            ),
-            child: Icon(
-              icon,
-              size: size,
-              color: isActive
-                  ? colorScheme.onSurface
-                  : colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ),
       ),
     );
   }
