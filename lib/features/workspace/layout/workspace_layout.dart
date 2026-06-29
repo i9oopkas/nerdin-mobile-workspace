@@ -39,7 +39,7 @@ class _WorkspaceLayoutState extends ConsumerState<WorkspaceLayout> {
     final tabs = ref.read(openTabsProvider);
     if (tabs.isNotEmpty) return;
     ref.read(openTabsProvider.notifier).resetTo(
-      const WorkspaceTab(
+      WorkspaceTab(
         id: 'chat',
         title: 'Chat',
         icon: Icons.chat_bubble_outlined,
@@ -52,7 +52,7 @@ class _WorkspaceLayoutState extends ConsumerState<WorkspaceLayout> {
   void _openAgentTab() {
     ref.read(activeSidePanelProvider.notifier).state = SidePanelTab.agent;
     ref.read(openTabsProvider.notifier).open(
-      const WorkspaceTab(
+      WorkspaceTab(
         id: 'agent',
         title: 'Agent',
         icon: Icons.smart_toy_outlined,
