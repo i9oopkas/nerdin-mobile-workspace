@@ -11,6 +11,7 @@ import 'core/providers/app_providers.dart';
 import 'core/router/app_router.dart';
 import 'core/utils/system_ui_style.dart';
 import 'core/providers/app_startup_providers.dart';
+import 'core/providers/chat_seed_provider.dart';
 import 'features/agent/permissions/permission_providers.dart';
 import 'features/agent/permissions/permission_dialog_handler.dart';
 
@@ -93,6 +94,7 @@ class _NerdinAppState extends ConsumerState<NerdinApp> {
     debugPrint('app: init');
     ref.read(appStartupFlowProvider.notifier).start();
     ref.read(permissionInitProvider);
+    ref.read(chatTabSeedProvider);
   }
 
   @override
