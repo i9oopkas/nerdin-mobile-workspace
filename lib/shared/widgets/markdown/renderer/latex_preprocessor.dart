@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tex/flutter_tex.dart';
 
+import '../../../../core/utils/debug_logger.dart';
 import '../../jovial_svg_image.dart';
 import 'latex_rendering_server.dart';
 
@@ -137,6 +138,7 @@ class LatexPreprocessor {
       return key;
     });
 
+    DebugLogger.info('LaTeX preprocessor: ${_blockExpressions.length + _inlineExpressions.length} expressions', scope: 'markdown/latex');
     return result;
   }
 

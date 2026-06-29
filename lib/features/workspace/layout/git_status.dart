@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 
 class GitStatus extends StatefulWidget {
   const GitStatus({super.key});
@@ -96,6 +97,7 @@ class _GitStatusState extends State<GitStatus> {
         ));
       }
     }
+    DebugLogger.info('Git status: branch=$_branch ${_files.length} changed', scope: 'workspace/git');
   }
 
   Future<String> _getDiff(String filePath) async {
@@ -123,6 +125,7 @@ class _GitStatusState extends State<GitStatus> {
       return;
     }
 
+    DebugLogger.info('Git diff shown: $path', scope: 'workspace/git');
     setState(() {
       _expandedFile = path;
       _diffContent = '';
@@ -136,6 +139,7 @@ class _GitStatusState extends State<GitStatus> {
 
   Future<void> _commit() async {
     final message = _commitController.text.trim();
+    DebugLogger.info('Git commit: ${message.length} chars', scope: 'workspace/git');
     if (message.isEmpty) return;
 
     try {
@@ -294,7 +298,10 @@ class _GitStatusState extends State<GitStatus> {
       mainAxisSize: MainAxisSize.min,
       children: [
         InkWell(
-          onTap: () => _toggleFile(file.path),
+          onTap: () {
+            DebugLogger.info('Git staged/unstaged: ${file.path}', scope: 'workspace/git');
+            _toggleFile(file.path);
+          },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             child: SizedBox(

@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
+
 /// Where a tool should execute.
 enum ExecutionTarget {
   local('local'),
@@ -748,6 +750,7 @@ bool _globMatch(String path, String pattern) {
 /// tools fall back to local-only execution (and return error messages
 /// if a Termux target is requested).
 List<ToolDefinition> createBuiltinTools({ToolBackends? backends}) {
+  DebugLogger.info('Tool definitions loaded', scope: 'agent/tools');
   return [
     _createReadFileTool(backends),
     _createWriteFileTool(backends),

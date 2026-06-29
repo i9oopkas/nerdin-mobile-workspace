@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/features/workspace/layout/workspace_layout.dart';
 
 /// Single-route GoRouter — no auth, no server, no ShellRoute.
@@ -24,5 +25,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     },
   );
 
+  DebugLogger.navigation('GoRouter initialized: /chat route', scope: 'router/init');
   return router;
 });

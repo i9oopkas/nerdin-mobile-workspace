@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 
 /// A single message in the chat conversation.
 class ChatMessage {
@@ -32,6 +33,7 @@ class ChatMessagesNotifier extends Notifier<List<ChatMessage>> {
 
   /// Add a user message.
   void addUser(String content) {
+    DebugLogger.info('Chat user message: ${content.length} chars', scope: 'chat/provider');
     state = [
       ...state,
       ChatMessage(role: 'user', content: content),
@@ -40,6 +42,7 @@ class ChatMessagesNotifier extends Notifier<List<ChatMessage>> {
 
   /// Append an empty assistant message placeholder (streaming starts).
   void startAssistant() {
+    DebugLogger.stream('Chat assistant started', scope: 'chat/provider');
     state = [
       ...state,
       ChatMessage(role: 'assistant', content: '', isStreaming: true),
@@ -49,6 +52,7 @@ class ChatMessagesNotifier extends Notifier<List<ChatMessage>> {
   /// Append a text delta to the last assistant message.
   void appendToAssistant(String delta) {
     if (state.isEmpty) return;
+    DebugLogger.stream('Chat assistant delta: ${delta.length} chars', scope: 'chat/provider');
     final messages = [...state];
     final last = messages.last;
     if (last.role != 'assistant') return;
@@ -61,6 +65,7 @@ class ChatMessagesNotifier extends Notifier<List<ChatMessage>> {
   /// Mark the last assistant message as finished (streaming done).
   void finishAssistant() {
     if (state.isEmpty) return;
+    DebugLogger.stream('Chat assistant finished', scope: 'chat/provider');
     final messages = [...state];
     final last = messages.last;
     if (last.role != 'assistant') return;

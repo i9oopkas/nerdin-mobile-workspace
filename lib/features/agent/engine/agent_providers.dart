@@ -12,6 +12,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/features/agent/engine/agent_loop.dart';
 import 'package:nerdin_mobile_workspace/features/agent/engine/agent_session.dart';
 import 'package:nerdin_mobile_workspace/features/agent/engine/tool_registry.dart';
@@ -34,6 +35,7 @@ class AgentSessionNotifier extends Notifier<AgentSession> {
 
   @override
   AgentSession build() {
+    DebugLogger.info('Agent session provider initialized', scope: 'agent/provider');
     // Start with an empty idle session
     return AgentSession.create(task: '');
   }
@@ -43,6 +45,7 @@ class AgentSessionNotifier extends Notifier<AgentSession> {
   /// Creates a fresh session and immediately begins the ReAct loop.
   /// Returns a [Future] that completes when the session finishes.
   Future<void> startTask(String task) async {
+    DebugLogger.info('Task started: "${task.length > 50 ? '${task.substring(0, 50)}...' : task}"', scope: 'agent/session');
     // Reset to a new session
     state = AgentSession.create(task: task);
 
@@ -69,6 +72,7 @@ class AgentSessionNotifier extends Notifier<AgentSession> {
 
   /// Cancel the current running session.
   void cancel() {
+    DebugLogger.info('Task cancelled', scope: 'agent/session');
     _currentRunSubscription?.cancel();
     _currentRunSubscription = null;
     if (!state.isTerminal) {
@@ -81,6 +85,7 @@ class AgentSessionNotifier extends Notifier<AgentSession> {
 
   /// Reset the session to idle.
   void reset() {
+    DebugLogger.info('Session reset', scope: 'agent/session');
     _currentRunSubscription?.cancel();
     _currentRunSubscription = null;
     state = AgentSession.create(task: '');
@@ -102,6 +107,7 @@ final agentLoopProvider = Provider<AgentLoop Function({
   int maxIterations,
   String? model,
 })>((ref) {
+  DebugLogger.info('Agent loop provider created', scope: 'agent/provider');
   final llmClient = ref.read(llmClientProvider);
   final toolRegistry = ref.read(toolRegistryProvider);
   final permissionManager = ref.read(permissionManagerProvider);

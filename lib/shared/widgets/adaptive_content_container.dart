@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/utils/debug_logger.dart';
+
 /// A container that fills available space and shows a scrollbar
 /// when content overflows.
 ///
@@ -68,6 +70,7 @@ class AdaptiveContentContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    DebugLogger.info('AdaptiveContentContainer built', scope: 'widget/layout');
     return LayoutBuilder(
       builder: (context, constraints) {
         // Compute effective decoration

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import '../../core/utils/system_ui_style.dart';
 import 'theme_extensions.dart';
 import 'tweakcn_themes.dart';
@@ -11,6 +12,7 @@ import 'color_tokens.dart';
 
 class AppTheme {
   static ThemeData light(TweakcnThemeDefinition theme) {
+    DebugLogger.info('AppTheme: light theme built', scope: 'theme/build');
     final tokens = AppColorTokens.light(theme: theme);
     return _buildTheme(
       theme: theme,

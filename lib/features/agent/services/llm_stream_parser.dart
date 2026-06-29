@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/features/agent/services/llm_event.dart';
 
 /// Parses OpenAI-compatible SSE streams into [LlmEvent] events.
@@ -17,6 +18,7 @@ import 'package:nerdin_mobile_workspace/features/agent/services/llm_event.dart';
 class LlmStreamParser {
   /// Parse an SSE byte stream into [LlmEvent] events.
   Stream<LlmEvent> parse(Stream<List<int>> byteStream) {
+    DebugLogger.stream('Parsing stream', scope: 'llm/parse');
     return byteStream
         .transform(const Utf8Decoder())
         .transform(const LineSplitter())
@@ -64,6 +66,7 @@ class LlmStreamParser {
 
       events.add(MessageFinished(finishReason));
     } catch (e) {
+      DebugLogger.error('Parse error', error: e, scope: 'llm/parse');
       events.add(LlmErrorEvent(e));
     }
 
@@ -136,6 +139,10 @@ class LlmStreamParser {
           arguments: function?['arguments'] as String? ?? '',
         ));
       }
+    }
+
+    for (final event in events) {
+      DebugLogger.stream('LLM event: ${event.runtimeType}', scope: 'llm/event');
     }
 
     return events;

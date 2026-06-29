@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/services/performance_profiler.dart';
+import '../../../../core/utils/debug_logger.dart';
 import '../../../../core/models/chat_message.dart';
 import '../compiled_markdown_document.dart';
 import '../markdown_compile_service.dart';
@@ -136,6 +137,7 @@ class _NerdinMarkdownWidgetState extends ConsumerState<NerdinMarkdownWidget> {
   @override
   void initState() {
     super.initState();
+    DebugLogger.info('NerdinMarkdownWidget mounted', scope: 'markdown/widget');
     _documentController = MarkdownDocumentController(
       readCompiler: () => ref.read(markdownCompileServiceProvider),
       isWidgetTest: () => _isWidgetTest,
@@ -184,6 +186,7 @@ class _NerdinMarkdownWidgetState extends ConsumerState<NerdinMarkdownWidget> {
 
   @override
   void dispose() {
+    DebugLogger.info('NerdinMarkdownWidget disposed', scope: 'markdown/widget');
     _documentController.dispose();
     super.dispose();
   }

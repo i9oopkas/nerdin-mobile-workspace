@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nerdin_mobile_workspace/core/database/daos/permission_rules_dao.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/core/database/database_provider.dart';
 import 'package:nerdin_mobile_workspace/features/agent/permissions/permission_manager.dart';
 import 'package:nerdin_mobile_workspace/features/agent/permissions/permission_rules.dart';
@@ -30,6 +31,7 @@ final permissionInitProvider = FutureProvider<void>((ref) async {
 class PendingPermissionNotifier extends Notifier<List<PermissionRequest>> {
   @override
   List<PermissionRequest> build() {
+    DebugLogger.auth('Pending permission created', scope: 'permission/provider');
     final manager = ref.watch(permissionManagerProvider);
 
     // Listen for new pending requests
@@ -53,6 +55,7 @@ class PendingPermissionNotifier extends Notifier<List<PermissionRequest>> {
 
   /// Reply to a pending request with once/always/alwaysSession/reject/edit.
   void reply(String requestId, PermissionReply reply, {String? editedInput}) {
+    DebugLogger.auth('Permission resolved: $reply', scope: 'permission/provider');
     final manager = ref.read(permissionManagerProvider);
     final handled = manager.reply(requestId, reply, editedInput: editedInput);
 

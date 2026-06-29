@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 
 /// A tab in the main area's tab bar.
 ///
@@ -40,15 +41,18 @@ class OpenTabsNotifier extends Notifier<List<WorkspaceTab>> {
     final existingIndex = state.indexWhere((t) => t.id == tab.id);
     if (existingIndex >= 0) {
       // Tab already open — just switch to it
+      DebugLogger.navigation('Tab activated: ${tab.id}', scope: 'workspace/tab');
       ref.read(activeTabIdProvider.notifier).state = tab.id;
       return;
     }
+    DebugLogger.storage('Tab opened: ${tab.title} (${tab.id})', scope: 'workspace/tab');
     state = [...state, tab];
     ref.read(activeTabIdProvider.notifier).state = tab.id;
   }
 
   /// Close a tab by [id].
   void close(String id) {
+    DebugLogger.storage('Tab closed: $id', scope: 'workspace/tab');
     final index = state.indexWhere((t) => t.id == id);
     if (index == -1) return;
 

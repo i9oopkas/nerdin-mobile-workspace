@@ -1,5 +1,6 @@
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 
 import 'theme_extensions.dart';
 
@@ -20,11 +21,14 @@ class NerdinButtonStyles {
   final NerdinThemeExtension theme;
 
   /// Filled button with the theme primary color.
-  ButtonVariantStyle primary() => (
-    background: theme.buttonPrimary,
-    foreground: theme.buttonPrimaryText,
-    adaptiveStyle: AdaptiveButtonStyle.filled,
-  );
+  ButtonVariantStyle primary() {
+    DebugLogger.info('NerdinButtonStyles: primary style accessed', scope: 'theme/buttons');
+    return (
+      background: theme.buttonPrimary,
+      foreground: theme.buttonPrimaryText,
+      adaptiveStyle: AdaptiveButtonStyle.filled,
+    );
+  }
 
   /// Bordered button with secondary colors.
   ButtonVariantStyle secondary() => (

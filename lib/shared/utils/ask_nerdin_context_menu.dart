@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 
 import '../../features/chat/providers/chat_providers.dart';
 
@@ -27,6 +28,7 @@ List<ContextMenuButtonItem> withAskNerdinContextMenuItem({
   required String? composerTargetId,
   required VoidCallback hideToolbar,
 }) {
+  DebugLogger.info('ask_nerdin_context_menu: accessed', scope: 'utils/general');
   final text = selectedText;
   if (!_canShowAskNerdinSelectionAction ||
       composerTargetId == null ||

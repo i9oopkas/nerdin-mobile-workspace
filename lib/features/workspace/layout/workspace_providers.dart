@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 
 /// Which panel is shown in the side panel.
 enum SidePanelTab { explorer, search, git, agent, extensions }
@@ -20,6 +21,11 @@ final activeSidePanelProvider =
 class SidePanelOpenNotifier extends Notifier<bool> {
   @override
   bool build() => false;
+
+  void toggle() {
+    state = !state;
+    DebugLogger.info('Side panel: ${state ? "opened" : "closed"}', scope: 'workspace/panel');
+  }
 }
 
 final sidePanelOpenProvider =

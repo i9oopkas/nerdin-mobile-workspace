@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/features/agent/engine/agent_providers.dart';
 import 'package:nerdin_mobile_workspace/features/agent/engine/tool_definitions.dart';
 import 'package:nerdin_mobile_workspace/features/agent/engine/tool_registry.dart';
@@ -14,6 +15,7 @@ import 'package:nerdin_mobile_workspace/features/agent/termux/termux_providers.d
 /// like `read_file`, `write_file`, and `run_command` can execute on the
 /// termux target.
 void registerTermuxTools(Ref ref) {
+  DebugLogger.info('Termux tools registered', scope: 'termux/integration');
   final registry = ref.read(toolRegistryProvider);
   final commandService = ref.read(termuxCommandServiceProvider);
   final fileService = ref.read(termuxFileServiceProvider);

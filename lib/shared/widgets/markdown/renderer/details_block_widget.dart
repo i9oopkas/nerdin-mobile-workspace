@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 
 import '../../../../core/utils/reasoning_parser.dart';
 import '../../assistant_detail_header.dart';
@@ -115,6 +116,7 @@ class _MarkdownDetailsBlockState extends State<MarkdownDetailsBlock> {
 
   @override
   Widget build(BuildContext context) {
+    DebugLogger.info('Details block rendered', scope: 'markdown/details');
     final title = _headerTitle(context);
     final showInlineChevron = _usesInlineExpansion && _canExpand;
     final inlineBody = showInlineChevron && _isInlineExpanded

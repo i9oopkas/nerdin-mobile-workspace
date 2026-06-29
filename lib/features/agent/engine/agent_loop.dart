@@ -18,6 +18,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/features/agent/engine/agent_session.dart';
 import 'package:nerdin_mobile_workspace/features/agent/engine/tool_registry.dart';
 import 'package:nerdin_mobile_workspace/features/agent/permissions/permission_manager.dart';
@@ -103,6 +104,7 @@ When a task is complete, summarize what you did.
 
     while (iteration < maxIterations) {
       iteration++;
+      DebugLogger.info('Agent loop iteration $iteration started', scope: 'agent/loop');
       yield AgentEvent.statusChange(AgentStatus.streaming);
 
       // --- Step 1: Send to LLM and stream response ---
@@ -146,7 +148,8 @@ When a task is complete, summarize what you did.
               return;
           }
         }
-      } on Exception catch (e) {
+      } on Exception catch (e, stackTrace) {
+        DebugLogger.error('Agent loop error', error: e, stackTrace: stackTrace, scope: 'agent/loop');
         yield AgentEvent.error('Stream error: $e');
         yield AgentEvent.statusChange(AgentStatus.error);
         return;
@@ -172,6 +175,7 @@ When a task is complete, summarize what you did.
 
       // --- Step 3: Handle finish reason ---
       if (_lastFinishReason == 'stop' || accumulatedToolCalls.isEmpty) {
+        DebugLogger.info('Agent loop finished (stop)', scope: 'agent/loop');
         // Task complete — LLM decided not to use tools
         yield AgentEvent.finished(accumulatedContent);
         yield AgentEvent.statusChange(AgentStatus.finished);
@@ -212,6 +216,8 @@ When a task is complete, summarize what you did.
         }
 
         yield AgentEvent.toolCall(tc.functionName, parsedArgs);
+
+        DebugLogger.info('Executing tool: ${tc.functionName}', scope: 'agent/loop', data: {'tool': tc.functionName, 'args': tc.arguments});
 
         // Execute the tool (ToolRegistry handles permission checks internally)
         final result = await _toolRegistry.execute(

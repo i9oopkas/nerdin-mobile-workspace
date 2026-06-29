@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 
 enum _FileFilter { all, dart, kotlin, python, go, rust, tsjs, web, config, shell }
 
@@ -114,6 +115,7 @@ class _FileSearchState extends State<FileSearch> {
   }
 
   Future<void> _runSearch(String query) async {
+    DebugLogger.info('Search: "$query" filter=${_selectedFilter.name}', scope: 'workspace/search');
     setState(() {
       _isSearching = true;
       _showDebounceIndicator = false;
@@ -129,6 +131,7 @@ class _FileSearchState extends State<FileSearch> {
           _fileCount = results.map((r) => r.path).toSet().length;
         });
       }
+      DebugLogger.info('Search found ${results.length} results', scope: 'workspace/search');
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -301,11 +304,12 @@ class _FileSearchState extends State<FileSearch> {
 
     return Padding(
       padding: const EdgeInsets.only(right: 4),
-      child: GestureDetector(
-        onTap: () {
-          setState(() => _selectedFilter = filter);
-          _triggerSearch();
-        },
+        child: GestureDetector(
+          onTap: () {
+            DebugLogger.info('Search filter: ${filter.name}', scope: 'workspace/search');
+            setState(() => _selectedFilter = filter);
+            _triggerSearch();
+          },
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(

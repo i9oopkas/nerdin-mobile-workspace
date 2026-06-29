@@ -1,3 +1,5 @@
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
+
 // Unified event types for LLM streaming responses.
 //
 // All LLM providers (OpenAI, OpenRouter, Ollama, LM Studio, etc.) produce
@@ -8,7 +10,12 @@
 // for OpenAI-compatible APIs and agent-focused use cases (tool_calls).
 
 /// Base sealed class for all LLM stream events.
-sealed class LlmEvent {}
+sealed class LlmEvent {
+  static final _loaded = () {
+    DebugLogger.info('LlmEvent types loaded', scope: 'llm/event');
+    return true;
+  }();
+}
 
 /// A text delta chunk from streaming content.
 ///

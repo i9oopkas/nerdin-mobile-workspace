@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'tweakcn_themes.dart';
 import 'color_tokens.dart';
 
@@ -25,6 +26,8 @@ class NerdinThemeExtension extends ThemeExtension<NerdinThemeExtension> {
     required ShadowThemeExtension shadows,
     required ShapeThemeExtension shapes,
   }) {
+    final isDark = brightness == Brightness.dark;
+    DebugLogger.info('NerdinThemeExtension created (isDark=$isDark)', scope: 'theme/extension');
     return NerdinThemeExtension._(
       tokens: tokens,
       variant: theme.variantFor(brightness),

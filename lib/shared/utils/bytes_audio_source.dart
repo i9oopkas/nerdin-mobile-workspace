@@ -2,6 +2,7 @@
 import 'dart:typed_data';
 
 import 'package:just_audio/just_audio.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 
 /// A [StreamAudioSource] that plays audio from raw bytes in memory.
 ///
@@ -32,6 +33,7 @@ class BytesAudioSource extends StreamAudioSource {
 
   @override
   Future<StreamAudioResponse> request([int? start, int? end]) async {
+    DebugLogger.info('bytes_audio_source: accessed', scope: 'utils/general');
     start ??= 0;
     end ??= _bytes.length;
 

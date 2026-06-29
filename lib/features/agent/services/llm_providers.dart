@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/features/agent/services/llm_client.dart';
 import 'package:nerdin_mobile_workspace/features/agent/services/llm_event.dart';
 
@@ -36,7 +37,10 @@ class ZenConfig {
 /// Zen with the free `big-pickle` model.
 class ZenConfigNotifier extends Notifier<ZenConfig> {
   @override
-  ZenConfig build() => ZenConfig();
+  ZenConfig build() {
+    DebugLogger.info('Zen config: model=${ZenConfig().defaultModel}, 200K context', scope: 'llm/config');
+    return ZenConfig();
+  }
 
   void updateBaseUrl(String url) {
     state = ZenConfig(baseUrl: url, apiKey: state.apiKey, defaultModel: state.defaultModel);
@@ -78,6 +82,7 @@ class SelectedModelNotifier extends Notifier<String> {
   @override
   String build() {
     final zen = ref.watch(zenConfigProvider);
+    DebugLogger.info('Model selected: ${zen.defaultModel}', scope: 'llm/model');
     return zen.defaultModel;
   }
 

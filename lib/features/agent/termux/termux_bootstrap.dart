@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/features/agent/termux/termux_daemon_client.dart';
 
 /// Status of the Termux daemon bootstrap process.
@@ -70,9 +71,11 @@ class TermuxBootstrap {
   ///
   /// Returns a [BootstrapResult] indicating the final status.
   Future<BootstrapResult> bootstrap() async {
+    DebugLogger.info('Bootstrap: checking daemon', scope: 'termux/bootstrap');
     // Step 1: Check if Termux is installed
     final termuxInstalled = await isTermuxInstalled();
     if (!termuxInstalled) {
+      DebugLogger.info('Bootstrap status: ${DaemonBootstrapStatus.termuxNotInstalled}', scope: 'termux/bootstrap');
       return BootstrapResult(
         status: DaemonBootstrapStatus.termuxNotInstalled,
         message: 'Termux is not installed. Install it from F-Droid: '
@@ -83,6 +86,7 @@ class TermuxBootstrap {
     // Step 2: Check if daemon is already running
     final running = await isDaemonRunning();
     if (running) {
+      DebugLogger.info('Bootstrap status: ${DaemonBootstrapStatus.alreadyRunning}', scope: 'termux/bootstrap');
       return BootstrapResult(
         status: DaemonBootstrapStatus.alreadyRunning,
         message: 'Termux daemon is already running.',
@@ -107,6 +111,7 @@ class TermuxBootstrap {
         final stderr = result['stderr'] as String? ?? '';
 
         if (exitCode != 0) {
+          DebugLogger.error('Bootstrap failed', error: 'Daemon installation failed (exit $exitCode)', scope: 'termux/bootstrap');
           return BootstrapResult(
             status: DaemonBootstrapStatus.failed,
             message: 'Daemon installation failed (exit $exitCode):\n'
@@ -115,6 +120,7 @@ class TermuxBootstrap {
         }
       }
     } catch (e) {
+      DebugLogger.error('Bootstrap failed', error: e, scope: 'termux/bootstrap');
       return BootstrapResult(
         status: DaemonBootstrapStatus.failed,
         message: 'Failed to send RUN_COMMAND: $e',
@@ -126,6 +132,7 @@ class TermuxBootstrap {
       await Future.delayed(const Duration(seconds: 1));
       final ready = await isDaemonRunning();
       if (ready) {
+        DebugLogger.info('Bootstrap complete: daemon ready', scope: 'termux/bootstrap');
         return BootstrapResult(
           status: DaemonBootstrapStatus.ready,
           message: 'Termux daemon started successfully.',
@@ -133,6 +140,7 @@ class TermuxBootstrap {
       }
     }
 
+    DebugLogger.error('Bootstrap failed', error: 'Daemon did not become ready within 15 seconds', scope: 'termux/bootstrap');
     return BootstrapResult(
       status: DaemonBootstrapStatus.failed,
       message: 'Daemon did not become ready within 15 seconds.',

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/shared/widgets/adaptive_content_container.dart';
 import 'package:nerdin_mobile_workspace/shared/widgets/log_viewer.dart';
 
@@ -55,6 +56,7 @@ class ErrorScreen extends StatelessWidget {
 
     buf.writeln('');
     buf.writeln('===== End of report =====');
+    DebugLogger.info('ErrorScreen: crash report generated (${buf.length} chars)', scope: 'error/screen');
     return buf.toString();
   }
 
@@ -327,7 +329,10 @@ class ErrorScreen extends StatelessWidget {
                   width: double.infinity,
                   height: 48,
                   child: ElevatedButton.icon(
-                    onPressed: onRestart,
+                    onPressed: () {
+                      DebugLogger.info('ErrorScreen: restart triggered', scope: 'error/screen');
+                      onRestart?.call();
+                    },
                     icon: const Icon(Icons.refresh),
                     label: const Text('Restart Nerdin'),
                     style: ElevatedButton.styleFrom(

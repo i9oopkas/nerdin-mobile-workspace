@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/features/agent/services/llm_client.dart';
 import 'package:nerdin_mobile_workspace/features/agent/services/llm_event.dart';
 import 'package:nerdin_mobile_workspace/features/agent/services/llm_providers.dart';
@@ -26,6 +27,7 @@ class _ChatTabState extends ConsumerState<ChatTab> {
   @override
   void initState() {
     super.initState();
+    DebugLogger.info('ChatTab mounted', scope: 'chat/tab');
     // Register send handler after build phase is complete
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -35,6 +37,7 @@ class _ChatTabState extends ConsumerState<ChatTab> {
 
   @override
   void dispose() {
+    DebugLogger.info('ChatTab disposed', scope: 'chat/tab');
     _streamSub?.cancel();
     _scrollController.dispose();
     // NOTE: Don't null sendMessageHandlerProvider here — Riverpod 3.x forbids
@@ -47,6 +50,7 @@ class _ChatTabState extends ConsumerState<ChatTab> {
   /// The main send function: sends user message, streams assistant reply.
   Future<void> _handleSend(String text) async {
     if (!mounted) return;
+    DebugLogger.info('Chat send: "${text.length > 50 ? "${text.substring(0, 50)}..." : text}"', scope: 'chat/send', data: {'length': text.length});
     final notifier = ref.read(chatMessagesProvider.notifier);
     final client = ref.read(llmClientProvider);
     final model = ref.read(selectedModelProvider);
@@ -75,12 +79,15 @@ class _ChatTabState extends ConsumerState<ChatTab> {
       (event) {
         switch (event) {
           case TextDelta(:final text):
+            DebugLogger.stream('Chat text delta: ${text.length} chars', scope: 'chat/stream');
             notifier.appendToAssistant(text);
             _scrollToBottom();
           case MessageFinished():
+            DebugLogger.stream('Chat message finished', scope: 'chat/stream');
             notifier.finishAssistant();
             _scrollToBottom();
           case LlmErrorEvent(:final error):
+            DebugLogger.error('Chat stream error', error: error, scope: 'chat/stream');
             notifier.appendToAssistant(
               '\n\n⚠️ **Error:** $error',
             );

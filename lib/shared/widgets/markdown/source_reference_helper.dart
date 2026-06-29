@@ -1,4 +1,5 @@
 import '../../../core/models/chat_message.dart';
+import '../../../core/utils/debug_logger.dart';
 
 /// Shared helpers for deriving display labels and URLs from source references.
 ///
@@ -19,7 +20,7 @@ class SourceReferenceHelper {
     final metadata = primaryMetadata(source);
     final nestedSource = nestedSourceMetadata(source);
 
-    return _firstNonEmpty([
+    final label = _firstNonEmpty([
           metadata?['name'],
           metadata?['title'],
           source.title,
@@ -29,6 +30,8 @@ class SourceReferenceHelper {
           source.url,
         ]) ??
         'Source ${index + 1}';
+    DebugLogger.info('Source label: $label', scope: 'markdown/source');
+    return label;
   }
 
   /// Returns the compact label used by inline citation chips.

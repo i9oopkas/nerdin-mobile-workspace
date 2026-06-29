@@ -1,4 +1,5 @@
 import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:flutter/material.dart';
 
 /// Represents a single tweakcn theme variant (light or dark) and exposes the
@@ -98,6 +99,7 @@ class TweakcnThemeDefinition {
   final List<Color> preview;
 
   TweakcnThemeVariant variantFor(Brightness brightness) {
+    DebugLogger.info('TweakcnTheme: ${id} loaded', scope: 'theme/tweakcn');
     return brightness == Brightness.dark ? dark : light;
   }
 

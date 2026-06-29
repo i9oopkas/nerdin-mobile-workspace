@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 
 import 'tweakcn_themes.dart';
 
@@ -97,6 +98,7 @@ class AppColorTokens extends ThemeExtension<AppColorTokens> {
   final Color codeAccent;
 
   factory AppColorTokens.light({TweakcnThemeDefinition? theme}) {
+    DebugLogger.info('AppColorTokens: light tokens built', scope: 'theme/tokens');
     return AppColorTokens._fromTheme(
       theme ?? TweakcnThemes.conduit,
       Brightness.light,

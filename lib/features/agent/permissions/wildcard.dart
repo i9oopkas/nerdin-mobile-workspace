@@ -1,3 +1,5 @@
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
+
 /// Wildcard pattern matching for permission rules.
 ///
 /// Matches input strings against patterns containing:
@@ -27,7 +29,10 @@ class Wildcard {
   /// Wildcard.match('anything', '*');              // true
   /// ```
   static bool match(String input, String pattern) {
-    if (pattern == '*') return true;
+    if (pattern == '*') {
+      DebugLogger.info('Wildcard match: "$pattern" vs "$input" → true', scope: 'permission/wildcard');
+      return true;
+    }
 
     // Escape all regex special characters except * and ?
     final escaped = StringBuffer();
@@ -46,7 +51,9 @@ class Wildcard {
 
     try {
       final regex = RegExp('^${escaped.toString()}\$');
-      return regex.hasMatch(input);
+      final result = regex.hasMatch(input);
+      DebugLogger.info('Wildcard match: "$pattern" vs "$input" → $result', scope: 'permission/wildcard');
+      return result;
     } catch (e) {
       // If the pattern somehow produces an invalid regex, fall back to exact match
       return input == pattern;

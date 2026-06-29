@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/features/agent/engine/tool_definitions.dart';
 import 'package:nerdin_mobile_workspace/features/agent/termux/termux_daemon_client.dart';
 
@@ -46,6 +47,7 @@ class TermuxCommandService implements TermuxCommandBackend {
     Map<String, String>? env,
     int? timeout,
   }) {
+    DebugLogger.info('Executing command: ${cmd.length > 80 ? "${cmd.substring(0, 80)}..." : cmd}', scope: 'termux/command');
     return _client.exec(
       cmd: cmd,
       workdir: workdir,
@@ -54,6 +56,13 @@ class TermuxCommandService implements TermuxCommandBackend {
     ).map((chunk) {
       if (chunk.type == 'error') {
         throw DaemonException(chunk.data, 'EXEC_ERROR');
+      }
+      if (chunk.type == 'stdout') {
+        DebugLogger.stream('Command stdout: ${chunk.data.length} bytes', scope: 'termux/command');
+      } else if (chunk.type == 'stderr') {
+        DebugLogger.stream('Command stderr: ${chunk.data.length} bytes', scope: 'termux/command');
+      } else if (chunk.type == 'exit') {
+        DebugLogger.info('Command exit: ${chunk.exitCode}', scope: 'termux/command', data: {'exitCode': chunk.exitCode});
       }
       return CommandChunk(
         type: chunk.type,

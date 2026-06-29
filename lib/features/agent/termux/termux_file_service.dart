@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/features/agent/engine/tool_definitions.dart';
 import 'package:nerdin_mobile_workspace/features/agent/termux/termux_daemon_client.dart';
 
@@ -48,6 +49,7 @@ class TermuxFileService implements TermuxFileBackend {
     final completer = Completer<TermuxReadResult>();
     StreamSubscription<DaemonResponse>? sub;
 
+    DebugLogger.info('File read: $path', scope: 'termux/file');
     sub = _client.send(type: 'read_file', id: requestId, path: path, maxBytes: maxBytes).listen(
       (response) {
         if (response.id != requestId) return;
@@ -86,6 +88,7 @@ class TermuxFileService implements TermuxFileBackend {
     final completer = Completer<void>();
     StreamSubscription<DaemonResponse>? sub;
 
+    DebugLogger.info('File write: $path', scope: 'termux/file');
     sub = _client.send(
       type: 'write_file',
       id: requestId,
@@ -177,6 +180,7 @@ class TermuxFileService implements TermuxFileBackend {
         if (response.id != requestId) return;
         if (response is DirListResponse) {
           completer.complete(response.entries);
+          DebugLogger.info('Dir list: $path → ${response.entries.length} items', scope: 'termux/file');
         } else if (response is ErrorResponse) {
           completer.completeError(
             DaemonException(response.message, response.code),

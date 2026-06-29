@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'daos/permission_rules_dao.dart';
@@ -46,6 +47,7 @@ class AppDatabase extends _$AppDatabase {
           }
         },
         beforeOpen: (details) async {
+          DebugLogger.info('AppDatabase initialized', scope: 'database/init');
           await customStatement('PRAGMA foreign_keys = ON');
         },
       );

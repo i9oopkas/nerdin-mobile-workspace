@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import '../../shared/theme/app_theme.dart';
 import '../../shared/theme/tweakcn_themes.dart';
 
@@ -8,9 +9,15 @@ import '../../shared/theme/tweakcn_themes.dart';
 
 class AppThemeModeNotifier extends Notifier<ThemeMode> {
   @override
-  ThemeMode build() => ThemeMode.system;
+  ThemeMode build() {
+    DebugLogger.info('AppThemeModeNotifier initialized', scope: 'theme/notifier');
+    return ThemeMode.system;
+  }
 
-  void setTheme(ThemeMode mode) => state = mode;
+  void setTheme(ThemeMode mode) {
+    DebugLogger.info('Theme toggled', scope: 'theme/toggle', data: {'mode': '$mode'});
+    state = mode;
+  }
 }
 
 final appThemeModeProvider =

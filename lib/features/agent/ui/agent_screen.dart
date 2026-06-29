@@ -5,6 +5,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/features/agent/engine/agent_providers.dart';
 import 'package:nerdin_mobile_workspace/features/agent/engine/agent_session.dart';
 
@@ -20,6 +21,12 @@ class _AgentScreenState extends ConsumerState<AgentScreen> {
   final TextEditingController _inputController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   bool _autoScroll = true;
+
+  @override
+  void initState() {
+    super.initState();
+    DebugLogger.info('AgentScreen mounted', scope: 'agent/ui');
+  }
 
   @override
   void dispose() {
@@ -45,11 +52,13 @@ class _AgentScreenState extends ConsumerState<AgentScreen> {
     final text = _inputController.text.trim();
     if (text.isEmpty) return;
     _inputController.clear();
+    DebugLogger.info('Agent send: ${text.length} chars', scope: 'agent/ui');
     ref.read(agentSessionProvider.notifier).startTask(text);
     _scrollToBottom();
   }
 
   void _handleCancel() {
+    DebugLogger.info('Agent cancelled', scope: 'agent/ui');
     ref.read(agentSessionProvider.notifier).cancel();
   }
 

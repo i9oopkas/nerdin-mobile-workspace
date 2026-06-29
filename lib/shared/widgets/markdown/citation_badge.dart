@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/models/chat_message.dart';
+import '../../../core/utils/debug_logger.dart';
 import '../../theme/theme_extensions.dart';
 import '../../utils/external_link_launcher.dart';
 import 'source_reference_helper.dart';
@@ -78,6 +79,7 @@ class CitationBadge extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
+          DebugLogger.info('Citation badge tapped: $displayTitle', scope: 'markdown/citation');
           if (onTap != null) {
             onTap!();
           } else if (url != null) {

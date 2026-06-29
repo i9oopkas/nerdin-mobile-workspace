@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:flutter_highlight/themes/github.dart';
 import 'package:flutter_highlight/themes/dracula.dart';
 import 'package:highlight/languages/all.dart'; // registers all languages
@@ -47,6 +48,7 @@ class _CodeEditorTabState extends State<CodeEditorTab> {
   }
 
   void _loadFile() {
+    DebugLogger.info('Code editor opened: ${widget.filePath}', scope: 'workspace/editor');
     try {
       final file = File(widget.filePath);
       if (!file.existsSync()) {

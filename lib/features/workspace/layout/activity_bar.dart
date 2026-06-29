@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/features/agent/services/llm_providers.dart';
 import 'package:nerdin_mobile_workspace/features/agent/ui/agent_tab.dart';
 import 'package:nerdin_mobile_workspace/features/chat/chat_tab.dart';
@@ -25,6 +26,8 @@ class ActivityBar extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     final selectedIndex = _resolveIndex(activeTabId, activePanel, sidePanelOpen);
+
+    DebugLogger.info('ActivityBar built', scope: 'workspace/activity');
 
     return NavigationRail(
       selectedIndex: selectedIndex,
@@ -98,6 +101,8 @@ class ActivityBar extends ConsumerWidget {
   }
 
   void _onDestinationSelected(int index, WidgetRef ref, BuildContext context) {
+    final labels = ['Chat', 'Agent', 'Files', 'Search', 'Git', 'Settings'];
+    DebugLogger.navigation('Tab selected', scope: 'workspace/nav', data: {'tab': labels[index]});
     switch (index) {
       case 0:
         _openChatTab(ref);

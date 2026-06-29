@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/features/agent/services/llm_event.dart';
 import 'package:nerdin_mobile_workspace/features/agent/services/llm_providers.dart';
 import 'package:nerdin_mobile_workspace/features/workspace/layout/bottom_bar_providers.dart';
@@ -21,6 +22,12 @@ class _BottomBarState extends ConsumerState<BottomBar> {
   bool _isSending = false;
 
   @override
+  void initState() {
+    super.initState();
+    DebugLogger.info('BottomBar mounted', scope: 'workspace/bottom');
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
     super.dispose();
@@ -28,6 +35,7 @@ class _BottomBarState extends ConsumerState<BottomBar> {
 
   Future<void> _handleSend() async {
     final text = _controller.text.trim();
+    DebugLogger.info('Send triggered: ${text.length} chars', scope: 'workspace/send');
     if (text.isEmpty || _isSending) return;
 
     final handler = ref.read(sendMessageHandlerProvider);
@@ -161,8 +169,10 @@ class _ModelDropdown extends ConsumerWidget {
 
     return PopupMenuButton<String>(
       tooltip: 'Select model',
-      onSelected: (id) =>
-          ref.read(selectedModelProvider.notifier).select(id),
+      onSelected: (id) {
+        DebugLogger.info('Model selected', scope: 'workspace/model', data: {'model': '$id'});
+        ref.read(selectedModelProvider.notifier).select(id);
+      },
       itemBuilder: (context) {
         if (modelIds.isEmpty) {
           return [

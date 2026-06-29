@@ -4,6 +4,8 @@ import 'dart:isolate';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+
+import '../../../core/utils/debug_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:markdown/markdown.dart' as md;
@@ -122,7 +124,10 @@ class MarkdownCompileService {
 
   CompiledMarkdownDocument compilePreparedSynchronously(
     String preparedContent,
-  ) => compilePreparedMarkdownSync(preparedContent);
+  ) {
+    DebugLogger.info('Markdown compiled: ${preparedContent.length} chars', scope: 'markdown/compile');
+    return compilePreparedMarkdownSync(preparedContent);
+  }
 
   Future<String> prepareContent(
     String content, {
@@ -133,6 +138,8 @@ class MarkdownCompileService {
     if (content.isEmpty) {
       return '';
     }
+
+    DebugLogger.info('Markdown prepared: ${content.length} chars', scope: 'markdown/compile');
 
     if (allowSynchronous &&
         shouldPrepareSynchronously(content, widgetTest: widgetTest)) {
@@ -388,6 +395,7 @@ class MarkdownCompileService {
   }
 
   void dispose() {
+    DebugLogger.info('MarkdownCompileService disposed', scope: 'markdown/compile');
     _disposed = true;
     _inFlight.clear();
     _backend.dispose();

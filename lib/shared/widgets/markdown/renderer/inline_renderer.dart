@@ -1,8 +1,9 @@
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
-import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 
 import '../../../../core/models/chat_message.dart';
 import '../../../../core/utils/citation_parser.dart';
@@ -165,6 +166,7 @@ class InlineRenderer {
     List<CompiledMarkdownNode> nodes, {
     TextStyle? parentStyle,
   }) {
+    DebugLogger.info('InlineRenderer: rendering inline content', scope: 'markdown/render');
     // Non-fadable call sites (tables, headings, cells) only need the base tree.
     // Skip range recording entirely; the [_visibleTextOffset] cursor still
     // advances as before so cross-block coordinates stay aligned.

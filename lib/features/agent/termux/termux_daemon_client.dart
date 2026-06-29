@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 
 /// Possible response types from the daemon.
 sealed class DaemonResponse {
@@ -162,9 +163,11 @@ class TermuxDaemonClient {
     _responseController = StreamController<DaemonResponse>.broadcast();
     _connectCompleter = Completer<void>();
 
+    DebugLogger.info('Daemon client connecting', scope: 'termux/daemon');
     Socket.connect(host, port).then((socket) {
       _socket = socket;
       _connected = true;
+      DebugLogger.info('Daemon client connected', scope: 'termux/daemon');
       _connectCompleter?.complete();
 
       socket
@@ -178,6 +181,7 @@ class TermuxDaemonClient {
             final response = _parseResponse(json);
             if (response != null) {
               _responseController?.add(response);
+              DebugLogger.stream('Daemon recv: ${response.runtimeType}', scope: 'termux/daemon');
             }
           } catch (e) {
             // Skip malformed lines
@@ -185,6 +189,7 @@ class TermuxDaemonClient {
         },
         onError: (error) {
           _connected = false;
+          DebugLogger.error('Daemon error', error: error, scope: 'termux/daemon');
           _responseController?.addError(error);
         },
         onDone: () {
@@ -194,6 +199,7 @@ class TermuxDaemonClient {
       );
     }).catchError((error) {
       _connected = false;
+      DebugLogger.error('Daemon error', error: error, scope: 'termux/daemon');
       _connectCompleter?.completeError(error);
       _responseController?.addError(error);
     });
@@ -208,6 +214,7 @@ class TermuxDaemonClient {
     }
     final line = jsonEncode(request) + '\n';
     _socket!.write(line);
+    DebugLogger.stream('Daemon send: ${jsonEncode(request).length} bytes', scope: 'termux/daemon');
   }
 
   /// Send a typed request and return the response stream.
@@ -313,6 +320,7 @@ class TermuxDaemonClient {
 
   /// Close the connection.
   Future<void> disconnect() async {
+    DebugLogger.info('Daemon client disconnected', scope: 'termux/daemon');
     _connected = false;
     await _socket?.close();
     await _responseController?.close();

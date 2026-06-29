@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 
 PageRoute<T> buildPlatformPageRoute<T>({
   required WidgetBuilder builder,
@@ -8,6 +9,7 @@ PageRoute<T> buildPlatformPageRoute<T>({
   bool fullscreenDialog = false,
   bool opaque = true,
 }) {
+  DebugLogger.info('platform_page_route: accessed', scope: 'utils/general');
   switch (defaultTargetPlatform) {
     case TargetPlatform.iOS:
     case TargetPlatform.macOS:

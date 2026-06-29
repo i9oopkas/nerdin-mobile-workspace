@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:path_provider/path_provider.dart';
 
 /// A simple file tree widget for the side panel's Explorer tab.
@@ -36,6 +37,7 @@ class _FileExplorerState extends State<FileExplorer> {
       final root = Directory(dir.path);
       _rootPath = root.path;
       _rootEntries = await _listDirectory(root);
+      DebugLogger.info('Directory loaded: $_rootPath, ${_rootEntries.length} items', scope: 'workspace/explorer');
     } catch (e) {
       // Fallback: try current directory
       try {
@@ -156,6 +158,7 @@ class _FileTreeTileState extends State<_FileTreeTile> {
 
   Future<void> _toggleExpand() async {
     if (!widget.entry.isDirectory) {
+      DebugLogger.info('File tapped: ${widget.entry.path}', scope: 'workspace/explorer');
       widget.onFileTap?.call(widget.entry.path);
       return;
     }
@@ -166,6 +169,7 @@ class _FileTreeTileState extends State<_FileTreeTile> {
     }
 
     if (_children != null) {
+      DebugLogger.info('Directory expanded: ${widget.entry.path}', scope: 'workspace/explorer');
       setState(() => _expanded = true);
       return;
     }
@@ -190,6 +194,7 @@ class _FileTreeTileState extends State<_FileTreeTile> {
     } catch (_) {
       _children = [];
     }
+    DebugLogger.info('Directory expanded: ${widget.entry.path}', scope: 'workspace/explorer');
     if (mounted) {
       setState(() {
         _expanded = true;

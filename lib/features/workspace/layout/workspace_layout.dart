@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/features/workspace/layout/activity_bar.dart';
 import 'package:nerdin_mobile_workspace/features/workspace/layout/main_area.dart';
 import 'package:nerdin_mobile_workspace/features/workspace/layout/main_area_providers.dart';
@@ -28,6 +29,7 @@ class _WorkspaceLayoutState extends ConsumerState<WorkspaceLayout> {
     final sidePanelOpen = ref.watch(sidePanelOpenProvider);
     final isTablet = MediaQuery.of(context).size.shortestSide >= 600;
     const panelWidth = 280.0;
+    DebugLogger.navigation('WorkspaceLayout built', scope: 'workspace/layout', data: {'mode': isTablet ? 'tablet' : 'phone'});
 
     if (isTablet) {
       return _buildTabletLayout(context, sidePanelOpen, panelWidth);
@@ -88,6 +90,7 @@ class _WorkspaceLayoutState extends ConsumerState<WorkspaceLayout> {
   }
 
   void _openFileTab(String path) {
+    DebugLogger.info('File tab opened: $path', scope: 'workspace/file');
     final fileName = path.split('/').last;
     ref.read(sidePanelOpenProvider.notifier).state = false;
     ref.read(openTabsProvider.notifier).open(

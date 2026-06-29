@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../../../core/utils/debug_logger.dart';
 import 'compiled_markdown_document.dart';
 import 'markdown_compile_service.dart';
 
@@ -84,6 +85,7 @@ class MarkdownDocumentController {
     String preparedContent, {
     bool clearDocumentWhenAsync = false,
   }) {
+    DebugLogger.info('Markdown resolved', scope: 'markdown/controller');
     final preparedChanged =
         _requestedPreparedContent != preparedContent ||
         _requestedResolveMode != _MarkdownResolveMode.full;
@@ -198,6 +200,7 @@ class MarkdownDocumentController {
   }
 
   void dispose() {
+    DebugLogger.info('MarkdownDocumentController disposed', scope: 'markdown/controller');
     _disposed = true;
     _queuedRequest = null;
     _documentGeneration += 1;

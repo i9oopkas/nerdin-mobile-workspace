@@ -10,6 +10,7 @@ import 'package:nerdin_mobile_workspace/shared/widgets/themed_sheets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nerdin_mobile_workspace/core/services/haptic_service.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:nerdin_mobile_workspace/features/chat/providers/chat_providers.dart' as chat;
@@ -67,6 +68,8 @@ class _NerdinContextMenuState extends State<NerdinContextMenu> {
 
   @override
   Widget build(BuildContext context) {
+    DebugLogger.info('Conversation context menu shown', scope: 'ui/contextmenu');
+
     if (widget.actions.isEmpty) {
       return widget.child;
     }
@@ -83,6 +86,7 @@ class _NerdinContextMenuState extends State<NerdinContextMenu> {
             icon: action.materialIcon,
             isDestructive: action.destructive,
             onPressed: () {
+              DebugLogger.info('Context menu action: ${action.label}', scope: 'ui/contextmenu');
               NerdinHaptics.selectionClick();
               action.onBeforeClose?.call();
               action.onSelected();
@@ -101,6 +105,7 @@ class _NerdinContextMenuState extends State<NerdinContextMenu> {
             isDestructiveAction: action.destructive,
             trailingIcon: action.cupertinoIcon,
             onPressed: () {
+              DebugLogger.info('Context menu action: ${action.label}', scope: 'ui/contextmenu');
               Navigator.of(context, rootNavigator: true).pop();
               Future.microtask(() {
                 NerdinHaptics.selectionClick();

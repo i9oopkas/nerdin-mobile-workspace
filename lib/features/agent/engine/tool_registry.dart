@@ -8,6 +8,7 @@
 //
 // Integration with Phase 1b (Permission System) and Phase 1d (API Client).
 
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/features/agent/engine/tool_definitions.dart';
 import 'package:nerdin_mobile_workspace/features/agent/permissions/permission_manager.dart';
 import 'package:nerdin_mobile_workspace/features/agent/permissions/permission_rules.dart';
@@ -60,6 +61,7 @@ class ToolRegistry {
 
   /// Register a single tool.
   void register(ToolDefinition tool) {
+    DebugLogger.info('Tool registered: ${tool.name}', scope: 'agent/tool');
     _tools[tool.name] = tool;
   }
 
@@ -149,15 +151,18 @@ class ToolRegistry {
     arguments.remove('target');
 
     // 5. Execute the tool
+    DebugLogger.info('Executing tool: $toolName', scope: 'agent/tool');
     try {
       final output = await tool.handler(arguments, target);
+      DebugLogger.info('Tool $toolName result: ${output.length} chars', scope: 'agent/tool');
       return ToolResult(
         toolCallId: toolCallId,
         toolName: toolName,
         output: output,
         success: true,
       );
-    } catch (e) {
+    } catch (e, st) {
+      DebugLogger.error('Tool $toolName failed', error: e, scope: 'agent/tool');
       return ToolResult(
         toolCallId: toolCallId,
         toolName: toolName,

@@ -1,9 +1,10 @@
-import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
-import 'package:flutter/material.dart';
-import '../theme/theme_extensions.dart';
-import 'package:flutter/cupertino.dart';
 import 'dart:io' show Platform;
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import '../theme/color_tokens.dart';
+import '../theme/theme_extensions.dart';
 import '../theme/tweakcn_themes.dart';
 
 /// Centralized service for consistent brand identity throughout the app
@@ -12,7 +13,10 @@ class BrandService {
   BrandService._();
 
   /// Primary brand icon - the hub icon (consistent across platforms)
-  static IconData get primaryIcon => Icons.hub;
+  static IconData get primaryIcon {
+    DebugLogger.info('BrandService: primary brand accessed', scope: 'brand/service');
+    return Icons.hub;
+  }
 
   /// Alternative brand icons for different contexts
   static IconData get primaryIconOutlined => Icons.hub_outlined;

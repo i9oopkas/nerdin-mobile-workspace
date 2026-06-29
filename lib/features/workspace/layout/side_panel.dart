@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/features/workspace/layout/file_explorer.dart';
 import 'package:nerdin_mobile_workspace/features/workspace/layout/workspace_providers.dart';
 import 'package:nerdin_mobile_workspace/features/workspace/layout/file_search.dart';
@@ -19,6 +20,7 @@ class SidePanel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    DebugLogger.info('SidePanel built', scope: 'workspace/sidepanel');
     final activePanel = ref.watch(activeSidePanelProvider);
     final colorScheme = Theme.of(context).colorScheme;
 

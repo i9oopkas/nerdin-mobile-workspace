@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/features/agent/services/llm_event.dart';
 import 'package:nerdin_mobile_workspace/features/agent/services/llm_stream_parser.dart';
 
@@ -137,6 +138,7 @@ class LlmClient {
     LlmStreamParser? parser,
     Dio? dio,
   }) : parser = parser ?? LlmStreamParser() {
+    DebugLogger.info('LlmClient created: ${config.baseUrl}', scope: 'llm/client');
     _dio = dio ?? _createDio();
   }
 
@@ -171,6 +173,7 @@ class LlmClient {
     double temperature = 0.7,
     int? maxTokens,
   }) async* {
+    DebugLogger.stream('LLM stream start: model=${model ?? config.defaultModel}, ${messages.length} messages', scope: 'llm/stream');
     final body = _buildBody(
       messages: messages,
       model: model ?? config.defaultModel,
@@ -198,9 +201,12 @@ class LlmClient {
       // Parse the SSE stream
       final byteStream = responseBody.stream;
       yield* parser.parse(byteStream);
+      DebugLogger.stream('LLM stream complete', scope: 'llm/stream');
     } on DioException catch (e) {
+      DebugLogger.error('LLM stream error', error: e, scope: 'llm/stream');
       yield LlmErrorEvent(_formatDioError(e));
     } catch (e) {
+      DebugLogger.error('LLM stream error', error: e, scope: 'llm/stream');
       yield LlmErrorEvent(e);
     }
   }

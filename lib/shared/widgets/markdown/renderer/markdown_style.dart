@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/utils/debug_logger.dart';
 import '../../../theme/theme_extensions.dart';
 
 /// Centralized per-element style configuration for the
@@ -67,6 +68,7 @@ class NerdinMarkdownStyle {
   ///
   /// This is the recommended way to create an instance.
   factory NerdinMarkdownStyle.fromTheme(BuildContext context) {
+    DebugLogger.info('Markdown style initialized', scope: 'markdown/style');
     final theme = context.nerdinTheme;
     final textTheme = Theme.of(context).textTheme;
     final textScaler = MediaQuery.textScalerOf(context);

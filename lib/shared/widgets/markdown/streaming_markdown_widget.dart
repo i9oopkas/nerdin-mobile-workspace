@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/utils/debug_logger.dart';
 import '../../../core/models/chat_message.dart';
 import '../../utils/ask_nerdin_context_menu.dart';
 import 'compiled_markdown_document.dart';
@@ -144,6 +145,7 @@ class _StreamingMarkdownWidgetState
   @override
   void initState() {
     super.initState();
+    DebugLogger.info('StreamingMarkdownWidget built, streaming=${widget.isStreaming}', scope: 'markdown/widget');
     WidgetsBinding.instance.addObserver(this);
     _isAppForeground = _isLifecycleForeground(
       WidgetsBinding.instance.lifecycleState,

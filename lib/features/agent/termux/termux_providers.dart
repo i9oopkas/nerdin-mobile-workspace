@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/features/agent/termux/termux_bootstrap.dart';
 import 'package:nerdin_mobile_workspace/features/agent/termux/termux_command_service.dart';
 import 'package:nerdin_mobile_workspace/features/agent/termux/termux_daemon_client.dart';
@@ -6,6 +7,7 @@ import 'package:nerdin_mobile_workspace/features/agent/termux/termux_file_servic
 
 /// The shared daemon client instance.
 final termuxDaemonClientProvider = Provider<TermuxDaemonClient>((ref) {
+  DebugLogger.info('Termux providers initialized', scope: 'termux/provider');
   final client = TermuxDaemonClient();
   ref.onDispose(() => client.disconnect());
   return client;

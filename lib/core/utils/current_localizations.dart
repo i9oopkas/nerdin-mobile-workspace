@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 
 /// Stub for current_app_localizations.
 /// The full OWUI localization system has been removed.
@@ -11,6 +12,7 @@ String currentAppLocalizations() {
 /// TweakcnThemeDefinition label/description builders.
 class AppLocalizations {
   static AppLocalizations of(BuildContext context) {
+    DebugLogger.warning('AppLocalizations accessed — stub implementation', scope: 'l10n/stub');
     return AppLocalizations();
   }
 

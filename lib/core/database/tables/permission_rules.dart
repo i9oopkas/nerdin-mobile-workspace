@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 
 /// Stores persisted "always forever" permission rules.
 ///
@@ -7,6 +8,12 @@ import 'package:drift/drift.dart';
 /// (last-match-wins ordering: defaults < drift rules < session rules).
 @DataClassName('PermissionRuleRow')
 class PermissionRules extends Table {
+  static final bool _logged = _initLogging();
+
+  static bool _initLogging() {
+    DebugLogger.info('PermissionRules table definition loaded', scope: 'database/table');
+    return true;
+  }
   TextColumn get action => text()();
   TextColumn get resource => text()();
   TextColumn get effect => text()(); // "allow" | "deny" | "ask"

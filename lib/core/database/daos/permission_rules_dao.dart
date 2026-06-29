@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 
 import '../app_database.dart';
 import '../tables/permission_rules.dart';
@@ -16,6 +17,7 @@ class PermissionRulesDao extends DatabaseAccessor<AppDatabase>
 
   /// Load all persisted rules.
   Future<List<domain.PermissionRule>> loadAll() async {
+    DebugLogger.storage('getAllAsync', scope: 'database/dao');
     final rows = await select(permissionRules).get();
     return rows.map(_toDomain).toList();
   }
@@ -33,6 +35,8 @@ class PermissionRulesDao extends DatabaseAccessor<AppDatabase>
   /// If a rule with the same (action, resource) already exists, it's
   /// silently ignored (ON CONFLICT DO NOTHING behavior).
   Future<void> save(domain.PermissionRule rule) async {
+    DebugLogger.storage('insertAsync: ${rule.action} ${rule.resource}', scope: 'database/dao');
+    DebugLogger.storage('updateAsync', scope: 'database/dao');
     await into(permissionRules).insertOnConflictUpdate(
       PermissionRulesCompanion.insert(
         action: rule.action,
@@ -56,6 +60,7 @@ class PermissionRulesDao extends DatabaseAccessor<AppDatabase>
 
   /// Remove a rule by its (action, resource) pair.
   Future<void> remove(String action, String resource) async {
+    DebugLogger.storage('deleteAsync', scope: 'database/dao');
     await (delete(permissionRules)
           ..where((t) => t.action.equals(action))
           ..where((t) => t.resource.equals(resource)))

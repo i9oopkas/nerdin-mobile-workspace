@@ -3,6 +3,7 @@ import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/features/agent/permissions/permission_rules.dart';
 import 'package:nerdin_mobile_workspace/features/agent/permissions/wildcard.dart';
 
@@ -67,6 +68,7 @@ class PermissionManager {
     for (final rule in allRules.reversed) {
       if (Wildcard.match(action, rule.action) &&
           Wildcard.match(resource, rule.resource)) {
+        DebugLogger.auth('Rule evaluated: ${rule.effect} for $action $resource', scope: 'permission/rule');
         return rule;
       }
     }
@@ -92,7 +94,10 @@ class PermissionManager {
     for (final resource in resources) {
       final rule = evaluate(action, resource);
 
+      DebugLogger.auth('Permission check: $action on $resource', scope: 'permission/check');
+
       if (rule == null || rule.effect == PermissionEffect.ask) {
+        DebugLogger.auth('ASK: $action $resource', scope: 'permission/decision');
         // Need to ask the user
         await _ask(
           action: action,
@@ -103,7 +108,10 @@ class PermissionManager {
           timeout: timeout,
         );
       } else if (rule.effect == PermissionEffect.deny) {
+        DebugLogger.auth('DENY: $action $resource', scope: 'permission/decision');
         throw PermissionDeniedException(action, resource, rule);
+      } else {
+        DebugLogger.auth('ALLOW: $action $resource', scope: 'permission/decision');
       }
       // allow → continue to next resource
     }
@@ -126,6 +134,7 @@ class PermissionManager {
         _resolveRequest(requestId);
 
       case PermissionReply.alwaysSession:
+        DebugLogger.auth('Session permission granted: ${request.action} ${request.resources.join(", ")}', scope: 'permission/session');
         // Add rule for each resource
         for (final resource in request.resources) {
           _sessionRules.add(PermissionRule(
@@ -140,6 +149,7 @@ class PermissionManager {
         _cascade(request.sessionId);
 
       case PermissionReply.always:
+        DebugLogger.auth('Session permission granted: ${request.action} ${request.resources.join(", ")}', scope: 'permission/session');
         // The caller (provider) should persist to Drift via the DAO.
         // We store the save patterns for the provider to pick up.
         request.metadata?['_pending_save'] = true;

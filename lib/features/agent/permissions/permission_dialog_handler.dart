@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/features/agent/permissions/permission_dialog.dart';
 import 'package:nerdin_mobile_workspace/features/agent/permissions/permission_providers.dart';
 
@@ -25,6 +26,12 @@ class PermissionDialogHandler extends ConsumerStatefulWidget {
 class _PermissionDialogHandlerState
     extends ConsumerState<PermissionDialogHandler> {
   bool _isShowingDialog = false;
+
+  @override
+  void initState() {
+    super.initState();
+    DebugLogger.auth('PermissionDialogHandler mounted', scope: 'permission/handler');
+  }
 
   @override
   Widget build(BuildContext context) {

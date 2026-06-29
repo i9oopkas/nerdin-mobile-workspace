@@ -1,3 +1,5 @@
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
+
 /// Replaces unpaired UTF-16 surrogates with U+FFFD so Flutter text layout
 /// does not crash on malformed strings.
 String sanitizeUtf16(String input) {
@@ -33,5 +35,7 @@ String sanitizeUtf16(String input) {
     buffer.writeCharCode(codeUnit);
   }
 
-  return buffer.toString();
+  final result = buffer.toString();
+  DebugLogger.info('UTF-16 sanitize: ${input.length} → ${result.length} chars', scope: 'utils/utf16');
+  return result;
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/features/workspace/layout/bottom_bar.dart';
 import 'package:nerdin_mobile_workspace/features/workspace/layout/bottom_bar_providers.dart';
 import 'package:nerdin_mobile_workspace/features/workspace/layout/main_area_providers.dart';
@@ -19,6 +20,7 @@ class MainArea extends ConsumerWidget {
     final openTabs = ref.watch(openTabsProvider);
     final activeTabId = ref.watch(activeTabIdProvider);
     final showBottomBar = ref.watch(bottomBarVisibleProvider);
+    DebugLogger.info('MainArea built, tabs: ${openTabs.length}', scope: 'workspace/main');
 
     return Container(
       color: colorScheme.surface,
@@ -117,7 +119,10 @@ class _TabBar extends StatelessWidget {
           final tab = tabs[index];
           final isActive = tab.id == activeTabId;
           return GestureDetector(
-            onTap: () => onSelect(tab.id),
+            onTap: () {
+              DebugLogger.navigation('Tab switched to: ${tab.id}', scope: 'workspace/tab');
+              onSelect(tab.id);
+            },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
@@ -147,9 +152,12 @@ class _TabBar extends StatelessWidget {
                   ),
                   if (tab.closable) ...[
                     const SizedBox(width: 6),
-                    GestureDetector(
-                      onTap: () => onClose(tab.id),
-                      child: Icon(Icons.close, size: 14,
+                      GestureDetector(
+                          onTap: () {
+                            DebugLogger.info('Tab closed: ${tab.title}', scope: 'workspace/tab');
+                            onClose(tab.id);
+                          },
+                          child: Icon(Icons.close, size: 14,
                           color: colorScheme.onSurfaceVariant),
                     ),
                   ],

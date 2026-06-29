@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:io' show Platform;
 import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 
 /// Utility functions for common UI patterns and helpers
 /// Following Nerdin design principles
@@ -105,6 +106,7 @@ class UiUtils {
     VoidCallback? onRetry,
     Duration? duration,
   }) {
+    DebugLogger.info('ui_utils: accessed', scope: 'utils/general');
     AdaptiveSnackBar.show(
       context,
       message: message,

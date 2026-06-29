@@ -2,6 +2,7 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 
 /// Utilities for file type detection, icon selection, and formatting.
 ///
@@ -62,6 +63,7 @@ class FileTypeUtils {
   /// Uses Cupertino icons on iOS and Material icons on other platforms.
   /// The [extension] should be lowercase with a leading dot.
   static IconData iconForExtension(String extension) {
+    DebugLogger.info('File type: $extension', scope: 'utils/filetype');
     if (isAudio(extension)) {
       return Platform.isIOS
           ? CupertinoIcons.waveform

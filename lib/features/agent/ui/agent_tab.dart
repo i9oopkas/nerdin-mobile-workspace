@@ -5,6 +5,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/features/agent/engine/agent_providers.dart';
 import 'package:nerdin_mobile_workspace/features/agent/engine/agent_session.dart';
 import 'package:nerdin_mobile_workspace/features/workspace/layout/bottom_bar_providers.dart';
@@ -28,6 +29,7 @@ class _AgentTabState extends ConsumerState<AgentTab> {
   @override
   void initState() {
     super.initState();
+    DebugLogger.info('AgentTab mounted', scope: 'agent/ui');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       ref.read(sendMessageHandlerProvider.notifier).state = _handleSend;
@@ -59,15 +61,18 @@ class _AgentTabState extends ConsumerState<AgentTab> {
 
   Future<void> _handleSend(String text) async {
     if (!mounted) return;
+    DebugLogger.info('AgentTab send: ${text.length} chars', scope: 'agent/ui/send');
     ref.read(agentSessionProvider.notifier).startTask(text);
     _scrollToBottom();
   }
 
   void _handleCancel() {
+    DebugLogger.info('AgentTab cancel', scope: 'agent/ui');
     ref.read(agentSessionProvider.notifier).cancel();
   }
 
   void _handleReset() {
+    DebugLogger.info('AgentTab reset', scope: 'agent/ui');
     ref.read(agentSessionProvider.notifier).reset();
   }
 

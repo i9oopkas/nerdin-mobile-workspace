@@ -1,5 +1,6 @@
-import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 
 import '../../nerdin_loading.dart';
 import '../../../theme/theme_extensions.dart';
@@ -117,6 +118,7 @@ class BlockRenderer {
 
   /// Renders a list of precompiled root blocks as a [Column].
   Widget renderCompiledBlocks(List<CompiledMarkdownBlock> blocks) {
+    DebugLogger.info('BlockRenderer: rendering block node', scope: 'markdown/render');
     final renderedBlocks = <(String blockId, Widget widget)>[];
     for (final block in blocks) {
       final widget = _renderCompiledBlock(block);

@@ -4,9 +4,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
 
-import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
+import 'package:nerdin_mobile_workspace/core/utils/current_localizations.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -502,6 +503,7 @@ class _PdfInlineViewState extends ConsumerState<PdfInlineView> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    DebugLogger.info('PDF inline view: ${widget.url}', scope: 'markdown/pdf');
     if (_started) return;
     _started = true;
     _startLoad(refresh: false, notify: false);

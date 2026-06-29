@@ -6,6 +6,8 @@
 // conversation history, iteration count, and status.
 // Consumed by Riverpod providers and the Agent UI (Phase 1e).
 
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
+
 /// The status of an agent session.
 enum AgentStatus {
   /// Agent is idle, not processing any task.
@@ -155,6 +157,8 @@ class AgentSession {
     int maxIterations = 10,
     String? id,
   }) {
+    final truncatedTask = task.length > 50 ? '${task.substring(0, 50)}...' : task;
+    DebugLogger.info('Task started: "$truncatedTask"', scope: 'agent/session');
     return AgentSession(
       id: id ?? 'session_${DateTime.now().millisecondsSinceEpoch}',
       status: AgentStatus.idle,
@@ -192,6 +196,7 @@ class AgentSession {
 
   /// Add an event and return a new session state.
   AgentSession withEvent(AgentEvent event) {
+    DebugLogger.stream('Event: ${event.type}', scope: 'agent/session', data: {'type': event.type});
     final newEvents = [...events, event];
     AgentStatus newStatus = status;
     String? newFinalResponse = finalResponse;
@@ -216,6 +221,9 @@ class AgentSession {
         if (status == AgentStatus.idle) newStatus = AgentStatus.streaming;
     }
 
+    if (newStatus != status) {
+      DebugLogger.info('Status: $newStatus', scope: 'agent/session');
+    }
     return copyWith(
       status: newStatus,
       events: newEvents,

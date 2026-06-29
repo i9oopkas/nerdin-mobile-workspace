@@ -1,5 +1,7 @@
 import 'package:html_unescape/html_unescape.dart';
 
+import '../../../core/utils/debug_logger.dart';
+
 /// Content preprocessing, sanitization, and transformation for Markdown.
 ///
 /// Provides:
@@ -131,6 +133,7 @@ class NerdinMarkdownPreprocessor {
   static String normalize(String input) {
     if (input.isEmpty) return input;
 
+    DebugLogger.info('Markdown normalized: ${input.length} chars', scope: 'markdown/preprocess');
     var output = input.replaceAll('\r\n', '\n');
 
     // Strip link reference definitions using markdown package
@@ -176,6 +179,7 @@ class NerdinMarkdownPreprocessor {
   static String sanitize(String input) {
     if (input.isEmpty) return input;
 
+    DebugLogger.info('Markdown sanitized: ${input.length} chars', scope: 'markdown/preprocess');
     return input
         .replaceAll('\r\n', '\n')
         .transform(_stripLinkReferenceDefinitions)

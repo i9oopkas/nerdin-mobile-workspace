@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import 'package:nerdin_mobile_workspace/features/agent/permissions/permission_rules.dart';
 import 'package:nerdin_mobile_workspace/features/agent/permissions/permission_providers.dart';
 
@@ -37,6 +38,7 @@ class _PermissionDialogState extends ConsumerState<PermissionDialog> {
   @override
   void initState() {
     super.initState();
+    DebugLogger.auth('Permission dialog shown: ${_request.action} on ${_request.resources.join(", ")}', scope: 'permission/dialog');
     // Pre-fill edit field with the command (for run_command) or first resource
     final command = _request.metadata?['command'] as String? ??
         _request.resources.first;
@@ -258,6 +260,7 @@ class _PermissionDialogState extends ConsumerState<PermissionDialog> {
   }
 
   void _reply(PermissionReply reply, {String? editedInput}) {
+    DebugLogger.auth('User choice: $reply', scope: 'permission/dialog');
     ref.read(pendingPermissionRequestsProvider.notifier).reply(
           _request.id,
           reply,

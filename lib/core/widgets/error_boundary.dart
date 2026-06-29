@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nerdin_mobile_workspace/core/utils/debug_logger.dart';
 import '../../shared/theme/theme_extensions.dart';
 
 /// Error boundary widget that catches and handles errors in child widgets.
@@ -32,6 +33,7 @@ class _ErrorBoundaryState extends ConsumerState<ErrorBoundary> {
   @override
   void initState() {
     super.initState();
+    DebugLogger.info('ErrorBoundary mounted for ${widget.child.runtimeType}', scope: 'error/boundary');
     // Capture errors from the Flutter framework
     final previousOnError = FlutterError.onError;
     FlutterError.onError = (FlutterErrorDetails details) {
@@ -41,6 +43,7 @@ class _ErrorBoundaryState extends ConsumerState<ErrorBoundary> {
   }
 
   void _scheduleHandleError(Object error, StackTrace? stack) {
+    DebugLogger.error('ErrorBoundary caught error', error: error, stackTrace: stack, scope: 'error/caught');
     if (!mounted) return;
     setState(() {
       _hasError = true;
@@ -59,6 +62,7 @@ class _ErrorBoundaryState extends ConsumerState<ErrorBoundary> {
 
   @override
   void dispose() {
+    DebugLogger.info('ErrorBoundary disposed', scope: 'error/boundary');
     super.dispose();
   }
 
