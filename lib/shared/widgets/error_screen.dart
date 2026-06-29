@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:nerdin_mobile_workspace/shared/widgets/adaptive_content_container.dart';
 import 'package:nerdin_mobile_workspace/shared/widgets/log_viewer.dart';
 
 /// Full-screen crash report widget.
@@ -126,50 +127,6 @@ class ErrorScreen extends StatelessWidget {
     );
   }
 
-  /// Builds a log viewer block for the error details.
-  Widget _buildStackTrace() {
-    return LogViewer(
-      title: '❌ ${errorDetails.exception.runtimeType}',
-      body: errorDetails.stack?.toString() ?? '(No stack trace)',
-      accentColor: const Color(0xFF00FF88),
-      backgroundColor: const Color(0xFF0D0D1A),
-    );
-  }
-
-  /// Builds log viewer blocks for all cascading errors.
-  List<Widget> _buildCascadingErrors() {
-    if (additionalErrors.isEmpty) return [];
-
-    return [
-      const SizedBox(height: 16),
-      const Divider(color: Colors.white12),
-      const SizedBox(height: 8),
-      Text(
-        '📋 ${additionalErrors.length} cascading error(s):',
-        style: const TextStyle(
-          fontFamily: 'monospace',
-          fontSize: 13,
-          color: Colors.orangeAccent,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      const SizedBox(height: 8),
-      ...additionalErrors.asMap().entries.map((entry) {
-        final idx = entry.key + 1;
-        final err = entry.value;
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: LogViewer(
-            title: '📎 #$idx ${err.exception.runtimeType}',
-            body: err.stack?.toString() ?? err.exception.toString(),
-            accentColor: Colors.orangeAccent,
-            backgroundColor: const Color(0xFF1A1A0D),
-          ),
-        );
-      }),
-    ];
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -196,8 +153,82 @@ class ErrorScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   _buildErrorMessage(),
                   const SizedBox(height: 12),
-                  _buildStackTrace(),
-                  ..._buildCascadingErrors(),
+                  // Stack trace — auto-sizes to available space, scrolls on overflow
+                  AdaptiveContentContainer(
+                    backgroundColor: const Color(0xFF0D0D1A),
+                    borderRadius: BorderRadius.circular(8),
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '❌ ${errorDetails.exception.runtimeType}: ${errorDetails.exception}',
+                          style: const TextStyle(
+                            fontFamily: 'monospace',
+                            fontSize: 13,
+                            color: Colors.redAccent,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        SelectableText(
+                          errorDetails.stack?.toString() ?? '(No stack trace)',
+                          style: const TextStyle(
+                            fontFamily: 'monospace',
+                            fontSize: 11,
+                            color: Color(0xFF00FF88),
+                            height: 1.4,
+                          ),
+                        ),
+                        // Cascading errors
+                        if (additionalErrors.isNotEmpty) ...[
+                          const SizedBox(height: 16),
+                          const Divider(color: Colors.white12),
+                          const SizedBox(height: 8),
+                          Text(
+                            '📋 ${additionalErrors.length} cascading error(s):',
+                            style: const TextStyle(
+                              fontFamily: 'monospace',
+                              fontSize: 13,
+                              color: Colors.orangeAccent,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          ...additionalErrors.asMap().entries.map((entry) {
+                            final idx = entry.key + 1;
+                            final err = entry.value;
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '📎 #$idx ${err.exception.runtimeType}: ${err.exception}',
+                                    style: const TextStyle(
+                                      fontFamily: 'monospace',
+                                      fontSize: 12,
+                                      color: Colors.orange,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  SelectableText(
+                                    err.stack?.toString() ?? '(No stack trace)',
+                                    style: const TextStyle(
+                                      fontFamily: 'monospace',
+                                      fontSize: 10,
+                                      color: Color(0xFFFFCC88),
+                                      height: 1.3,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
+                        ],
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 16),
                 ],
               ),
