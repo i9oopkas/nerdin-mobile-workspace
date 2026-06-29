@@ -9,29 +9,47 @@ import 'package:share_plus/share_plus.dart';
 /// Shown when an unhandled Flutter error occurs (e.g. `_dirty` assertion).
 class ErrorScreen extends StatelessWidget {
   final FlutterErrorDetails errorDetails;
+  final List<FlutterErrorDetails> additionalErrors;
   final VoidCallback? onRestart;
 
   const ErrorScreen({
     super.key,
     required this.errorDetails,
+    this.additionalErrors = const [],
     this.onRestart,
   });
 
-  /// Builds the full crash report text
+  /// Builds the full crash report text (includes all errors)
   String get _fullLog {
     final buf = StringBuffer();
     buf.writeln('===== Nerdin Mobile Workspace Crash Report =====');
     buf.writeln('Timestamp: ${DateTime.now().toIso8601String()}');
     buf.writeln('');
+    
+    // Primary error
+    buf.writeln('--- Primary Error ---');
     buf.writeln('Error type: ${errorDetails.exception.runtimeType}');
     buf.writeln('Error message: ${errorDetails.exception}');
     buf.writeln('');
     if (errorDetails.stack != null) {
       buf.writeln('--- Stack trace ---');
       buf.writeln(errorDetails.stack.toString());
-    } else {
-      buf.writeln('(No stack trace available)');
     }
+    
+    // Additional errors
+    for (var i = 0; i < additionalErrors.length; i++) {
+      final err = additionalErrors[i];
+      buf.writeln('');
+      buf.writeln('--- Cascading Error #${i + 1} ---');
+      buf.writeln('Error type: ${err.exception.runtimeType}');
+      buf.writeln('Error message: ${err.exception}');
+      buf.writeln('');
+      if (err.stack != null) {
+        buf.writeln('--- Stack trace ---');
+        buf.writeln(err.stack.toString());
+      }
+    }
+    
     buf.writeln('');
     buf.writeln('===== End of report =====');
     return buf.toString();
@@ -120,7 +138,7 @@ class ErrorScreen extends StatelessWidget {
             ),
           ),
 
-          // Stack trace
+          // Stack trace — primary error
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -133,14 +151,76 @@ class ErrorScreen extends StatelessWidget {
                   border: Border.all(color: Colors.white10),
                 ),
                 child: SingleChildScrollView(
-                  child: SelectableText(
-                    errorDetails.stack?.toString() ?? '(No stack trace)',
-                    style: const TextStyle(
-                      fontFamily: 'monospace',
-                      fontSize: 11,
-                      color: Color(0xFF00FF88),
-                      height: 1.4,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Primary error
+                      Text(
+                        '❌ ${errorDetails.exception.runtimeType}: ${errorDetails.exception}',
+                        style: const TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 13,
+                          color: Colors.redAccent,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      SelectableText(
+                        errorDetails.stack?.toString() ?? '(No stack trace)',
+                        style: const TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 11,
+                          color: Color(0xFF00FF88),
+                          height: 1.4,
+                        ),
+                      ),
+                      // Additional cascading errors
+                      if (additionalErrors.isNotEmpty) ...[
+                        const SizedBox(height: 16),
+                        const Divider(color: Colors.white12),
+                        const SizedBox(height: 8),
+                        Text(
+                          '📋 ${additionalErrors.length} cascading error(s):',
+                          style: const TextStyle(
+                            fontFamily: 'monospace',
+                            fontSize: 13,
+                            color: Colors.orangeAccent,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        ...additionalErrors.asMap().entries.map((entry) {
+                          final idx = entry.key + 1;
+                          final err = entry.value;
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '📎 #$idx ${err.exception.runtimeType}: ${err.exception}',
+                                  style: const TextStyle(
+                                    fontFamily: 'monospace',
+                                    fontSize: 12,
+                                    color: Colors.orange,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                SelectableText(
+                                  err.stack?.toString() ?? '(No stack trace)',
+                                  style: const TextStyle(
+                                    fontFamily: 'monospace',
+                                    fontSize: 10,
+                                    color: Color(0xFFFFCC88),
+                                    height: 1.3,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      ],
+                    ],
                   ),
                 ),
               ),

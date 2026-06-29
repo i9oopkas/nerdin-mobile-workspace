@@ -39,27 +39,45 @@ final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
 /// Global reference to the app's ProviderContainer (for restart).
 ProviderContainer? _appContainer;
 
-/// Shows the ErrorScreen overlay after the current frame completes.
-void _showErrorScreen(FlutterErrorDetails details) {
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    // Dispose the old container (we'll create a fresh one on restart)
-    _appContainer?.dispose();
-    _appContainer = null;
+/// Collects ALL errors that occur during a crash sequence.
+/// Shows them all on the ErrorScreen at once.
+List<FlutterErrorDetails> _pendingErrors = [];
 
-    runApp(
-      MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: ErrorScreen(
-          errorDetails: details,
-          onRestart: _restartApp,
+/// Shows the ErrorScreen after the current frame completes.
+/// Accumulates errors — each call adds to the list, and the ErrorScreen
+/// shows ALL collected errors so the user can see every stack trace.
+void _showErrorScreen(FlutterErrorDetails details) {
+  _pendingErrors.add(details);
+
+  // If this is the first error, schedule the ErrorScreen
+  if (_pendingErrors.length == 1) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Take a snapshot of all errors collected so far
+      final errors = List<FlutterErrorDetails>.from(_pendingErrors);
+      _pendingErrors.clear();
+
+      // Don't dispose _appContainer here! It becomes unreachable when runApp
+      // replaces the old widget tree and will be GC'd.
+      runApp(
+        MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: ErrorScreen(
+            errorDetails: errors.first,           // primary error
+            additionalErrors: errors.sublist(1),  // cascading errors
+            onRestart: _restartApp,
+          ),
         ),
-      ),
-    );
-  });
+      );
+    });
+  } else {
+    debugPrint('📋 Collected cascading error #${_pendingErrors.length}:');
+    debugPrint('   ${details.exception}');
+  }
 }
 
 /// Restarts the app with a fresh ProviderContainer.
 void _restartApp() {
+  _pendingErrors.clear();  // Clear collected errors
   _appContainer?.dispose();
   _appContainer = ProviderContainer(overrides: []);
   runApp(
