@@ -28,15 +28,22 @@ class _AgentTabState extends ConsumerState<AgentTab> {
   @override
   void initState() {
     super.initState();
-    ref.read(sendMessageHandlerProvider.notifier).state = _handleSend;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(sendMessageHandlerProvider.notifier).state = _handleSend;
+    });
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
-    final current = ref.read(sendMessageHandlerProvider);
-    if (current == _handleSend) {
-      ref.read(sendMessageHandlerProvider.notifier).state = null;
+    try {
+      final current = ref.read(sendMessageHandlerProvider);
+      if (current == _handleSend) {
+        ref.read(sendMessageHandlerProvider.notifier).state = null;
+      }
+    } catch (_) {
+      // Widget is being torn down, provider mutation is non-critical
     }
     super.dispose();
   }

@@ -26,18 +26,25 @@ class _ChatTabState extends ConsumerState<ChatTab> {
   @override
   void initState() {
     super.initState();
-    // Register send handler with the bottom bar
-    ref.read(sendMessageHandlerProvider.notifier).state = _handleSend;
+    // Register send handler after build phase is complete
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(sendMessageHandlerProvider.notifier).state = _handleSend;
+    });
   }
 
   @override
   void dispose() {
     _streamSub?.cancel();
     _scrollController.dispose();
-    // Unregister send handler (only if it's still us)
-    final current = ref.read(sendMessageHandlerProvider);
-    if (current == _handleSend) {
-      ref.read(sendMessageHandlerProvider.notifier).state = null;
+    // Best-effort cleanup: unregister handler if it's still us
+    try {
+      final current = ref.read(sendMessageHandlerProvider);
+      if (current == _handleSend) {
+        ref.read(sendMessageHandlerProvider.notifier).state = null;
+      }
+    } catch (_) {
+      // Widget is being torn down, provider mutation is non-critical
     }
     super.dispose();
   }
