@@ -1,0 +1,68 @@
+name: Android Emulator Test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle cache
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build debug APK
+        run: |
+          cd android-app
+          ./gradlew assembleDebug \
+            --no-daemon \
+            -Dorg.gradle.jvmargs="-Xmx2g" \
+            --max-workers=2
+
+      - name: Run on emulator + capture logs
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          avd-name: NerdinTest
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -cache-size 512
+          disable-animations: true
+          script: |
+            # Wait for boot
+            adb wait-for-device
+            adb shell settings put global window_animation_scale 0.0
+            adb shell settings put global transition_animation_scale 0.0
+            adb shell settings put global animator_duration_scale 0.0
+
+            APK="$GITHUB_WORKSPACE/android-app/app/build/outputs/apk/debug/app-debug.apk"
+
+            echo "=== INSTALL APK ==="
+            adb install -r "$APK"
+
+            echo "=== START APP ==="
+            adb shell am start -n app.nerdin.mobile/.MainActivity
+            sleep 8
+
+            echo "=== CRASH LOG (Nerdin errors) ==="
+            adb logcat -d -v brief '*:E' NerdinCore:I NerdinCrash:I '*:S' 2>&1 || true
+
+            echo "=== FULL LOGCAT (last 300) ==="
+            adb logcat -d -t 300 -v brief 2>&1 || true
+
+            echo "=== CHECK CRASH FILES ==="
+            adb shell ls -la /data/data/app.nerdin.mobile/cache/crash_reports/ 2>&1 || echo "no cache dir"
+            adb shell "cat /data/data/app.nerdin.mobile/cache/crash_reports/crash_*.txt" 2>&1 || echo "no crash file"
+
+            echo "=== DONE ==="
