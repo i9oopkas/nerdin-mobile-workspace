@@ -1,8 +1,0 @@
-app.nerdin.plugins.llm.api-pngs-0 /workspaces/work/nerdin-mobile-workspace/android-app/plugins/llm/api/build/generated/res/pngs/debug
-app.nerdin.plugins.llm.api-updated_navigation_xml-1 /workspaces/work/nerdin-mobile-workspace/android-app/plugins/llm/api/build/generated/updated_navigation_xml/debug
-app.nerdin.plugins.llm.api-mergeDebugResources-2 /workspaces/work/nerdin-mobile-workspace/android-app/plugins/llm/api/build/intermediates/incremental/debug/mergeDebugResources/merged.dir
-app.nerdin.plugins.llm.api-mergeDebugResources-3 /workspaces/work/nerdin-mobile-workspace/android-app/plugins/llm/api/build/intermediates/incremental/debug/mergeDebugResources/stripped.dir
-app.nerdin.plugins.llm.api-debug-4 /workspaces/work/nerdin-mobile-workspace/android-app/plugins/llm/api/build/intermediates/merged_res/debug/mergeDebugResources
-app.nerdin.plugins.llm.api-debug-5 /workspaces/work/nerdin-mobile-workspace/android-app/plugins/llm/api/build/intermediates/packaged_res/debug/packageDebugResources
-app.nerdin.plugins.llm.api-debug-6 /workspaces/work/nerdin-mobile-workspace/android-app/plugins/llm/api/src/debug/res
-app.nerdin.plugins.llm.api-main-7 /workspaces/work/nerdin-mobile-workspace/android-app/plugins/llm/api/src/main/res
