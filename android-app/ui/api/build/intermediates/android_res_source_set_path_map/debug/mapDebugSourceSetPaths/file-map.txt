@@ -1,0 +1,8 @@
+app.nerdin.ui.api-pngs-0 /workspaces/work/nerdin-mobile-workspace/android-app/ui/api/build/generated/res/pngs/debug
+app.nerdin.ui.api-updated_navigation_xml-1 /workspaces/work/nerdin-mobile-workspace/android-app/ui/api/build/generated/updated_navigation_xml/debug
+app.nerdin.ui.api-mergeDebugResources-2 /workspaces/work/nerdin-mobile-workspace/android-app/ui/api/build/intermediates/incremental/debug/mergeDebugResources/merged.dir
+app.nerdin.ui.api-mergeDebugResources-3 /workspaces/work/nerdin-mobile-workspace/android-app/ui/api/build/intermediates/incremental/debug/mergeDebugResources/stripped.dir
+app.nerdin.ui.api-debug-4 /workspaces/work/nerdin-mobile-workspace/android-app/ui/api/build/intermediates/merged_res/debug/mergeDebugResources
+app.nerdin.ui.api-debug-5 /workspaces/work/nerdin-mobile-workspace/android-app/ui/api/build/intermediates/packaged_res/debug/packageDebugResources
+app.nerdin.ui.api-debug-6 /workspaces/work/nerdin-mobile-workspace/android-app/ui/api/src/debug/res
+app.nerdin.ui.api-main-7 /workspaces/work/nerdin-mobile-workspace/android-app/ui/api/src/main/res
